@@ -14,3 +14,5 @@
 - Display confirm with swift code return value
 - If swift code not valid display error for user
 - Use MemoryStore in backend for JWT auth
+
+API FAILING VIA 5173 PORT ON REGISTRATION GET PROXY WORKING

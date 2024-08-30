@@ -27,7 +27,7 @@ mongoose
 
 app.use(
   cors({
-    origin: ["https://localhost:3000", "https://localhost:5173"], // Replace with your frontend URL
+    origin: ["https://localhost:3000", "https://localhost:5173", "https://localhost:5173/api"], // Replace with your frontend URL
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders:
       "Origin, X-Requested-With, Content-Type, Accept, Authorization",

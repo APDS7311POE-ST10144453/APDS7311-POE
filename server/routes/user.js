@@ -12,13 +12,13 @@ const checkAuth = require("../check-auth");
 //Encryption function
 function encrypt(text) {
   const algorithm = "aes-256-cbc";
-  const salt = crypto.randomBytes(16).toString('hex');
+  const salt = crypto.randomBytes(16).toString("hex");
   const key = crypto.scryptSync(process.env.ENCRYPTION_KEY, salt, 32);
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(algorithm, key, iv);
   let encrypted = cipher.update(text, "utf8", "hex");
   encrypted += cipher.final("hex");
-  return salt + ":" +iv.toString("hex") + ":" + encrypted;
+  return salt + ":" + iv.toString("hex") + ":" + encrypted;
 }
 
 function decrypt(text) {
@@ -48,14 +48,7 @@ router.post("/register", async (req, res) => {
     const { username, name, idNumber, accountNumber, password } = req.body;
 
     // Check if the username already exists
-    const user = await User.findOne({ username });
-    if (user) {
-      return res.status(400).json({
-        message:
-          "Error: Try using a different Username, Name, ID Number, Account number and Password",
-      });
-    }
-
+    // rs
     // Hash the password
     const hash = await bcrypt.hash(password, 10);
 
@@ -82,7 +75,7 @@ router.post("/register", async (req, res) => {
 
 // User login route using username, account number, and password to find the user
 router.post(
-  "/login", 
+  "/login",
   checkAuth, // Apply checkAuth middleware to this route
   limiter, // Apply rate limiter middleware to this route
   [
@@ -104,8 +97,8 @@ router.post(
       const { username, password, accountNumber } = req.body;
 
       // Find the user by username and account number
-      const user = await User.findOne({ username});
-      
+      const user = await User.findOne({ username });
+
       if (!user) {
         return res.status(401).json({
           message:
@@ -115,7 +108,7 @@ router.post(
 
       // Decrypt the account number
       const decryptedAccountNumber = decrypt(user.accountNumber);
-      
+
       if (decryptedAccountNumber !== accountNumber) {
         return res.status(401).json({
           message:
@@ -125,7 +118,7 @@ router.post(
 
       // Compare the provided password with the hashed password in the database
       const isMatch = await bcrypt.compare(password, user.password);
-      
+
       if (!isMatch) {
         return res.status(401).json({
           message:
