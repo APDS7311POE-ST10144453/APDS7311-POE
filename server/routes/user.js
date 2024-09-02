@@ -8,6 +8,11 @@ const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 const crypto = require("crypto");
 const checkAuth = require("../check-auth");
+const brute = require("express-brute");
+const ExpressBrute = require("express-brute");
+
+var store = new ExpressBrute.MemoryStore();
+var bruteforce = new ExpressBrute(store);
 
 //Encryption function
 function encrypt(text) {
@@ -90,6 +95,7 @@ router.post(
       .isNumeric()
       .withMessage("Account number must be numeric"),
   ],
+  bruteforce.prevent,
   async (req, res) => {
     // Check for validation errors
     const errors = validationResult(req);
