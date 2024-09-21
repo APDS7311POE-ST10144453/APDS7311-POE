@@ -18,7 +18,7 @@ export default function Login() {
     setSuccessMessage("");
     console.log("User Logged in");
 
-    //Fetch the login API endpoint
+    // Fetch the login API endpoint
     try {
       const response = await fetch("https://localhost:3000/api/user/login", {
         method: "POST",
@@ -33,6 +33,7 @@ export default function Login() {
         console.log("User logged in successfully", result);
         setSuccessMessage("Login successful!");
         localStorage.setItem("token", result.token);
+        window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
       } else {
         const error = await response.json();
         setErrorMessage(error.message || "Login failed");

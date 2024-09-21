@@ -37,6 +37,8 @@ export default function Register() {
         const result = await response.json();
         console.log(result);
         setResponseMessage("User registered successfully");
+        console.log("Redirecting to /customer-dashboard");
+        window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
       } else {
         const error = await response.json();
         setErrorMessage(error.message || "Registration failed");
