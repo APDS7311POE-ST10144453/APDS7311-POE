@@ -130,9 +130,9 @@ router.post(
   }
 );
 
-// Get the Encrypted AccountNumber for a user
-// Use the url: https://localhost:3000/api/user/accountNum?id=addIdInPlaceOfThisText
-router.get("/accountNum", async (req, res) => {
+// Get the Encrypted Account details for the user
+// Use the url: https://localhost:3000/api/user/account?id=addIdInPlaceOfThisText
+router.get("/account", checkAuth, async (req, res) => {
   try {
     // User ID
     const userID = req.query.id;
@@ -145,7 +145,13 @@ router.get("/accountNum", async (req, res) => {
     }
 
     // Respond with the user's account number
-    res.status(200).json({ accountNumber: user.accountNumber });
+    res.status(200).json({ 
+      username: user.username,
+      name: user.name,
+      idNumber: user.idNumber,
+      accountNumber: user.accountNumber,
+      role: user.role
+      });
   } catch (error) {
     res.status(500).json({ message: "Server error: " + error.message });
   }
