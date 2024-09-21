@@ -155,5 +155,27 @@ router.post(
   }
 );
 
+// Get the Encrypted AccountNumber for a user
+// Use the url: https://localhost:3000/api/user/accountNum?id=addIdInPlaceOfThisText
+router.get("/accountNum", async (req, res) => {
+  try {
+    // User ID
+    const userID = req.query.id;
+
+    // Finding user
+    const user = await User.findById(userID);
+
+    if (!user)
+    {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the user's account number
+    res.status(200).json({ accountNumber: user.accountNumber });
+  } catch (error) {
+    res.status(500).json({ message: "Server error: " + error.message });
+  }
+})
+
 // Export the router to be used in other parts of the application
 module.exports = router;
