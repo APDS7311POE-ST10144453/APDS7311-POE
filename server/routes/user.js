@@ -24,7 +24,8 @@ const limiter = rateLimit({
 // User registration route using bcrypt to hash the password
 router.post("/register", async (req, res) => {
   try {
-    const { username, name, idNumber, accountNumber, password, role } = req.body;
+    const { username, name, idNumber, accountNumber, password, role } =
+      req.body;
 
     // Check if the username already exists
     const existingUser = await User.findOne({ username });
@@ -139,8 +140,7 @@ router.get("/accountNum", async (req, res) => {
     // Finding user
     const user = await User.findById(userID);
 
-    if (!user)
-    {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -149,7 +149,7 @@ router.get("/accountNum", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server error: " + error.message });
   }
-})
+});
 
 // Export the router to be used in other parts of the application
 module.exports = router;
