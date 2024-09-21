@@ -3,7 +3,7 @@ const User = require("./models/user");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 require("dotenv").config();
-const encrypt = require("./helpers/encryption");
+const {encrypt} = require("./helpers/encryption");
 
 const employees = [
   {
@@ -27,8 +27,6 @@ const employees = [
 async function seedEmployees() {
   try {
     await mongoose.connect(process.env.CONNECTION_STRING, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
     });
 
     for (const employee of employees) {
@@ -38,6 +36,8 @@ async function seedEmployees() {
       // Encrypt the idNumber and accountNumber
       const encryptedIdNumber = encrypt(employee.idNumber);
       const encryptedAccountNumber = encrypt(employee.accountNumber);
+
+      
 
       // Create the employee with hashed password and encrypted fields
       await User.create({

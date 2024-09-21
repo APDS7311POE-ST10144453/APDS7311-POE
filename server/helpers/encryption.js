@@ -6,7 +6,11 @@ function encrypt(text) {
   const key = crypto.scryptSync(process.env.ENCRYPTION_KEY, salt, 32);
   const iv = crypto.randomBytes(16);
   const cipher = crypto.createCipheriv(algorithm, key, iv);
-  let encrypted = cipher.update(text, "utf8", "hex");
+  
+  // Add pepper to the text
+  const pepperedText = text + process.env.MY_SECRET_PEPPER;
+  
+  let encrypted = cipher.update(pepperedText, "utf8", "hex");
   encrypted += cipher.final("hex");
   const authTag = cipher.getAuthTag().toString('hex'); // Get authentication tag
   return salt + ":" + iv.toString("hex") + ":" + encrypted + ":" + authTag;
@@ -22,9 +26,15 @@ function decrypt(text) {
     Buffer.from(iv, "hex")
   );
   decipher.setAuthTag(Buffer.from(authTag, 'hex')); // Set authentication tag
+  
   let decrypted = decipher.update(encrypted, "hex", "utf8");
   decrypted += decipher.final("utf8");
-  return decrypted;
+  
+  // Remove pepper from the decrypted text
+  const pepperLength = process.env.MY_SECRET_PEPPER.length;
+  const originalText = decrypted.slice(0, -pepperLength);
+  
+  return originalText;
 }
 
 module.exports = { encrypt, decrypt };
