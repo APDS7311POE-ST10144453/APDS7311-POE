@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/transaction");
+const { encrypt } = require("../helpers/encryption");
 
 router.post("/transact", async (req, res) => {
   try {
@@ -12,7 +13,7 @@ router.post("/transact", async (req, res) => {
       senderAccountNumber,
       recipientName,
       recipientBank,
-      recipientAccountNumber,
+      recipientAccountNumber: encrypt(recipientAccountNumber),
       transferAmount,
       currency,
       swiftCode
