@@ -8,11 +8,7 @@ const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth");
-const brute = require("express-brute");
-const ExpressBrute = require("express-brute");
-
-var store = new ExpressBrute.MemoryStore();
-var bruteforce = new ExpressBrute(store);
+const { RateLimiterMemory } = require("rate-limiter-flexible");
 
 // Rate limiter middleware to limit repeated requests to public APIs
 const limiter = rateLimit({
@@ -20,6 +16,89 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
   message: "Too many requests, please try again later.",
 });
+
+// Brute force protection using rate-limiter-flexible
+const maxWrongAttemptsByIPPerDay = 100;
+const maxConsecutiveFailsByUsernameAndIP = 10;
+
+// Adjusted durations to fit within 32-bit signed integer limit
+const oneDayInSeconds = 24 * 60 * 60; // 1 day in milliseconds
+const oneHourInSeconds = 60 * 60; // 1 hour in milliseconds
+
+const limiterSlowBruteByIP = new RateLimiterMemory({
+  keyPrefix: "login_fail_ip_per_day",
+  points: maxWrongAttemptsByIPPerDay,
+  duration: oneDayInSeconds, // Store number for 1 day since first fail
+  blockDuration: oneHourInSeconds, // Block for 1 hour if more than maxWrongAttemptsByIPPerDay points consumed
+});
+
+const limiterConsecutiveFailsByUsernameAndIP = new RateLimiterMemory({
+  keyPrefix: "login_fail_consecutive_username_and_ip",
+  points: maxConsecutiveFailsByUsernameAndIP,
+  duration: oneDayInSeconds, // Store number for 1 day since first fail
+  blockDuration: oneHourInSeconds, // Block for 1 hour if more than maxConsecutiveFailsByUsernameAndIP points consumed
+});
+
+const getUsernameIPkey = (username, ip) => `${username}_${ip}`;
+
+const loginRoute = async (req, res) => {
+  const { username, password, accountNumber } = req.body;
+  const ipAddr = req.ip;
+
+  const usernameIPkey = getUsernameIPkey(username, ipAddr);
+
+  try {
+    await limiterSlowBruteByIP.consume(ipAddr);
+    await limiterConsecutiveFailsByUsernameAndIP.consume(usernameIPkey);
+
+    const user = await User.findOne({ username });
+
+    if (!user) {
+      throw new Error("Invalid username or password");
+    }
+
+    const decryptedAccountNumber = decrypt(user.accountNumber);
+
+    if (decryptedAccountNumber !== accountNumber) {
+      throw new Error("Invalid username or password");
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      throw new Error("Invalid username or password");
+    }
+
+    const token = jwt.sign(
+      { username: user.username, userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 3600000, // 1 hour
+    });
+
+    res.status(200).json({
+      message: "Login successful",
+      userId: user._id,
+      role: user.role,
+      token,
+    });
+
+    await limiterConsecutiveFailsByUsernameAndIP.delete(usernameIPkey);
+  } catch (rlRejected) {
+    if (rlRejected instanceof Error) {
+      res.status(401).json({ message: rlRejected.message });
+    } else {
+      res
+        .status(429)
+        .json({ message: "Too many requests, please try again later." });
+    }
+  }
+};
 
 // User registration route using bcrypt to hash the password
 router.post("/register", async (req, res) => {
@@ -36,7 +115,7 @@ router.post("/register", async (req, res) => {
     // Hash the password
     const hash = await bcrypt.hash(password, 10);
 
-    //Encrypt the idNumber and accountNumber
+    // Encrypt the idNumber and accountNumber
     const encryptedIdNumber = encrypt(idNumber);
     const encryptedAccountNumber = encrypt(accountNumber);
 
@@ -70,69 +149,12 @@ router.post(
       .isNumeric()
       .withMessage("Account number must be numeric"),
   ],
-  bruteforce.prevent,
-  async (req, res) => {
-    // Check for validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    try {
-      const { username, password, accountNumber } = req.body;
-
-      // Find the user by username and account number
-      const user = await User.findOne({ username });
-
-      if (!user) {
-        return res.status(401).json({
-          message:
-            "Error: Try using a different Username, Account number and Password",
-        });
-      }
-
-      // Decrypt the account number
-      const decryptedAccountNumber = decrypt(user.accountNumber);
-
-      if (decryptedAccountNumber !== accountNumber) {
-        return res.status(401).json({
-          message:
-            "Error: Try using a different Username, Account number and Password",
-        });
-      }
-
-      // Compare the provided password with the hashed password in the database
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (!isMatch) {
-        return res.status(401).json({
-          message:
-            "Error: Try using a different Username, Account number and Password",
-        });
-      }
-
-      // If the password matches, generate a JWT token
-      const token = jwt.sign(
-        { username: user.username, userId: user._id },
-        process.env.JWT_SECRET, // Use environment variable for secret
-        { expiresIn: "1h" }
-      );
-
-      // Send the JWT token and user information in the response
-      res.status(200).json({
-        token: token,
-        expiresIn: 3600,
-        userId: user._id,
-      });
-    } catch (err) {
-      res.status(500).json({ message: "Server error " + err.message });
-    }
-  }
+  loginRoute
 );
 
-// Get the Encrypted Account details for the user
-// Use the url: https://localhost:3000/api/user/account?id=addIdInPlaceOfThisText
-router.get("/account", checkAuth, async (req, res) => {
+// Get the Encrypted AccountNumber for a user
+// Use the url: https://localhost:3000/api/user/accountNum?id=addIdInPlaceOfThisText
+router.get("/accountNum", async (req, res) => {
   try {
     // User ID
     const userID = req.query.id;
@@ -145,13 +167,7 @@ router.get("/account", checkAuth, async (req, res) => {
     }
 
     // Respond with the user's account number
-    res.status(200).json({ 
-      username: user.username,
-      name: user.name,
-      idNumber: user.idNumber,
-      accountNumber: user.accountNumber,
-      role: user.role
-      });
+    res.status(200).json({ accountNumber: user.accountNumber });
   } catch (error) {
     res.status(500).json({ message: "Server error: " + error.message });
   }
