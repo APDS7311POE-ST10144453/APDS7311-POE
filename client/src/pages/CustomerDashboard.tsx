@@ -8,13 +8,20 @@ function CustomerDashboard() {
         navigate('/customer-payment-form');
     };
 
+    const handleMainMenuClick = () => {
+        navigate("/");
+      };
+
+      const handleTransactionClick = () => {
+        navigate("/transactions");
+      };
+
     return (
         <div className="dashboard-container">
             {/* Side Navigation Bar */}
             <div className="side-nav">
-                <button className="nav-button">Main Menu</button>
-                <button className="nav-button">Transactions</button>
-                <button className="nav-button">Payments</button>
+                <button className="nav-button" onClick={handleMainMenuClick}>Main Menu</button>
+                <button className="nav-button" onClick={handleTransactionClick}>Transactions</button>
             </div>
 
             {/* Main Dashboard Content */}

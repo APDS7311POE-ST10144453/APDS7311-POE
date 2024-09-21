@@ -1,6 +1,7 @@
 import React from "react";
 import "../css/LoginAndRegister.css";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [data, setData] = useState({
@@ -11,6 +12,7 @@ export default function Login() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate();
 
   const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -41,6 +43,10 @@ export default function Login() {
     } catch (error) {
       setErrorMessage("An error occurred, please try again later.");
     }
+  };
+
+  const handleEmployeeLoginClick = () => {
+    navigate("/employee-login");
   };
 
   return (
@@ -84,6 +90,9 @@ export default function Login() {
         </form>
         {errorMessage && <p className="error">{errorMessage}</p>}
         {successMessage && <p className="success">{successMessage}</p>}
+        <button type="button" onClick={handleEmployeeLoginClick}>
+          Employee Login
+        </button>
       </div>
     </div>
   );
