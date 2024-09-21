@@ -130,7 +130,7 @@ router.post(
   }
 );
 
-// Get the Encrypted Account details for the user
+// Get the Decrypted Account details for the user
 // Use the url: https://localhost:3000/api/user/account?id=addIdInPlaceOfThisText
 router.get("/account", checkAuth, async (req, res) => {
   try {
@@ -148,8 +148,8 @@ router.get("/account", checkAuth, async (req, res) => {
     res.status(200).json({ 
       username: user.username,
       name: user.name,
-      idNumber: user.idNumber,
-      accountNumber: user.accountNumber,
+      idNumber: decrypt(user.idNumber),
+      accountNumber: decrypt(user.accountNumber),
       role: user.role
       });
   } catch (error) {
