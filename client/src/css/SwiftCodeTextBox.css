@@ -1,0 +1,20 @@
+/* src/components/SwiftCodeTextBox.css */
+.error-textbox {
+  border: 2px solid #ccc;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  outline: none;
+  width: 300px; /* Example width, adjust as needed */
+  transition: border-color 0.2s ease-in-out; /* Smooth transition for border changes */
+}
+
+.error-textbox.error {
+  border-color: red; /* Border color for error state */
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-top: 5px;
+}
