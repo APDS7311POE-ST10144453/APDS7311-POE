@@ -35,7 +35,6 @@ const SwiftCodeTextBox: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("SWIFT code data:", data);
-        // Assume the API returns some useful data to validate
         // If the response data indicates a valid SWIFT code, set the error state accordingly
         if (data && data.length > 0) {
           setHasError(false);
