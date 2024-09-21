@@ -30,7 +30,7 @@ jobs:
           echo "CONNECTION_STRING=${{ secrets.CONNECTION_STRING }}" >> .env
           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "MY_SECRET_PEPPER=${{secrets.MY_SECRET_PEPPER}}" >> .ev
+          echo "MY_SECRET_PEPPER=${{secrets.MY_SECRET_PEPPER}}" >> .env
         working-directory: ./backend
 
       - name: Deploy to Server
