@@ -1,0 +1,22 @@
+h1 {
+    text-align: left; /* Align text to the left */
+    font-size: 4.4em;
+    margin-top: 1em;
+    font-family: HeroMessageFont;
+    margin-left: 0.5em;
+}
+
+.potential{
+    text-align: center;
+    font-family: PotentialFont;
+}
+
+@font-face {
+    font-family: 'HeroMessageFont';
+    src: url(../assets/Fonts/Inconsolata-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'PotentialFont';
+    src: url(../assets/Fonts/PantonNarrow-Heavy.ttf) format('truetype');
+}
