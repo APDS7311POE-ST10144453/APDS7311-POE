@@ -30,6 +30,11 @@ const transactionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  approvalStatus: {
+    type: String,
+    enum: ["approved", "pending", "denied"],
+    default: "pending",
+  },
 });
 
 module.exports = mongoose.model("Transaction", transactionSchema);
