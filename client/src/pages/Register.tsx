@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import "../css/Register.css";
+import "../css/LoginAndRegister.css"; // Using the same CSS for both login and register
 
 export default function Register() {
   const [data, setData] = useState({
@@ -42,81 +42,87 @@ export default function Register() {
         setErrorMessage(error.message || "Registration failed");
       }
     } catch (error) {
-      // Handle the error here
       console.error("An error occurred., please try again later., ", error);
       setErrorMessage("An error occurred, please try again later.");
     }
   };
 
   return (
-    <div>
-      <form onSubmit={registerUser}>
-        <div className="form-group">
-          <label>Full Name</label>
-          <input
-            type="text"
-            name="name"
-            placeholder="John Smith"
-            value={data.name}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
-        <div className="form-group">
-          <label>Username</label>
-          <input
-            type="text"
-            name="username"
-            placeholder="Your Username"
-            value={data.username}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
-        <div className="form-group">
-          <label>ID Number</label>
-          <input
-            type="text"
-            name="idNumber"
-            placeholder="10 Digit ZA ID Number"
-            value={data.idNumber}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
-        <div className="form-group">
-          <label>Account Number</label>
-          <input
-            type="text"
-            name="accountNumber"
-            placeholder="Your Account Number"
-            value={data.accountNumber}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={data.password}
-            onChange={handleChange}
-            className="form-control"
-          />
-        </div>
-        <div className="form-group">
-          <label>Confirm Password</label>
-          <input
-            type="password"
-            name="confirmPassword"
-            className="form-control"
-          />
-        </div>
-        <button type="submit">Register</button>
-      </form>
-      {responseMessage && <p className="success-message">{responseMessage}</p>}
-      {errorMessage && <p className="error-message">{errorMessage}</p>}
+    <div className="login-container">
+      <div className="login-image">
+        {/* Add your image here */}
+        <img src="your-image-url.jpg" alt="Register" />
+      </div>
+
+      <div className="login-form">
+        <form onSubmit={registerUser}>
+          <div className="form-group">
+            <label>Full Name</label>
+            <input
+              type="text"
+              name="name"
+              placeholder="John Smith"
+              value={data.name}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Your Username"
+              value={data.username}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>ID Number</label>
+            <input
+              type="text"
+              name="idNumber"
+              placeholder="10 Digit ZA ID Number"
+              value={data.idNumber}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>Account Number</label>
+            <input
+              type="text"
+              name="accountNumber"
+              placeholder="Your Account Number"
+              value={data.accountNumber}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              value={data.password}
+              onChange={handleChange}
+              className="form-control"
+            />
+          </div>
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              className="form-control"
+            />
+          </div>
+          <button type="submit">Register</button>
+        </form>
+        {responseMessage && <p className="success">{responseMessage}</p>}
+        {errorMessage && <p className="error">{errorMessage}</p>}
+      </div>
     </div>
   );
 }
