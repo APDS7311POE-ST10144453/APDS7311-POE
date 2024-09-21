@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Decimal128 = mongoose.Types.Decimal128;
 
-const userschema = mongoose.Schema({
+const transactionSchema = mongoose.Schema({
   senderAccountNumber: {
     type: String,
     required: true,
@@ -32,4 +32,4 @@ const userschema = mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Transaction", transactionschema);
+module.exports = mongoose.model("Transaction", transactionSchema);
