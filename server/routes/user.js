@@ -50,7 +50,7 @@ const limiter = rateLimit({
 // User registration route using bcrypt to hash the password
 router.post("/register", async (req, res) => {
   try {
-    const { username, name, idNumber, accountNumber, password } = req.body;
+    const { username, name, idNumber, accountNumber, password, role } = req.body;
 
     // Check if the username already exists
     const existingUser = await User.findOne({ username });
@@ -72,6 +72,7 @@ router.post("/register", async (req, res) => {
       idNumber: encryptedIdNumber,
       accountNumber: encryptedAccountNumber,
       password: hash,
+      role: role,
     });
 
     // Save the new user to the database
