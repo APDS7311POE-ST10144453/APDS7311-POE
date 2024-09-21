@@ -86,7 +86,6 @@ router.post("/register", async (req, res) => {
 // User login route using username, account number, and password to find the user
 router.post(
   "/login",
-  checkAuth, // Apply checkAuth middleware to this route
   limiter, // Apply rate limiter middleware to this route
   [
     // Validate and sanitize input fields
