@@ -13,6 +13,9 @@ const jwtSecret = crypto.randomBytes(32).toString("hex");
 // const salt = crypto.randomBytes(16).toString("hex");
 //console.log("SALT:", salt);
 
+//Generate secure pepper
+const pepper1 = crypto.randomBytes(16).toString("hex");
+console.log("PEPPER:", pepper1);
 
 // Generate a secure password salt
 const salt = crypto.randomBytes(16).toString("hex");
