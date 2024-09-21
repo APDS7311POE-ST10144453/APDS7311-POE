@@ -1,5 +1,5 @@
 import "./App.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
@@ -7,9 +7,12 @@ import Login from "./pages/Login";
 import CustomerDashboard from "./pages/CustomerDashboard";
 
 function App() {
+  const location = useLocation();
+
   return (
     <>
-      <Navbar></Navbar>
+      {/* Conditionally render Navbar */}
+      {location.pathname !== "/customer-dashboard" && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
