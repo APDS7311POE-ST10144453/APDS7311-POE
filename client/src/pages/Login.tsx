@@ -19,6 +19,7 @@ export default function Login() {
     console.log("User Logged in");
 
     // Fetch the login API endpoint
+    // Fetch the login API endpoint
     try {
       const response = await fetch("https://localhost:3000/api/user/login", {
         method: "POST",
