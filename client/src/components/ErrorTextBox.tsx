@@ -1,5 +1,5 @@
 import React from "react";
-import "./SwiftCodeTextBox.css"; // Import the external CSS file
+import "../css/SwiftCodeTextBox.css"; // Import the external CSS file
 
 // Define the props interface for the component
 interface ErrorTextBoxProps {
