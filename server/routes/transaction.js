@@ -16,7 +16,8 @@ router.post("/transact", async (req, res) => {
       recipientAccountNumber: encrypt(recipientAccountNumber),
       transferAmount,
       currency,
-      swiftCode
+      swiftCode,
+      approvalStatus: "pending"
     });
 
     // Saving the transaction to the database
