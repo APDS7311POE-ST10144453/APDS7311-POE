@@ -14,7 +14,7 @@
 
 h1 {
     font-size: 6.5vw; /* Use viewport width for font-size */
-    font-family: HeroMessageFont, sans-serif;
+    font-family: HeroMessageFont, sans-serif; /* Added generic font family */
     margin-bottom: 1vh; /* Use viewport height for margin-bottom */
     line-height: 1.2;
     margin-top: 1vh; /* Use viewport height for margin-top */
@@ -22,12 +22,12 @@ h1 {
 
 .body-text {
     font-size: 1.5vw; /* Use viewport width for font-size */
-    font-family: BodyFont, sans-serif;
+    font-family: BodyFont, sans-serif; /* Added generic font family */
     max-width: 800px;
 }
 
 .potential {
-    font-family: PotentialFont, sans-serif;
+    font-family: PotentialFont, sans-serif; /* Added generic font family */
     background: linear-gradient(to right, #8aeba5, #19aa6b);
     background-clip: text;
     -webkit-background-clip: text;
