@@ -34,6 +34,7 @@ export default function Login() {
         console.log("User logged in successfully", result);
         setSuccessMessage("Login successful!");
         localStorage.setItem("token", result.token);
+        console.log("Redirecting to /customer-dashboard");
         window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
       } else {
         const error = await response.json();
