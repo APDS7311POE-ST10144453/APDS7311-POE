@@ -22,11 +22,11 @@ const userschema = mongoose.Schema({
     type: String,
     required: true,
   },
-  role:{
+  role: {
     type: String,
-    enum: ['customer', 'employee'],
-    default: 'user'
-  }
+    enum: ["customer", "employee"],
+    default: "customer",
+  },
 });
 
 module.exports = mongoose.model("User", userschema);

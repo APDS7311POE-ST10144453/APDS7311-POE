@@ -24,7 +24,7 @@ export default function Register() {
   const registerUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      console.log("User register attempt, data passed: ", data)
+      console.log("User register attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/register", {
         method: "POST",
         headers: {
@@ -120,5 +120,3 @@ export default function Register() {
     </div>
   );
 }
-
-
