@@ -1,0 +1,64 @@
+/* Container for the image and form split */
+.login-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Left side for the image */
+  .login-image {
+    width: 50vw; /* Ensures it takes up exactly half of the viewport width */
+    background-image: url('../assets/Images/construction.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat; /* Ensures the image doesn't repeat */
+  }
+  
+  /* Right side for the login form */
+  .login-form {
+    width: 50vw; /* Ensures the form takes the other half */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  /* Centering the form content */
+  form {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  
+  /* Input and form group styling */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+  }
+  
+  label {
+    margin-bottom: 5px;
+  }
+  
+  input {
+    padding: 8px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .error {
+    color: red;
+  }
+  
+  .success {
+    color: green;
+  }
+  
