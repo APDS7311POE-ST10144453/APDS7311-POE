@@ -18,3 +18,14 @@
   font-size: 14px;
   margin-top: 5px;
 }
+
+.success-message {
+  color: green;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.loading-message {
+  font-size: 14px;
+  margin-top: 5px;
+}
