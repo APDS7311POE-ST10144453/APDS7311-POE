@@ -14,6 +14,6 @@
 - [ ] API Ninja for swift code verification
 - [ ] Display confirm with swift code return value
 - [ ] If swift code not valid display error for user
-- [ ] Use MemoryStore in backend for JWT auth (Nick)
+- [x] Use MemoryStore in backend for JWT auth (Nick)
 - [ ] Secret management through git (Nick)
 - [ ] Make sure customers cant access employee functions even with http req
