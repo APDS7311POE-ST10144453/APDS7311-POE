@@ -1,4 +1,13 @@
+import { useNavigate } from 'react-router-dom';
+
+
 function CustomerDashboard() {
+    const navigate = useNavigate();
+
+    const handleLocalPaymentClick = () => {
+        navigate('/customer-payment-form');
+    };
+
     return (
         <div className="dashboard-container">
             {/* Side Navigation Bar */}
@@ -15,8 +24,7 @@ function CustomerDashboard() {
 
                 {/* Payment Buttons */}
                 <div className="buttons-container">
-                    <button className="payment-button">Make Local Payment</button>
-                    <button className="payment-button">Make International Payment</button>
+                <button className="payment-button" onClick={handleLocalPaymentClick}>Make Payment</button>
                 </div>
 
                 {/* Banking Details Section */}
