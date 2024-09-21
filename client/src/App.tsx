@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import CustomerDashboard from "./pages/CustomerDashboard";
+import CustomerPaymentForm from "./pages/CustomerPaymentForm";
 
 function App() {
   const location = useLocation();
@@ -12,12 +13,13 @@ function App() {
   return (
     <>
       {/* Conditionally render Navbar */}
-      {location.pathname !== "/customer-dashboard" && <Navbar />}
+      {location.pathname !== "/customer-dashboard" && location.pathname !== "/customer-payment-form" && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
+        <Route path="/customer-payment-form" element={<CustomerPaymentForm />} />
       </Routes>
     </>
   );
