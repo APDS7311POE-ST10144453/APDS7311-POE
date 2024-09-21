@@ -1,0 +1,43 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: Build project
+        run: npm run build
+        working-directory: ./server
+
+      - name: Create .env file
+        run: |
+          echo "CONNECTION_STRING=${{ secrets.CONNECTION_STRING }}" >> .env
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "MY_SECRET_PEPPER=${{secrets.MY_SECRET_PEPPER}}" >> .ev
+        working-directory: ./backend
+
+      - name: Deploy to Server
+        run: |
+          # Your deployment script here
+        env:
+          DATABASE_URL: ${{ secrets.CONNECTION_STRING }}
+          API_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          JWT_SECRET: ${{secrets.JWT_SECRET}}
+          MY_SECRET_PEPPER: ${{secrets.MY_SECRET_PEPPER}}
