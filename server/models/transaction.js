@@ -6,27 +6,27 @@ const transactionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  RecipientName: {
+  recipientName: {
     type: String,
     required: true,
   },
-  RecipeintBank: {
+  recipientBank: {
     type: String,
     required: true,
   },
-  RecipientAccountNumber: {
+  recipientAccountNumber: {
     type: String,
     required: true,
   },
-  TransferAmount: {
+  transferAmount: {
     type: Decimal128,
     required: true,
   },
-  Currency: {
+  currency: {
     type: String,
     required: true,
   },
-  SwiftCode: {
+  swiftCode: {
     type: String,
     required: true,
   },

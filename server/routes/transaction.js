@@ -20,7 +20,7 @@ router.post("/transact", async (req, res) => {
 
     // Saving the transaction to the database
     await newTransaction.save();
-    res.status(201).json({ message: "Transaction registered successfully" });
+    res.status(201).json({ message: "Transaction successfully recorded" });
 
   } catch (err) {
     res.status(400).json({ error: err.message });
