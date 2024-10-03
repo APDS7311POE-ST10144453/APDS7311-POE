@@ -1,10 +1,7 @@
 import React from "react";
-import "../css/Login.css";
+import "../css/LoginAndRegister.css";
 import { useState } from "react";
-
-//After registering,
-//customers need to log on to the website by providing their username, account number and
-//password.
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [data, setData] = useState({
@@ -15,6 +12,7 @@ export default function Login() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate();
 
   const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,7 +20,7 @@ export default function Login() {
     setSuccessMessage("");
     console.log("User Logged in");
 
-    //Fetch the login API endpoint
+    // Fetch the login API endpoint
     try {
       const response = await fetch("https://localhost:3000/api/user/login", {
         method: "POST",
@@ -36,8 +34,8 @@ export default function Login() {
         const result = await response.json();
         console.log("User logged in successfully", result);
         setSuccessMessage("Login successful!");
-        //Store JWT token in local storage
         localStorage.setItem("token", result.token);
+        window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
       } else {
         const error = await response.json();
         setErrorMessage(error.message || "Login failed");
@@ -47,41 +45,55 @@ export default function Login() {
     }
   };
 
+  const handleEmployeeLoginClick = () => {
+    navigate("/employee-login");
+  };
+
   return (
-    <div>
-      <form onSubmit={loginUser}>
-        <div className="form-group">
-          <label>Username</label>
-          <input
-            type="text"
-            placeholder="Your Username"
-            value={data.username}
-            onChange={(e) => setData({ ...data, username: e.target.value })}
-          />
-        </div>
-        <div className="form-group">
-          <label>Account Number</label>
-          <input
-            type="text"
-            placeholder="Your Account Number"
-            value={data.accountNumber}
-            onChange={(e) =>
-              setData({ ...data, accountNumber: e.target.value })
-            }
-          />
-        </div>
-        <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            value={data.password}
-            onChange={(e) => setData({ ...data, password: e.target.value })}
-          />
-        </div>
-        <button type="submit">Login</button>
-      </form>
-      {errorMessage && <p className="error">{errorMessage}</p>}
-      {successMessage && <p className="success">{successMessage}</p>}
+    <div className="login-container">
+      <div className="login-image">
+        {/* Add your image here */}
+        <img src="your-image-url.jpg" alt="Login" />
+      </div>
+
+      <div className="login-form">
+        <form onSubmit={loginUser}>
+          <div className="form-group">
+            <label>Username</label>
+            <input
+              type="text"
+              placeholder="Your Username"
+              value={data.username}
+              onChange={(e) => setData({ ...data, username: e.target.value })}
+            />
+          </div>
+          <div className="form-group">
+            <label>Account Number</label>
+            <input
+              type="text"
+              placeholder="Your Account Number"
+              value={data.accountNumber}
+              onChange={(e) =>
+                setData({ ...data, accountNumber: e.target.value })
+              }
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              value={data.password}
+              onChange={(e) => setData({ ...data, password: e.target.value })}
+            />
+          </div>
+          <button type="submit">Login</button>
+        </form>
+        {errorMessage && <p className="error">{errorMessage}</p>}
+        {successMessage && <p className="success">{successMessage}</p>}
+        <button type="button" onClick={handleEmployeeLoginClick}>
+          Employee Login
+        </button>
+      </div>
     </div>
   );
 }

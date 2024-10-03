@@ -6,39 +6,13 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
-const crypto = require("crypto");
+const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth");
 const brute = require("express-brute");
 const ExpressBrute = require("express-brute");
 
 var store = new ExpressBrute.MemoryStore();
 var bruteforce = new ExpressBrute(store);
-
-//Encryption function
-function encrypt(text) {
-  const algorithm = "aes-256-cbc";
-  const salt = crypto.randomBytes(16).toString("hex");
-  const key = crypto.scryptSync(process.env.ENCRYPTION_KEY, salt, 32);
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(algorithm, key, iv);
-  let encrypted = cipher.update(text, "utf8", "hex");
-  encrypted += cipher.final("hex");
-  return salt + ":" + iv.toString("hex") + ":" + encrypted;
-}
-
-function decrypt(text) {
-  const algorithm = "aes-256-cbc";
-  const [salt, iv, encrypted] = text.split(":");
-  const key = crypto.scryptSync(process.env.ENCRYPTION_KEY, salt, 32);
-  const decipher = crypto.createDecipheriv(
-    algorithm,
-    key,
-    Buffer.from(iv, "hex")
-  );
-  let decrypted = decipher.update(encrypted, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
-}
 
 // Rate limiter middleware to limit repeated requests to public APIs
 const limiter = rateLimit({
@@ -50,7 +24,8 @@ const limiter = rateLimit({
 // User registration route using bcrypt to hash the password
 router.post("/register", async (req, res) => {
   try {
-    const { username, name, idNumber, accountNumber, password, role } = req.body;
+    const { username, name, idNumber, accountNumber, password, role } =
+      req.body;
 
     // Check if the username already exists
     const existingUser = await User.findOne({ username });
@@ -86,7 +61,6 @@ router.post("/register", async (req, res) => {
 // User login route using username, account number, and password to find the user
 router.post(
   "/login",
-   // Apply checkAuth middleware to this route
   limiter, // Apply rate limiter middleware to this route
   [
     // Validate and sanitize input fields
@@ -155,6 +129,33 @@ router.post(
     }
   }
 );
+
+// Get the Decrypted Account details for the user
+// Use the url: https://localhost:3000/api/user/account?id=addIdInPlaceOfThisText
+router.get("/account", checkAuth, async (req, res) => {
+  try {
+    // User ID
+    const userID = req.query.id;
+
+    // Finding user
+    const user = await User.findById(userID);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the user's account number
+    res.status(200).json({ 
+      username: user.username,
+      name: user.name,
+      idNumber: decrypt(user.idNumber),
+      accountNumber: decrypt(user.accountNumber),
+      role: user.role
+      });
+  } catch (error) {
+    res.status(500).json({ message: "Server error: " + error.message });
+  }
+});
 
 // Export the router to be used in other parts of the application
 module.exports = router;

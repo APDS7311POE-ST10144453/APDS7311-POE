@@ -56,4 +56,7 @@ app.get(urlprefix + "/", (req, res) => {
 const userRoutes = require("./routes/user");
 app.use(urlprefix + "/user", userRoutes);
 
+const transactionRoutes = require("./routes/transaction")
+app.use(urlprefix + "/transaction", transactionRoutes);
+
 module.exports = app;

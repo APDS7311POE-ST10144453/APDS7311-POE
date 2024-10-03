@@ -1,8 +1,8 @@
 /* Navbar.css */
-body{
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
 }
 
 .navbar {
@@ -10,25 +10,60 @@ body{
   top: 0;
   left: 0;
   width: 100%;
-  background-color: #333;
-  padding: 0.5rem;
+  background-color: transparent;
+  padding: 0.5rem 1rem; /* Add some padding to ensure the content doesn't touch the edges */
   display: flex;
-  justify-content: space-evenly;
+  justify-content: space-between; /* Ensure brand is on the left and links are on the right */
   align-items: center;
   z-index: 1000;
   border-radius: 4px;
 }
 
+.brand {
+  display: flex;
+  align-items: center;
+  margin-left: 2rem; /* Add some space between the brand and the left edge */
+}
+
+.nav-links {
+  display: flex;
+  margin-right: 2rem; /* Add some space between the links and the right edge */
+}
+
 .nav-link {
   color: white;
   text-decoration: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 2.3rem;
   transition: background-color 0.4s ease-in-out;
   border-radius: 4px;
+  font-family: 'NavFont', sans-serif; /* Added generic font family */
+  font-size: 1.2em;
 }
 
 .nav-link:hover {
-  background-color: #555;
-  color: #ddd;
+  color: #8a8a8a;
   border-radius: 4px;
+}
+
+p {
+  font-family: 'WebsiteNameFont', sans-serif; /* Added generic font family */
+  color: white;
+  font-size: 1.5em;
+  margin-left: 10px; /* Add some space between the image and text */
+}
+
+img {
+  width: 1.5em;
+  height: 1.5em;
+  margin-top: -0.5em;
+}
+
+@font-face {
+  font-family: 'NavFont';
+  src: url('../assets/Fonts/PantonNarrow-Bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'WebsiteNameFont';
+  src: url('../assets/Fonts/PantonNarrow-Heavy.ttf') format('truetype');
 }
