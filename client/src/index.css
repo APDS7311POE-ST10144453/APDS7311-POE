@@ -33,22 +33,30 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 15px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-family: "PantonNarrow-Bold", sans-serif;
+  background-color: #2d2d2dec;
   cursor: pointer;
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #19aa6b;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  width: 100%; /* Ensure the form group takes full width */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 @media (prefers-color-scheme: light) {
@@ -62,4 +70,9 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+@font-face {
+  font-family: "PantonNarrow-Bold";
+  src: url("./assets/Fonts/PantonNarrow-Bold.ttf") format("truetype");
 }

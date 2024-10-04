@@ -4,6 +4,7 @@
     padding: 1vw; /* Use viewport width for padding */
     max-width: 1200px;
     margin-top: 10vh; /* Use viewport height for margin-top */
+    height: 100%;
 }
 
 .text-container {
