@@ -1,7 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import "../css/LoginAndRegister.css";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [data, setData] = useState({
@@ -12,16 +10,18 @@ export default function Login() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setData({
+      ...data,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
-    console.log("User Logged in");
-
-    // Fetch the login API endpoint
     try {
+      console.log("User login attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/login", {
         method: "POST",
         headers: {
@@ -32,67 +32,73 @@ export default function Login() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log("User logged in successfully", result);
-        setSuccessMessage("Login successful!");
-        localStorage.setItem("token", result.token);
+        console.log(result);
+        setSuccessMessage("User logged in successfully");
+        console.log("Redirecting to /customer-dashboard");
         window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
       } else {
         const error = await response.json();
         setErrorMessage(error.message || "Login failed");
       }
     } catch (error) {
+      console.error("An error occurred, please try again later.", error);
       setErrorMessage("An error occurred, please try again later.");
     }
   };
 
   const handleEmployeeLoginClick = () => {
-    navigate("/employee-login");
+    console.log("Redirecting to /employee-login");
+    window.location.href = "/employee-login"; // Redirect to employee login
   };
 
   return (
     <div className="login-container">
       <div className="login-image">
-        {/* Add your image here */}
-        <img src="your-image-url.jpg" alt="Login" />
       </div>
 
       <div className="login-form">
-        <form onSubmit={loginUser}>
-          <div className="form-group">
-            <label>Username</label>
-            <input
-              type="text"
-              placeholder="Your Username"
-              value={data.username}
-              onChange={(e) => setData({ ...data, username: e.target.value })}
-            />
-          </div>
-          <div className="form-group">
-            <label>Account Number</label>
-            <input
-              type="text"
-              placeholder="Your Account Number"
-              value={data.accountNumber}
-              onChange={(e) =>
-                setData({ ...data, accountNumber: e.target.value })
-              }
-            />
-          </div>
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              value={data.password}
-              onChange={(e) => setData({ ...data, password: e.target.value })}
-            />
-          </div>
+        <div className="form-container">
+          <form onSubmit={loginUser}>
+            <div className="form-group">
+              <label>Username</label>
+              <input
+                type="text"
+                name="username"
+                placeholder="Your Username"
+                value={data.username}
+                onChange={handleChange}
+                className="input-field login-input-field"
+              />
+            </div>
+            <div className="form-group">
+              <label>Account Number</label>
+              <input
+                type="text"
+                name="accountNumber"
+                placeholder="Your Account Number"
+                value={data.accountNumber}
+                onChange={handleChange}
+                className="input-field login-input-field"
+              />
+            </div>
+            <div className="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                name="password"
+                value={data.password}
+                onChange={handleChange}
+                className="input-field login-input-field"
+              />
+            </div>
+          </form>
           <button type="submit">Login</button>
-        </form>
-        {errorMessage && <p className="error">{errorMessage}</p>}
-        {successMessage && <p className="success">{successMessage}</p>}
-        <button type="button" onClick={handleEmployeeLoginClick}>
-          Employee Login
-        </button>
+          {errorMessage && <p className="error">{errorMessage}</p>}
+          {successMessage && <p className="success">{successMessage}</p>}
+          <button className="employeeLogin-button" type="button" onClick={handleEmployeeLoginClick}>
+            Employee Login
+          </button>
+        </div>
       </div>
     </div>
   );

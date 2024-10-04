@@ -20,20 +20,20 @@
     flex-direction: column;
 }
 
-.form-group {
+.form-group-payment {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
 }
 
-.form-group label {
+.form-group-payment label {
     width: 45%;
     font-family: Arial, sans-serif;
     font-size: 14px;
     color: #4A4A4A;
 }
 
-.form-group input {
+.form-group-payment input {
     width: 50%;
     padding: 5px;
     border: 1px solid #d4d4d4;
