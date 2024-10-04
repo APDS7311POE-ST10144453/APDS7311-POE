@@ -8,7 +8,6 @@ const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth");
-const brute = require("express-brute");
 const ExpressBrute = require("express-brute");
 
 var store = new ExpressBrute.MemoryStore();
@@ -22,7 +21,14 @@ const limiter = rateLimit({
 });
 
 // User registration route using bcrypt to hash the password
-router.post("/register", async (req, res) => {
+router.post("/register",[
+  body("username").notEmpty().withMessage("Username is required").trim().escape(),
+  body("name").notEmpty().withMessage("Name is required").trim().escape(),
+  body("idNumber").notEmpty().withMessage("ID number is required").trim().escape(),
+  body("accountNumber").notEmpty().withMessage("Account number is required").trim().escape(),
+  body("password").isLength({min: 8}).withMessage("Password is required").trim().escape(),
+], 
+async (req, res) => {
   try {
     const { username, name, idNumber, accountNumber, password, role } =
       req.body;
@@ -64,8 +70,8 @@ router.post(
   limiter, // Apply rate limiter middleware to this route
   [
     // Validate and sanitize input fields
-    body("username").notEmpty().withMessage("Username is required"),
-    body("password").notEmpty().withMessage("Password is required"),
+    body("username").notEmpty().withMessage("Username is required").trim().escape(),
+    body("password").notEmpty().withMessage("Password is required").trim().escape(),
     body("accountNumber")
       .isNumeric()
       .withMessage("Account number must be numeric"),
