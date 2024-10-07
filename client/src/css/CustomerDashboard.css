@@ -17,7 +17,7 @@ h1 {
 }
 
 h2 {
-    font-size: 2em; /* Increased from 1.5em to 2em */
+    font-size: 1.8em; /* Increased from 1.5em to 2em */
 }
 
 .buttons-container {
@@ -42,13 +42,14 @@ h2 {
 }
 
 .nav-button {
-    padding: 10px 20px;
-    border: 1px solid #19aa6b;
+    padding: 15px;
+    border: 2px solid #19aa6b;
     background-color: transparent; /* Changed from rgba to transparent */
     color: #19aa6b;
     cursor: pointer;
     border-radius: 5px;
-    font-size: 1.5em; /* Reduced from 2em to 1.2em for better fit */
+    font-size: 1.4em; /* Reduced from 2em to 1.2em for better fit */
+    text-align: center;
 }
 .nav-button:hover {
     background-color: #19aa6b;

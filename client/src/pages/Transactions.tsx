@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import '../css/Transaction.css';
 
 function Transactions(){
     const navigate = useNavigate();
@@ -6,6 +7,20 @@ function Transactions(){
     const handleMainMenuClick = () => {
         navigate("/customer-dashboard");
       };
+
+      interface TransactionProps {
+        status: 'approved' | 'pending' | 'declined';
+    }
+    
+    const TransactionStatus: React.FC<TransactionProps> = ({ status }) => {
+        const transactionStatus: 'approved' | 'pending' | 'declined' = 'approved'; // Define the transactionStatus variable
+    
+        return (
+            <span className={`transaction-status ${status}`}>
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+            </span>
+        );
+    };
 
     return (
         <div className="dashboard-container">
@@ -17,9 +32,18 @@ function Transactions(){
 
             {/* Main Dashboard Content */}
             <div className="main-content">
-                <h1>Transactions</h1>
-                
+            <div className="payment-receipts">
+                    <h1> Transactions </h1>
+                    <div className="details-box">
+                        <div className="receipt-item">
+                            <span>2024/08/20 Sch Fees $200</span>
+                            <div>
+                            <TransactionStatus status="approved" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
             </div>
     );
 }

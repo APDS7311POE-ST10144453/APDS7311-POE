@@ -1,0 +1,19 @@
+.transaction-status {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: white;
+}
+
+.transaction-status.approved {
+    background-color: green;
+}
+
+.transaction-status.pending {
+    background-color: orange;
+}
+
+.transaction-status.declined {
+    background-color: red;
+}
