@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server",
-    "dev": "npm install && nodemon server"
+    "dev": "npm install && nodemon server",
+    "test": "mocha --reporter json --reporter-option output=test-results.json"
   },
   "author": "",
   "license": "ISC",
