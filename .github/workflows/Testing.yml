@@ -27,4 +27,4 @@ jobs:
       run: npm install
 
     - name: Run tests
-      run: npx mocha tests/generatecrypto.test.mjs
+      run: npx mocha server/tests/generatecrypto.test.mjs
