@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import '../css/CustomerDashboard.css';
 
 
 function CustomerDashboard() {
@@ -16,12 +17,17 @@ function CustomerDashboard() {
         navigate("/transactions");
       };
 
+      const handleLogOutClick = () => {
+        navigate("/");
+      }
+
     return (
         <div className="dashboard-container">
             {/* Side Navigation Bar */}
             <div className="side-nav">
                 <button className="nav-button" onClick={handleMainMenuClick}>Main Menu</button>
                 <button className="nav-button" onClick={handleTransactionClick}>Transactions</button>
+                <button className="nav-button" onClick={handleLogOutClick}>Log Out</button>
             </div>
 
             {/* Main Dashboard Content */}
