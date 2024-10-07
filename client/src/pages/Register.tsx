@@ -37,8 +37,11 @@ export default function Register() {
         const result = await response.json();
         console.log(result);
         setResponseMessage("User registered successfully");
-        console.log("Redirecting to /customer-dashboard");
-        window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
+        console.log("Redirecting to /login");
+        // wait a second before redirect
+        setTimeout(() => {
+          window.location.href = "/login"; // Redirect to login
+        }, 2000);
       } else {
         const error = await response.json();
         setErrorMessage(error.message || "Registration failed");
@@ -51,8 +54,7 @@ export default function Register() {
 
   return (
     <div className="login-container">
-      <div className="login-image">
-      </div>
+      <div className="login-image"></div>
 
       <div className="login-form">
         <div className="form-container">
