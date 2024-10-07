@@ -2,13 +2,26 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/PaymentForm.css';
 import SwiftCodeTextBox from '../components/SwiftCodeTextBox'; // Import the SwiftCodeTextBox component
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import "../css/PaymentForm.css";
+import { isAuthenticated } from "../utils/auth";
 
 function CustomerPaymentForm() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const alertShown = useRef(false); // Ref to track if the alert has been shown
 
-    const handleBackClick = () => {
-        navigate('/customer-dashboard');
-    };
+  useEffect(() => {
+    if (!isAuthenticated() && !alertShown.current) {
+      alert("You are not logged in. Please log in to continue.");
+      alertShown.current = true; // Set the ref to true after showing the alert
+      navigate("/login");
+    }
+  }, [navigate]);
+
+   const handleBackClick = () => {
+    navigate("/customer-dashboard");
+  };
 
     return (
         <div className="page-container"> {/* Add this class */}
@@ -42,8 +55,9 @@ function CustomerPaymentForm() {
                 </form>
             </div>
         </div>
-    );
+      </form>
+    </div>
+  );
 }
-
 
 export default CustomerPaymentForm;

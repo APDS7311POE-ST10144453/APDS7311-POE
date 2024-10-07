@@ -15,13 +15,18 @@ function App() {
   return (
     <>
       {/* Conditionally render Navbar */}
-      {location.pathname !== "/customer-dashboard" && location.pathname !== "/customer-payment-form" &&  location.pathname !== "/transactions" &&<Navbar />}
+      {location.pathname !== "/customer-dashboard" &&
+        location.pathname !== "/customer-payment-form" &&
+        location.pathname !== "/transactions" && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/customer-dashboard" element={<CustomerDashboard />} />
-        <Route path="/customer-payment-form" element={<CustomerPaymentForm />} />
+        <Route
+          path="/customer-payment-form"
+          element={<CustomerPaymentForm />}
+        />
         <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/transactions" element={<Transactions />} />
       </Routes>

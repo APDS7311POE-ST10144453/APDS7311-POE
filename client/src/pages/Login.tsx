@@ -29,10 +29,14 @@ export default function Login() {
         },
         body: JSON.stringify(data),
       });
+      
 
       if (response.ok) {
         const result = await response.json();
         console.log(result);
+
+        localStorage.setItem("token", result.token);
+
         setSuccessMessage("User logged in successfully");
         console.log("Redirecting to /customer-dashboard");
         window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
