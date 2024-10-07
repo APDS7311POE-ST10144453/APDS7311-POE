@@ -1,68 +1,68 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f7f7f7;
-}
 .dashboard-container {
-    width: 80%;
-    margin: auto;
-    padding: 20px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    width: 100%; /* Changed from 90% to full width */
+    margin: 0; /* Removed auto margin */
+    padding: 0; /* Removed padding */
+    border-radius: 0; /* Removed border-radius */
+    box-shadow: none; /* Removed box-shadow */
 }
-.header {
-    text-align: center;
-    margin-bottom: 20px;
+
+h1{
+    font-family: "Inconsolata-bold";
+    background: linear-gradient(to right, #8aeba5, #19aa6b);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
+
+h2{
+    font-size: 2em; /* Increased from 1.5em to 2em */
+}
+
 .buttons-container {
     display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically if needed */
+    margin: 20px 0; /* Add some margin for spacing */
 }
-.buttons-container button {
+
+.payment-button {
     padding: 10px 20px;
-    font-size: 16px;
-    border: 1px solid #007bff;
-    background-color: white;
-    color: #007bff;
+    font-size: 1.5em;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 20px;
 }
-.buttons-container button:hover {
-    background-color: #007bff;
-    color: white;
-}
-.banking-details, .payment-receipts {
-    margin-bottom: 20px;
-}
-.section-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-.details-box {
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 5px;
-}
-.payment-receipts .receipt-item {
+
+.side-nav {
+    width: 250px; /* Increased from 200px to 250px */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px; /* Added padding */
+    background-color: #2c2c2c7c; /* Added a dark background color */
+    height: 100vh; /* Make it full height */
+    backdrop-filter: blur(0.8px); /* Background blur for modern browsers */
+    -webkit-backdrop-filter: blur(0.8px); /* Background blur for Safari */
+    border-top-right-radius: 15px; /* Curve top right corner */
+    border-bottom-right-radius: 15px; /* Curve bottom right corner */
 }
-.payment-receipts button {
-    padding: 5px 10px;
-    font-size: 14px;
-    color: white;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
+
+.nav-button {
+    padding: 10px 20px;
+    border: 1px solid #19aa6b;
+    background-color: transparent; /* Changed from rgba to transparent */
+    color: #19aa6b;
     cursor: pointer;
+    border-radius: 5px;
+    font-size: 1.5em; /* Reduced from 2em to 1.2em for better fit */
 }
-.payment-receipts button:hover {
-    background-color: #0056b3;
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px; /* Added padding */
+}
+
+@font-face {
+    font-family: Inconsolata-bold;
+    src: url('../assets/Fonts/Inconsolata-Bold.ttf');
 }

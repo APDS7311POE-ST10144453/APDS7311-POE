@@ -18,8 +18,8 @@ export default function Login() {
     });
   };
 
-  const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const loginUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     try {
       console.log("User login attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/login", {
@@ -91,8 +91,8 @@ export default function Login() {
                 className="input-field login-input-field"
               />
             </div>
+            <button type="submit">Login</button>
           </form>
-          <button type="submit">Login</button>
           {errorMessage && <p className="error">{errorMessage}</p>}
           {successMessage && <p className="success">{successMessage}</p>}
           <button className="employeeLogin-button" type="button" onClick={handleEmployeeLoginClick}>
