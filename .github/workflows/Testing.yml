@@ -32,8 +32,8 @@ jobs:
         working-directory: ./server
 
       - name: Run tests
-        run: npx mocha tests/generatecrypto.test.mjs --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/results.xml
-        working-directory: ./server
+        run: npm test
+        working-directory: ./server/test-results
 
       - name: List test results directory
         run: ls -la test-results
@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: ${{ github.workspace }}/server/test-results/results.xml
+          path: ${{ github.workspace }}/server/test-results/results.json
           if-no-files-found: warn
           include-hidden-files: false
 
@@ -58,5 +58,5 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: Mocha Tests
-          path: ${{ github.workspace }}/server/test-results/results.xml
+          path: ${{ github.workspace }}/server/test-results/results.json
           reporter: mocha-json
