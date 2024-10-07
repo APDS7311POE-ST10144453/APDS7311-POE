@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import '../css/CustomerDashboard.css';
 
-
 function CustomerDashboard() {
     const navigate = useNavigate();
 
@@ -11,15 +10,15 @@ function CustomerDashboard() {
 
     const handleMainMenuClick = () => {
         navigate("/");
-      };
+    };
 
-      const handleTransactionClick = () => {
+    const handleTransactionClick = () => {
         navigate("/transactions");
-      };
+    };
 
-      const handleLogOutClick = () => {
+    const handleLogOutClick = () => {
         navigate("/");
-      }
+    }
 
     return (
         <div className="dashboard-container">
@@ -33,19 +32,20 @@ function CustomerDashboard() {
             {/* Main Dashboard Content */}
             <div className="main-content">
                 <h1>Customer Dashboard</h1>
-                <h2>Hello, [Customer's Name]</h2>
 
-                {/* Payment Buttons */}
-                <div className="buttons-container">
-                <button className="payment-button" onClick={handleLocalPaymentClick}>Make Payment</button>
-                </div>
+                {/* Greeting, Banking Details, and Payment Button Container */}
+                <div className="greeting-banking-container">
+                    <div className="greeting-section">
+                        <h2>Hello, [Customer's Name]</h2>
+                        <button className="make-payment-button" onClick={handleLocalPaymentClick}>Make Payment</button>
+                    </div>
 
-                {/* Banking Details Section */}
-                <div className="banking-details">
-                    <h3>Banking Details</h3>
-                    <div className="details-box">
-                        <p><strong>Current Acc</strong>: Acc No: XXXXXXXXXXXX</p>
-                        <p><strong>Available Balance</strong>: $1500.00</p>
+                    <div className="banking-details">
+                        <h2>Banking Details</h2>
+                        <div className="details-box">
+                            <p>Acc No: XXXXXXXXXXXX</p>
+                            <p><strong>Available Balance</strong>: $1500.00</p>
+                        </div>
                     </div>
                 </div>
 
@@ -55,11 +55,11 @@ function CustomerDashboard() {
                     <div className="details-box">
                         <div className="receipt-item">
                             <span>2024/08/20 Sch Fees $200</span>
-                            <button className="pay-again-button">Pay again</button>
+                            <button className="payment-button">Pay again</button>
                         </div>
                         <div className="receipt-item">
                             <span>2024/08/20 Home R $100</span>
-                            <button className="pay-again-button">Pay again</button>
+                            <button className="payment-button">Pay again</button>
                         </div>
                     </div>
                 </div>
