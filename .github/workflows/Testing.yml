@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x]
+        node-version: [ 16.x, 18.x, 20.x]
 
     steps:
       - name: Checkout repository
@@ -38,6 +38,9 @@ jobs:
       - name: List test results directory
         run: ls -la server/test-results
         working-directory: ./server
+
+      - name: Add delay
+        run: sleep 5
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
