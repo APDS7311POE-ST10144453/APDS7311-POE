@@ -7,15 +7,16 @@
     box-shadow: none; /* Removed box-shadow */
 }
 
-h1{
+h1 {
     font-family: "Inconsolata-bold", monospace;
     background: linear-gradient(to right, #8aeba5, #19aa6b);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    align-content: center;
 }
 
-h2{
+h2 {
     font-size: 2em; /* Increased from 1.5em to 2em */
 }
 
@@ -24,13 +25,6 @@ h2{
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically if needed */
     margin: 20px 0; /* Add some margin for spacing */
-}
-
-.payment-button {
-    padding: 10px 20px;
-    font-size: 1.5em;
-    cursor: pointer;
-    border-radius: 20px;
 }
 
 .side-nav {
@@ -56,13 +50,67 @@ h2{
     border-radius: 5px;
     font-size: 1.5em; /* Reduced from 2em to 1.2em for better fit */
 }
+.nav-button:hover {
+    background-color: #19aa6b;
+    color: white;
+}
 
+.payment-button{
+    background-color: #19aa6b;
+    color: white;
+    margin-left: 2vw;
+    width: 10vw;
+}
+.payment-button:hover{
+    background-color: white;
+    color: #19aa6b;
+}
 .main-content {
     flex-grow: 1;
     padding: 20px; /* Added padding */
 }
 
-@font-face {
-    font-family: Inconsolata-bold;
-    src: url('../assets/Fonts/Inconsolata-Bold.ttf');
+.greeting-banking-container {
+    display: flex;
+    justify-content: space-between; /* Space out the sections */
+    align-items: flex-start; /* Align items to the top */
+    margin-bottom: 20px; /* Add some margin for spacing */
+}
+
+.greeting-section {
+    flex: 1; /* Take up available space */
+    margin-right: 20px; /* Add some space between sections */
+}
+
+.banking-details {
+    flex: 1; /* Take up available space */
+}
+
+.details-box {
+    padding: 20px;
+    background-color: #2c2c2c7c; /* Added a dark background color */
+    border: 5px solid #19aa6b;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.greeting-banking-container {
+    display: flex;
+    justify-content: space-between; /* Space out the sections */
+    align-items: flex-start; /* Align items to the top */
+    margin-bottom: 20px; /* Add some margin for spacing */
+}
+
+.greeting-section {
+    flex: 1; /* Take up available space */
+    margin-right: 20px; /* Add some space between sections */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center items horizontally */
+}
+
+.make-payment-button{
+    padding-top: 2vw;
+    padding-bottom: 2vw;
+    font-size: 2em;
 }
