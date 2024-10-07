@@ -15,7 +15,6 @@ export async function getUserName() {
       // Check if request was successful
       if (response.ok) {
         const result = await response.json();
-        console.log("Username:", result.name);
         return result.name; // Return the username
       } else {
         const error = await response.json();
@@ -43,7 +42,6 @@ export async function getUserAccountNum() {
       // Check if request was successful
       if (response.ok) {
         const result = await response.json();
-        console.log("accountNumber:", result.accountNumber);
         return result.accountNumber; // Return the username
       } else {
         const error = await response.json();
