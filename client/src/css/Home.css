@@ -1,34 +1,43 @@
+.overall-container {
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+}
+
 .home-container {
     display: flex;
-    align-items: center; /* Align items vertically centered */
-    padding: 1vw; /* Use viewport width for padding */
+    flex-direction: column;
+    align-items: center; /* Center items vertically */
+    justify-content: center; /* Center items horizontally */
+    padding: 1vw;
     max-width: 1200px;
-    margin-top: 10vh; /* Use viewport height for margin-top */
-    height: 100%;
+    margin: 10vh auto;
+    height: auto;
 }
 
 .text-container {
-    padding-right: 5vw; /* Use viewport width for padding-right */
-    margin-left: 4vw; /* Use viewport width for margin-left */
-    margin-top: 5vh; /* Use viewport height for margin-top */
+    padding-right: 5vw;
+    margin: 0 4vw;
+    margin-top: 5vh;
+    text-align: center;
 }
 
 h1 {
-    font-size: 6.5vw; /* Use viewport width for font-size */
-    font-family: HeroMessageFont, sans-serif; /* Added generic font family */
-    margin-bottom: 1vh; /* Use viewport height for margin-bottom */
+    font-size: 6.5vw;
+    font-family: HeroMessageFont, sans-serif;
+    margin-bottom: 1vh;
     line-height: 1.2;
-    margin-top: 1vh; /* Use viewport height for margin-top */
+    margin-top: 1vh;
 }
 
 .body-text {
-    font-size: 1.5vw; /* Use viewport width for font-size */
-    font-family: BodyFont, sans-serif; /* Added generic font family */
+    font-size: 1.5vw;
+    font-family: BodyFont, sans-serif;
     max-width: 800px;
+    margin: 0 auto;
 }
 
 .potential {
-    font-family: PotentialFont, sans-serif; /* Added generic font family */
+    font-family: PotentialFont, sans-serif;
     background: linear-gradient(to right, #8aeba5, #19aa6b);
     background-clip: text;
     -webkit-background-clip: text;
@@ -36,9 +45,9 @@ h1 {
 }
 
 .business-image {
-    margin-right: -50vw; /* Use viewport width for margin-right */
-    width: 30vw; /* Use viewport width for width */
+    width: 30vw;
     height: auto;
+    margin: 2vh 0;
 }
 
 @font-face {
@@ -54,4 +63,38 @@ h1 {
 @font-face {
     font-family: 'BodyFont';
     src: url(../assets/Fonts/Garet-Book.ttf) format('truetype');
+}
+
+@media (min-width: 768px) {
+    .home-container {
+        flex-direction: row;
+        justify-content: center; /* Center items horizontally */
+    }
+
+    .text-container {
+        text-align: left;
+        margin-top: 0;
+        flex: 1; /* Allow text container to take available space */
+    }
+
+    .business-image {
+        margin: 0;
+        flex: 1; /* Allow image to take available space */
+        display: flex;
+        justify-content: center; /* Center image horizontally */
+    }
+}
+
+@media (max-width: 767px) {
+    h1 {
+        font-size: 8vw; /* Larger font size for smaller screens */
+    }
+
+    .body-text {
+        font-size: 2.5vw; /* Larger font size for smaller screens */
+    }
+
+    .business-image {
+        width: 50vw; /* Adjust image size for smaller screens */
+    }
 }
