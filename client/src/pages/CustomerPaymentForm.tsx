@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../css/PaymentForm.css';
 import SwiftCodeTextBox from '../components/SwiftCodeTextBox'; // Import the SwiftCodeTextBox component
 import { useEffect, useRef } from "react";
@@ -45,6 +44,10 @@ function CustomerPaymentForm() {
                         <input className="input-field" type="text" id="amount-transfer" placeholder="Enter Amount you want to pay" />
                     </div>
                     <div className="form-group">
+                        <label htmlFor="description">Description:</label>
+                        <input className="input-field" type="text" id="description" placeholder="Enter payment description" />
+                    </div>
+                    <div className="form-group">
                         <label htmlFor="swift-code">Enter SWIFT Code:</label>
                         <SwiftCodeTextBox /> {/* Replace the input field with the SwiftCodeTextBox component */}
                     </div>
@@ -55,8 +58,6 @@ function CustomerPaymentForm() {
                 </form>
             </div>
         </div>
-      </form>
-    </div>
   );
 }
 

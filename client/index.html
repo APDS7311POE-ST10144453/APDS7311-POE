@@ -2,12 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <title>E-Z Banking</title>
+    <link rel="icon" href="/src/assets/Images/piggy-bank.png" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Scrolling title effect
+      const originalTitle = "E-Z Banking";
+      let titleIndex = 0;
+
+      function scrollTitle() {
+        document.title = originalTitle.substring(titleIndex) + " " + originalTitle.substring(0, titleIndex);
+        titleIndex = (titleIndex + 1) % originalTitle.length;
+      }
+
+      setInterval(scrollTitle, 200); // Adjust the interval as needed
+    </script>
   </body>
 </html>
