@@ -1,6 +1,15 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import "../css/LoginAndRegister.css"; // Using the same CSS for both login and register
+import useFormValidationErrors from "../useFormValidationErrors";
+import {
+  getAccountNumberErrors,
+  getConfirmPasswordErrors,
+  getIdNumberErrors,
+  getNameErrors,
+  getPasswordErrors,
+  getUsernameErrors,
+} from "../validation";
 
 export default function Register() {
   const [data, setData] = useState({
@@ -11,18 +20,61 @@ export default function Register() {
     password: "",
   });
 
+  // custom hook for error validation
+  const { errors, setFieldError, clearFieldError } = useFormValidationErrors([
+    "name",
+    "username",
+    "idNumber",
+    "accountNumber",
+    "password",
+  ]);
+
   const [responseMessage, setResponseMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setData({
       ...data,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
   const registerUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Validation
+    clearFieldError("name"); // Full Name
+    const nameErrors = getNameErrors(data.name);
+    if (nameErrors.length > 0) {
+      setFieldError("name", nameErrors);
+      return;
+    }
+    clearFieldError("username"); // Username
+    const usernameErrors = getUsernameErrors(data.username);
+    if (usernameErrors.length > 0) {
+      setFieldError("username", usernameErrors);
+      return;
+    }
+    clearFieldError("idNumber"); // ID Number
+    const idNumberErrors = getIdNumberErrors(data.idNumber);
+    if (idNumberErrors.length > 0) {
+      setFieldError("idNumber", idNumberErrors);
+      return;
+    }
+    clearFieldError("accountNumber"); // Account Number
+    const accountNumberErrors = getAccountNumberErrors(data.accountNumber);
+    if (accountNumberErrors.length > 0) {
+      setFieldError("accountNumber", accountNumberErrors);
+      return;
+    }
+    clearFieldError("password"); // Password
+    const passwordErrors = getPasswordErrors(data.password);
+    if (passwordErrors.length > 0) {
+      setFieldError("password", passwordErrors);
+      return;
+    }
+
     try {
       console.log("User register attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/register", {
@@ -51,8 +103,7 @@ export default function Register() {
 
   return (
     <div className="login-container">
-      <div className="login-image">
-      </div>
+      <div className="login-image"></div>
 
       <div className="login-form">
         <div className="form-container">
@@ -67,6 +118,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
+              <text>{errors["name"]}</text>
             </div>
             <div className="form-group">
               <label>Username</label>
@@ -78,6 +130,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
+              <text>{errors["username"]}</text>
             </div>
             <div className="form-group-horizontal">
               <div className="form-group">
@@ -90,6 +143,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                <text>{errors["idNumber"]}</text>
               </div>
               <div className="form-group">
                 <label>Account Number</label>
@@ -101,6 +155,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                <text>{errors["accountNumber"]}</text>
               </div>
             </div>
             <div className="form-group-horizontal">
@@ -113,6 +168,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                <text>{errors["password"]}</text>
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
