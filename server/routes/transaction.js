@@ -9,7 +9,7 @@ const checkAuth = require("../check-auth")(); // Call the function to get the mi
 router.post("/transact", async (req, res) => {
   try {
     // Getting transaction information from the body
-    const {senderAccountNumber, recipientName, recipientBank, recipientAccountNumber, transferAmount, currency, swiftCode} = req.body;
+    const { senderAccountNumber, recipientName, recipientBank, recipientAccountNumber, transferAmount, currency, swiftCode,transactionDescription, transactionDate } = req.body;
 
     // Creating a new transaction (dbschema)
     const newTransaction = new Transaction({
@@ -20,17 +20,22 @@ router.post("/transact", async (req, res) => {
       transferAmount,
       currency,
       swiftCode,
+      transactionDescription,
+      transactionDate,
       approvalStatus: "pending"
     });
 
     // Saving the transaction to the database
+    console.log("Transaction:", newTransaction);
     await newTransaction.save();
     res.status(201).json({ message: "Transaction successfully recorded" });
 
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error("Error during transaction:", err); // Log error for better visibility
+    res.status(400).json({ error: "Transaction failed: " + err.message});
   }
 });
+
 
 // Get the List of transactions for the user
 // Use the url: https://localhost:3000/api/transaction/getTransactions?id=addIdInPlaceOfThisText

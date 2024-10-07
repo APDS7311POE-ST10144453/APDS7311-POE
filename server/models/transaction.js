@@ -30,11 +30,11 @@ const transactionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  TransactionDate: {
+  transactionDate: {
     type: Date,
     required: true,
   },
-  TransactionDescription: {
+  transactionDescription: {
     type: String,
     required: true,
   },

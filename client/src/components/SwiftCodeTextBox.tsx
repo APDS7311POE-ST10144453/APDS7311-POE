@@ -3,8 +3,12 @@ import ErrorTextBox from "./ErrorTextBox";
 import "../css/SwiftCodeTextBox.css";
 const API_KEY = "CcES+jV4ZAnevw2ULFMBiw==O5erOBpo9XDXEGFT";
 
-const SwiftCodeTextBox: React.FC = () => {
-  const [inputValue, setInputValue] = useState<string>("");
+interface SwiftCodeTextBoxProps {
+  value: string;
+  onChange: (value: string) => void;
+}
+
+const SwiftCodeTextBox: React.FC<SwiftCodeTextBoxProps> = ({ value, onChange }) => {
   const [hasError, setHasError] = useState<boolean>(false);
   const [isValid, setIsValid] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -12,7 +16,7 @@ const SwiftCodeTextBox: React.FC = () => {
 
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const swiftCode = e.target.value;
-    setInputValue(swiftCode);
+    onChange(swiftCode); // Call the onChange prop to update the value in the parent component
     setHasError(false); // Reset error state on input change
     setIsValid(false);
     setBankName(""); // Reset bank name
@@ -59,7 +63,7 @@ const SwiftCodeTextBox: React.FC = () => {
 
   return (
     <div>
-      <ErrorTextBox value={inputValue} onChange={handleInputChange} error={hasError} />
+      <ErrorTextBox value={value} onChange={handleInputChange} error={hasError} />
       {loading && <p className="loading-message">Validating SWIFT code...</p>}
       {hasError && <p className="error-message">Please enter a valid SWIFT code</p>}
       {isValid && <p className="success-message">SWIFT code for {bankName} is valid!</p>}
