@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import '../css/PaymentForm.css';
 import SwiftCodeTextBox from '../components/SwiftCodeTextBox'; // Import the SwiftCodeTextBox component
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import "../css/PaymentForm.css";
 import { isAuthenticated } from "../utils/auth";
 
@@ -19,7 +18,7 @@ function CustomerPaymentForm() {
     }
   }, [navigate]);
 
-   const handleBackClick = () => {
+  const handleBackClick = () => {
     navigate("/customer-dashboard");
   };
 
@@ -55,8 +54,6 @@ function CustomerPaymentForm() {
                 </form>
             </div>
         </div>
-      </form>
-    </div>
   );
 }
 
