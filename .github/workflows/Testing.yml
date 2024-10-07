@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 16.x, 18.x, 20.x]
+        node-version: [ 16.x, 18.x, 20.x ]
 
     steps:
       - name: Checkout repository
@@ -32,11 +32,11 @@ jobs:
         working-directory: ./server
 
       - name: Run tests
-        run: npx mocha tests/generatecrypto.test.mjs --reporter mocha-junit-reporter --reporter-options mochaFile=server/test-results/results.xml
+        run: npx mocha tests/generatecrypto.test.mjs --reporter mocha-junit-reporter --reporter-options mochaFile=test-results/results.xml
         working-directory: ./server
 
       - name: List test results directory
-        run: ls -la server/test-results
+        run: ls -la test-results
         working-directory: ./server
 
       - name: Add delay
