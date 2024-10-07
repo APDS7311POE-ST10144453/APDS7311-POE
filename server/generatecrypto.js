@@ -1,30 +1,29 @@
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
-// Generate a secure encryption key
-const encryptionKey = crypto.randomBytes(32).toString("hex");
-//console.log("ENCRYPTION_KEY:", encryptionKey);
-
+console.log("\nCopy the below and paste into the .env file\n");
 // Generate a secure JWT secret
 const jwtSecret = crypto.randomBytes(32).toString("hex");
-//console.log("JWT_SECRET:", jwtSecret);
+console.log("JWT_SECRET="+jwtSecret);
 
-// Generate a secure password salt
-// const salt = crypto.randomBytes(16).toString("hex");
-//console.log("SALT:", salt);
+// Generate a secure encryption key
+const encryptionKey = crypto.randomBytes(32).toString("hex");
+console.log("ENCRYPTION_KEY="+encryptionKey);
 
+// Generate a secure pepper
+const pepper = crypto.randomBytes(16).toString("hex");
+console.log("MY_SECRET_PEPPER="+pepper);
 
-// Generate a secure password salt
-const salt = crypto.randomBytes(16).toString("hex");
-console.log("Generated Salt:", salt);
-
-// Define a pepper (a secret value stored securely, not in the database)
-const pepper = process.env.MY_SECRET_PEPPER="SuperSecretPepper";
-console.log("Pepper:", pepper);
+console.log(`\n-------------------------------------------\n`);
+console.log(`Password security process:`);
 
 // An example of a password being hashed
 const password = 'mySecurePassword';
 console.log('Password:', password);
+
+// Generate a secure password salt
+const salt = crypto.randomBytes(16).toString("hex");
+console.log("Generated Salt=", salt);
 
 // Combine password, salt, and pepper
 const saltedPepperedPassword = password + salt + pepper;
