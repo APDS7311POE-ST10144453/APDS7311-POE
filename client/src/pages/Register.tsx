@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import "../css/LoginAndRegister.css"; // Using the same CSS for both login and register
 
 export default function Register() {
@@ -9,20 +8,39 @@ export default function Register() {
     idNumber: "",
     accountNumber: "",
     password: "",
+    confirmPassword: "",
   });
 
   const [responseMessage, setResponseMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setData({
       ...data,
       [e.target.name]: e.target.value,
     });
+    setPasswordError(""); // Clear password error message when user starts typing
+  };
+
+  const validatePassword = () => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(data.password)) {
+      setPasswordError("Password must be at least 8 characters long, contain at least 1 uppercase letter, 1 number, and 1 special character.");
+      return false;
+    }
+    if (data.password !== data.confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return false;
+    }
+    return true;
   };
 
   const registerUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!validatePassword()) {
+      return;
+    }
     try {
       console.log("User register attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/register", {
@@ -37,22 +55,24 @@ export default function Register() {
         const result = await response.json();
         console.log(result);
         setResponseMessage("User registered successfully");
-        console.log("Redirecting to /customer-dashboard");
-        window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
+        console.log("Redirecting to /login");
+        // wait a second before redirect
+        setTimeout(() => {
+          window.location.href = "/login"; // Redirect to login
+        }, 2000);
       } else {
         const error = await response.json();
         setErrorMessage(error.message || "Registration failed");
       }
     } catch (error) {
-      console.error("An error occurred., please try again later., ", error);
+      console.error("An error occurred, please try again later.", error);
       setErrorMessage("An error occurred, please try again later.");
     }
   };
 
   return (
     <div className="login-container">
-      <div className="login-image">
-      </div>
+      <div className="login-image"></div>
 
       <div className="login-form">
         <div className="form-container">
@@ -113,12 +133,15 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                {passwordError && <div className="error-message">{passwordError}</div>}
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
                 <input
                   type="password"
                   name="confirmPassword"
+                  value={data.confirmPassword}
+                  onChange={handleChange}
                   className="input-field"
                 />
               </div>

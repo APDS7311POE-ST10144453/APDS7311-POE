@@ -127,6 +127,10 @@ function CustomerPaymentForm() {
               required
             />
           </div>
+                    <div className="form-group">
+                        <label htmlFor="description">Description:</label>
+                        <input className="input-field" type="text" id="description" placeholder="Enter payment description" />
+                    </div>
           <div className="form-group">
             <label htmlFor="swift-code">Enter SWIFT Code:</label>
             <SwiftCodeTextBox value={swiftCode} onChange={setSwiftCode} /> {/* Assuming SwiftCodeTextBox takes a value and onChange prop */}

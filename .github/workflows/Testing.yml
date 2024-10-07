@@ -1,0 +1,66 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: Create test results directory
+        run: mkdir -p server/test-results
+        working-directory: ./server
+
+      - name: Run tests
+        run: npm test
+        working-directory: ./server
+
+      - name: List test results directory
+        run: ls -la test-results
+        working-directory: ./server
+
+      - name: Add delay
+        run: sleep 5
+
+      - name: Debug:List GitHub workspace
+        run: ls -la ${{ github.workspace }}
+        working-directory: ./server
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ${{ github.workspace }}/server/test-results/test-results.json
+          if-no-files-found: warn
+          include-hidden-files: false
+
+      - name: Publish test results to Dorny
+        uses: dorny/test-reporter@v1
+        with:
+          name: Mocha Tests
+          path: ${{ github.workspace }}/server/test-results/test-results.json
+          reporter: mocha-json
