@@ -42,4 +42,4 @@ jobs:
         with:
           name: Mocha Tests
           path: server/test-results/results.xml
-          reporter: mocha-junit-reporter
+          reporter: mocha-json
