@@ -33,7 +33,7 @@ jobs:
 
       - name: Run tests
         run: npm test
-        working-directory: ./server/test-results
+        working-directory: ./server
 
       - name: List test results directory
         run: ls -la test-results

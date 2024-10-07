@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server",
     "dev": "npm install && nodemon server",
-    "test": "mocha --reporter json --reporter-option output=test-results.json"
+    "test": "mocha --reporter json --reporter-option output=test-results/test-results.json"
   },
   "author": "",
   "license": "ISC",
