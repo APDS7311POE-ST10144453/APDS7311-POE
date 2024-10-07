@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/CustomerDashboard.css";
 import { isAuthenticated } from "../utils/auth";
-import { getUserName } from '../services/dataRequestService';
-import { getUserAccountNum } from '../services/dataRequestService';
-import { getPayments } from '../services/dataRequestService';
-import { getBalance } from '../services/dataRequestService';
-
-
+import {
+  getUserName,
+  getUserAccountNum,
+  getPayments,
+  getBalance,
+} from "../services/dataRequestService";
 
 function CustomerDashboard() {
   const navigate = useNavigate();
@@ -24,9 +24,17 @@ function CustomerDashboard() {
     }
   }, [navigate]);
 
-  if (!authChecked) {
-    return null; // Render nothing until auth check is done
+  const [username, setUsername] = useState("");
+  const [accountNum, setAccountNum] = useState("");
+  const [ballance, setBallance] = useState("");
+  interface Receipt {
+    id: string;
+    TransactionDate: string;
+    TransactionDescription: string;
+    transferAmount: number;
   }
+
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
 
   const handleLocalPaymentClick = () => {
     navigate("/customer-payment-form");
@@ -40,42 +48,39 @@ function CustomerDashboard() {
     navigate("/transactions");
   };
 
-  const [username, setUsername] = useState('');
-  const [accountNum, setAccountNum] = useState('');
-  const [ballance, setBallance] = useState('');
-  interface Receipt {
-    TransactionDate: string;
-    TransactionDescription: string;
-    transferAmount: number;
-  }
+  useEffect(() => {
+    if (!authChecked) {
+      return; // Do nothing until auth check is done
+    }
 
-  const [receipts, setReceipts] = useState<Receipt[]>([]);
+    // Fetch the user's name when the component loads
+    async function fetchUsername() {
+      const name = await getUserName();
+      if (name) setUsername(name);
+    }
+    async function fetchUserAccountNum() {
+      const AN = await getUserAccountNum();
+      if (AN) setAccountNum(AN);
+    }
+    async function fetchUserReceipts() {
+      const receipts = await getPayments();
+      if (receipts) setReceipts(receipts);
+    }
 
-useEffect(() => {
-// Fetch the user's name when the component loads
-async function fetchUsername() {
-  const name = await getUserName();
-  if (name) setUsername(name);
-}
-async function fetchUserAccountNum() {
-    const AN = await getUserAccountNum();
-    if (AN) setAccountNum(AN);
-  }
-  async function fetchUserReceipts() {
-    const receipts = await getPayments();
-    if (receipts) setReceipts(receipts);
-  }
+    async function fetchBalance() {
+      const B = await getBalance();
+      if (B) setBallance(B);
+    }
 
-  async function fetchBalance() {
-    const B = await getBalance();
-    if (B) setBallance(B);
-  }
+    fetchUsername();
+    fetchUserAccountNum();
+    fetchBalance();
+    fetchUserReceipts();
+  }, [authChecked]);
 
-fetchUsername();
-fetchUserAccountNum();
-fetchBalance();
-fetchUserReceipts();
-}, []);
+  if (!authChecked) {
+    return null; // Render nothing until auth check is done
+  }
 
   const handleLogOutClick = () => {
     localStorage.removeItem("token");
@@ -118,30 +123,34 @@ fetchUserReceipts();
             <div className="details-box">
               <p>Acc No: {accountNum}</p>
               <p>
-                <strong>Available Balance</strong>: $ {ballance}</p>
+                <strong>Available Balance</strong>: $ {ballance}
+              </p>
             </div>
           </div>
         </div>
 
-                {/* Payment Receipts Section */}
-                <div className="payment-receipts">
-                    <h3>Payment Receipts</h3>
-                    <div className="details-box">
-                        {receipts.length > 0 ? (
-                            receipts.map((receipt, index) => (
-                                <div key={index} className="receipt-item">
-                                    <span>{receipt.TransactionDate} {receipt.TransactionDescription} ${receipt.transferAmount}</span>
-                                    <button className="pay-again-button">Pay again</button>
-                                </div>
-                            ))
-                        ) : (
-                            <p>No receipts found.</p>
-                        )}
-                    </div>
+        {/* Payment Receipts Section */}
+        <div className="payment-receipts">
+          <h3>Payment Receipts</h3>
+          <div className="details-box">
+            {receipts.length > 0 ? (
+              receipts.map((receipt) => (
+                <div key={receipt.id} className="receipt-item">
+                  <span>
+                    {receipt.TransactionDate} {receipt.TransactionDescription} $
+                    {receipt.transferAmount}
+                  </span>
+                  <button className="pay-again-button">Pay again</button>
                 </div>
-            </div>
+              ))
+            ) : (
+              <p>No receipts found.</p>
+            )}
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default CustomerDashboard;
