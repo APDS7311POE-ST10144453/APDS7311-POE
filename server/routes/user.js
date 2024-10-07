@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
-const checkAuth = require("../check-auth");
+const checkAuth = require("../check-auth")();
 const ExpressBrute = require("express-brute");
 
 var store = new ExpressBrute.MemoryStore();
@@ -104,15 +104,16 @@ router.post(
       const encryptedIdNumber = encrypt(idNumber);
       const encryptedAccountNumber = encrypt(accountNumber);
 
-      // Create a new user with the hashed password
-      const newUser = new User({
-        username,
-        name,
-        idNumber: encryptedIdNumber,
-        accountNumber: encryptedAccountNumber,
-        password: hash,
-        role: role,
-      });
+    // Create a new user with the hashed password
+    const newUser = new User({
+      username,
+      name,
+      idNumber: encryptedIdNumber,
+      accountNumber: encryptedAccountNumber,
+      password: hash,
+      role: role,
+      balance: 75363,
+    });
 
       // Save the new user to the database
       await newUser.save();
@@ -184,6 +185,12 @@ router.post(
         });
       }
 
+       // Check if the user's balance is null and set it to 75363 if it is
+       if (user.balance === null) {
+        user.balance = 75363;
+        await user.save();
+      }
+
       // If the password matches, generate a JWT token
       const token = jwt.sign(
         { username: user.username, userId: user._id },
@@ -227,6 +234,72 @@ router.get("/account", checkAuth, async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error: " + error.message });
+  }
+});
+
+// Get the user's name based on the JWT token
+router.get("/getUserName", checkAuth, async (req, res) => {
+  try {
+    // Extract the userId from the token (provided by checkAuth middleware)
+    const userId = req.user.userId;
+
+    // Find the user by ID in the database
+    const user = await User.findById(userId);
+
+    // If the user is not found, return a 404 error
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the user's name
+    res.status(200).json({ name: user.name });
+  } catch (err) {
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+});
+
+// Get the user's name based on the JWT token
+router.get("/getaccountNum", checkAuth, async (req, res) => {
+  try {
+    // Extract the userId from the token (provided by checkAuth middleware)
+    const userId = req.user.userId;
+
+    // Find the user by ID in the database
+    const user = await User.findById(userId);
+
+    // If the user is not found, return a 404 error
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+const decryptedAccountNumber = decrypt(user.accountNumber);
+
+    // Respond with the user's accountNumber
+    res.status(200).json({ accountNumber: decryptedAccountNumber });
+  } catch (err) {
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+});
+
+
+// Get the user's name based on the JWT token
+router.get("/getBalance", checkAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const balance = user.balance.toString();
+    console.log("User balance:", balance);
+
+    res.status(200).json({ balance: balance });
+  } catch (err) {
+    console.error("Server error:", err.message);
+    res.status(500).json({ message: "Server error: " + err.message });
   }
 });
 

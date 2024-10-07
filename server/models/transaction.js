@@ -30,6 +30,14 @@ const transactionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  TransactionDate: {
+    type: Date,
+    required: true,
+  },
+  TransactionDescription: {
+    type: String,
+    required: true,
+  },
   approvalStatus: {
     type: String,
     enum: ["approved", "pending", "denied"],
