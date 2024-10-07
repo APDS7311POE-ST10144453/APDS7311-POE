@@ -28,4 +28,18 @@ jobs:
         working-directory: ./server
 
       - name: Run tests
-        run: npx mocha server/tests/generatecrypto.test.mjs
+        run: npx mocha tests/generatecrypto.test.mjs
+        working-directory: ./server
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: server/test-results/results.xml
+
+      - name: Publish test results to Dorny
+        uses: dorny/test-reporter@v1
+        with:
+          name: Mocha Tests
+          path: server/test-results/results.xml
+          reporter: mocha-junit-reporter
