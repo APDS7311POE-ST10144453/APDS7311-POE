@@ -14,6 +14,7 @@ function CustomerPaymentForm() {
   const [transferAmount, setTransferAmount] = useState('');
   const [swiftCode, setSwiftCode] = useState('');
   const [currency, setCurrency] = useState('USD'); // Example currency
+  const [description, setdescription] = useState(''); // Description of the transaction
   const navigate = useNavigate();
   const alertShown = useRef(false); // Ref to track if the alert has been shown
 
@@ -22,6 +23,7 @@ function CustomerPaymentForm() {
       alert("You are not logged in. Please log in to continue.");
       alertShown.current = true; // Set the ref to true after showing the alert
       navigate("/login");
+      
     }
   }, [navigate]);
 
@@ -36,6 +38,7 @@ function CustomerPaymentForm() {
   }
 
   const handlePayClick = async (e: any) => {
+    fetchUserAccountNum();
       e.preventDefault(); // Prevent the default form submission
       try {
         const response = await fetch("https://localhost:3000/api/transaction/transact", {
@@ -51,8 +54,8 @@ function CustomerPaymentForm() {
             transferAmount,
             currency,
             swiftCode,
-            TransactionDescription: "Payment for services", // Add a description
-            TransactionDate: new Date().toISOString() // Add the current date
+            transactionDescription: description,
+            transactionDate: new Date().toISOString(), // Add the current date
           })
         });
     
@@ -127,10 +130,16 @@ function CustomerPaymentForm() {
               required
             />
           </div>
-                    <div className="form-group">
-                        <label htmlFor="description">Description:</label>
-                        <input className="input-field" type="text" id="description" placeholder="Enter payment description" />
-                    </div>
+          <div className="form-group">
+              <label htmlFor="description">Description:</label>
+              <input 
+              className="input-field" 
+              type="text" 
+              id="description" 
+              placeholder="Enter payment description"
+              value={description}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setdescription(e.target.value)}/>
+          </div>
           <div className="form-group">
             <label htmlFor="swift-code">Enter SWIFT Code:</label>
             <SwiftCodeTextBox value={swiftCode} onChange={setSwiftCode} /> {/* Assuming SwiftCodeTextBox takes a value and onChange prop */}

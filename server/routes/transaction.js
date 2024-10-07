@@ -9,7 +9,7 @@ const checkAuth = require("../check-auth")(); // Call the function to get the mi
 router.post("/transact", async (req, res) => {
   try {
     // Getting transaction information from the body
-    const { senderAccountNumber, recipientName, recipientBank, recipientAccountNumber, transferAmount, currency, swiftCode } = req.body;
+    const { senderAccountNumber, recipientName, recipientBank, recipientAccountNumber, transferAmount, currency, swiftCode,transactionDescription, transactionDate } = req.body;
 
     // Creating a new transaction (dbschema)
     const newTransaction = new Transaction({
@@ -20,6 +20,8 @@ router.post("/transact", async (req, res) => {
       transferAmount,
       currency,
       swiftCode,
+      transactionDescription,
+      transactionDate,
       approvalStatus: "pending"
     });
 
@@ -30,7 +32,7 @@ router.post("/transact", async (req, res) => {
 
   } catch (err) {
     console.error("Error during transaction:", err); // Log error for better visibility
-    res.status(400).json({ error: "Transaction failed: " + err.message });
+    res.status(400).json({ error: "Transaction failed: " + err.message});
   }
 });
 
