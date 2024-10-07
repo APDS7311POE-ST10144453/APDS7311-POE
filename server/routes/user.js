@@ -7,16 +7,16 @@ const bcrypt = require("bcrypt");
 const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
-const checkAuth = require("../check-auth");
+const checkAuth = require("../check-auth")();
 const ExpressBrute = require("express-brute");
 
 var store = new ExpressBrute.MemoryStore();
 var bruteforce = new ExpressBrute(store);
 
 const passwordComplexityRegex =
-  /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,64}$/;
 const sqlInjectionRegex =
-  /\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|EXEC|UNION|WHERE)\b|;|--/i;
+  /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|EXEC|UNION|WHERE)\b|;|--)/i;
 
 // Rate limiter middleware to limit repeated requests to public APIs
 const limiter = rateLimit({
@@ -50,7 +50,7 @@ router.post(
       .trim()
       .escape(),
     body("idNumber")
-      .isLength({ min: 10, max: 10 })
+      .isLength({ min: 13, max: 13 })
       .withMessage("ID number is required and is 10 digits")
       .matches(sqlInjectionRegex)
       .withMessage(
@@ -82,11 +82,6 @@ router.post(
       .escape(),
   ],
   async (req, res) => {
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
     try {
       const { username, name, idNumber, accountNumber, password, role } =
         req.body;
@@ -95,6 +90,15 @@ router.post(
       const existingUser = await User.findOne({ username });
       if (existingUser) {
         return res.status(400).json({ message: "Username already exists" });
+      }
+
+      if (
+        sqlInjectionRegex.test(username) ||
+        sqlInjectionRegex.test(password) ||
+        sqlInjectionRegex.test(idNumber) ||
+        sqlInjectionRegex.test(accountNumber)
+      ) {
+        return res.status(400).json({ message: "Invalid input detected" });
       }
 
       // Hash the password
@@ -112,6 +116,7 @@ router.post(
         accountNumber: encryptedAccountNumber,
         password: hash,
         role: role,
+        balance: 75363,
       });
 
       // Save the new user to the database
@@ -184,6 +189,12 @@ router.post(
         });
       }
 
+      // Check if the user's balance is null and set it to 75363 if it is
+      if (user.balance === null) {
+        user.balance = 75363;
+        await user.save();
+      }
+
       // If the password matches, generate a JWT token
       const token = jwt.sign(
         { username: user.username, userId: user._id },
@@ -227,6 +238,71 @@ router.get("/account", checkAuth, async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Server error: " + error.message });
+  }
+});
+
+// Get the user's name based on the JWT token
+router.get("/getUserName", checkAuth, async (req, res) => {
+  try {
+    // Extract the userId from the token (provided by checkAuth middleware)
+    const userId = req.user.userId;
+
+    // Find the user by ID in the database
+    const user = await User.findById(userId);
+
+    // If the user is not found, return a 404 error
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with the user's name
+    res.status(200).json({ name: user.name });
+  } catch (err) {
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+});
+
+// Get the user's name based on the JWT token
+router.get("/getaccountNum", checkAuth, async (req, res) => {
+  try {
+    // Extract the userId from the token (provided by checkAuth middleware)
+    const userId = req.user.userId;
+
+    // Find the user by ID in the database
+    const user = await User.findById(userId);
+
+    // If the user is not found, return a 404 error
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const decryptedAccountNumber = decrypt(user.accountNumber);
+
+    // Respond with the user's accountNumber
+    res.status(200).json({ accountNumber: decryptedAccountNumber });
+  } catch (err) {
+    res.status(500).json({ message: "Server error: " + err.message });
+  }
+});
+
+// Get the user's name based on the JWT token
+router.get("/getBalance", checkAuth, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const balance = user.balance.toString();
+    console.log("User balance:", balance);
+
+    res.status(200).json({ balance: balance });
+  } catch (err) {
+    console.error("Server error:", err.message);
+    res.status(500).json({ message: "Server error: " + err.message });
   }
 });
 

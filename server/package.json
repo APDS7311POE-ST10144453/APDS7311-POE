@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server",
-    "dev": "npm install && nodemon server"
+    "dev": "npm install && nodemon server",
+    "test": "mocha --reporter json --reporter-option output=test-results/test-results.json"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
+    "esm": "^3.2.25",
     "express": "^4.19.2",
     "express-brute": "^1.0.1",
     "express-rate-limit": "^7.4.0",
@@ -23,5 +24,11 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.2",
     "nodemon": "^3.1.4"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "chai": "^5.1.1",
+    "mocha": "^10.7.3",
+    "mocha-junit-reporter": "^2.2.1"
   }
 }
