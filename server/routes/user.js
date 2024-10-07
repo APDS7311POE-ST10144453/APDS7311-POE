@@ -13,6 +13,11 @@ const ExpressBrute = require("express-brute");
 var store = new ExpressBrute.MemoryStore();
 var bruteforce = new ExpressBrute(store);
 
+const passwordComplexityRegex =
+  /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+const sqlInjectionRegex =
+  /\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|EXEC|UNION|WHERE)\b|;|--/i;
+
 // Rate limiter middleware to limit repeated requests to public APIs
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -21,48 +26,102 @@ const limiter = rateLimit({
 });
 
 // User registration route using bcrypt to hash the password
-router.post("/register",[
-  body("username").notEmpty().withMessage("Username is required").trim().escape(),
-  body("name").notEmpty().withMessage("Name is required").trim().escape(),
-  body("idNumber").notEmpty().withMessage("ID number is required").trim().escape(),
-  body("accountNumber").notEmpty().withMessage("Account number is required").trim().escape(),
-  body("password").isLength({min: 8}).withMessage("Password is required").trim().escape(),
-], 
-async (req, res) => {
-  try {
-    const { username, name, idNumber, accountNumber, password, role } =
-      req.body;
+router.post(
+  "/register",
+  [
+    body("username")
+      .notEmpty()
+      .withMessage("Username is required")
+      .matches(sqlInjectionRegex)
+      .withMessage(
+        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
+      )
+      .trim()
+      .escape(),
+    body("name")
+      .notEmpty()
+      .withMessage("Name is required")
+      .isLength({ min: 3, max: 50 })
+      .withMessage("Name must be between 3 and 50 characters")
+      .matches(sqlInjectionRegex)
+      .withMessage(
+        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
+      )
+      .trim()
+      .escape(),
+    body("idNumber")
+      .isLength({ min: 10, max: 10 })
+      .withMessage("ID number is required and is 10 digits")
+      .matches(sqlInjectionRegex)
+      .withMessage(
+        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
+      )
+      .trim()
+      .escape(),
+    body("accountNumber")
+      .isLength({ min: 10, max: 10 })
+      .withMessage("Account number is required")
+      .matches(sqlInjectionRegex)
+      .withMessage(
+        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
+      )
+      .trim()
+      .escape(),
+    body("password")
+      .isLength({ min: 8, max: 64 })
+      .withMessage("Password is required")
+      .matches(passwordComplexityRegex)
+      .withMessage(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+      )
+      .matches(sqlInjectionRegex)
+      .withMessage(
+        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
+      )
+      .trim()
+      .escape(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
 
-    // Check if the username already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: "Username already exists" });
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+    try {
+      const { username, name, idNumber, accountNumber, password, role } =
+        req.body;
 
-    // Hash the password
-    const hash = await bcrypt.hash(password, 10);
+      // Check if the username already exists
+      const existingUser = await User.findOne({ username });
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
 
-    //Encrypt the idNumber and accountNumber
-    const encryptedIdNumber = encrypt(idNumber);
-    const encryptedAccountNumber = encrypt(accountNumber);
+      // Hash the password
+      const hash = await bcrypt.hash(password, 10);
 
-    // Create a new user with the hashed password
-    const newUser = new User({
-      username,
-      name,
-      idNumber: encryptedIdNumber,
-      accountNumber: encryptedAccountNumber,
-      password: hash,
-      role: role,
-    });
+      //Encrypt the idNumber and accountNumber
+      const encryptedIdNumber = encrypt(idNumber);
+      const encryptedAccountNumber = encrypt(accountNumber);
 
-    // Save the new user to the database
-    await newUser.save();
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+      // Create a new user with the hashed password
+      const newUser = new User({
+        username,
+        name,
+        idNumber: encryptedIdNumber,
+        accountNumber: encryptedAccountNumber,
+        password: hash,
+        role: role,
+      });
+
+      // Save the new user to the database
+      await newUser.save();
+      res.status(201).json({ message: "User registered successfully" });
+    } catch (err) {
+      res.status(400).json({ error: err.message });
+    }
   }
-});
+);
 
 // User login route using username, account number, and password to find the user
 router.post(
@@ -70,8 +129,16 @@ router.post(
   limiter, // Apply rate limiter middleware to this route
   [
     // Validate and sanitize input fields
-    body("username").notEmpty().withMessage("Username is required").trim().escape(),
-    body("password").notEmpty().withMessage("Password is required").trim().escape(),
+    body("username")
+      .notEmpty()
+      .withMessage("Username is required")
+      .trim()
+      .escape(),
+    body("password")
+      .notEmpty()
+      .withMessage("Password is required")
+      .trim()
+      .escape(),
     body("accountNumber")
       .isNumeric()
       .withMessage("Account number must be numeric"),
@@ -121,7 +188,7 @@ router.post(
       const token = jwt.sign(
         { username: user.username, userId: user._id },
         process.env.JWT_SECRET, // Use environment variable for secret
-        { expiresIn: "1h" }
+        { expiresIn: "30m" }
       );
 
       // Send the JWT token and user information in the response
@@ -151,13 +218,13 @@ router.get("/account", checkAuth, async (req, res) => {
     }
 
     // Respond with the user's account number
-    res.status(200).json({ 
+    res.status(200).json({
       username: user.username,
       name: user.name,
       idNumber: decrypt(user.idNumber),
       accountNumber: decrypt(user.accountNumber),
-      role: user.role
-      });
+      role: user.role,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error: " + error.message });
   }
