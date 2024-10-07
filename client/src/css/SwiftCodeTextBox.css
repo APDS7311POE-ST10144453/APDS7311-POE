@@ -1,12 +1,14 @@
 /* src/components/SwiftCodeTextBox.css */
 .error-textbox {
-  border: 2px solid #ccc;
-  padding: 8px;
-  font-size: 16px;
-  border-radius: 4px;
-  outline: none;
-  width: 300px; /* Example width, adjust as needed */
-  transition: border-color 0.2s ease-in-out; /* Smooth transition for border changes */
+  padding: 12px;
+  font-size: 14px;
+  width: 100%; /* Ensure input fields take full width */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  color: #19aa6b;
+  border-radius: 20px;
+  border: 1px solid #2d2d2d;
+  background-color: #2d2d2dcc;
+  font-family: "PantonNarrow-Regular", sans-serif;
 }
 
 .error-textbox.error {

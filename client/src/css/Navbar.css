@@ -60,10 +60,10 @@ img {
 
 @font-face {
   font-family: 'NavFont';
-  src: url('../assets/Fonts/PantonNarrow-Bold.ttf') format('truetype');
+  src: url('../assets/Fonts/Ubuntu-Medium.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'WebsiteNameFont';
-  src: url('../assets/Fonts/PantonNarrow-Heavy.ttf') format('truetype');
+  src: url('../assets/Fonts/Ubuntu-Bold.ttf') format('truetype');
 }

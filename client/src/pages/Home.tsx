@@ -3,7 +3,7 @@ import businessMan from "../assets/Images/businessman.webp"; // Import your imag
 
 export default function Home() {
   return (
-    <div>
+    <div className="overall-container">
       <div className="home-container">
         <div className="text-container">
           <h1>

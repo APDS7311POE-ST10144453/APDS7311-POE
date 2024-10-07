@@ -60,10 +60,10 @@ button {
 
 @font-face {
   font-family: "PantonNarrow-Bold";
-  src: '../assets/Fonts/PantonNarrow-Bold.ttf';
+  src: '../assets/Fonts/Ubuntu-Bold.ttf';
 }
 
 @font-face {
   font-family: "PantonNarrow-Regular";
-  src: '../assets/Fonts/PantonNarrow-Regular.ttf';
+  src: '../assets/Fonts/Ubuntu-Regular.ttf';
 }
