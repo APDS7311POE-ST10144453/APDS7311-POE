@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [ main ]
   pull_request:
-    branches: ["main"]
+    branches: [ main ]
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16, 18, 20]
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
       - name: Checkout repository
@@ -35,11 +35,17 @@ jobs:
         run: npx mocha tests/generatecrypto.test.mjs --reporter mocha-junit-reporter --reporter-options mochaFile=server/test-results/results.xml
         working-directory: ./server
 
+      - name: List test results directory
+        run: ls -la server/test-results
+        working-directory: ./server
+
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
           path: server/test-results/results.xml
+          if-no-files-found: warn
+          include-hidden-files: false
 
       - name: Publish test results to Dorny
         uses: dorny/test-reporter@v1
