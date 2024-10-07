@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/transaction");
 const User = require("../models/user");
-const { encrypt } = require("../helpers/encryption");
+const { encrypt, decrypt  } = require("../helpers/encryption");
 const user = require("../models/user");
 const checkAuth = require("../check-auth")(); // Call the function to get the middleware
 
@@ -38,20 +38,22 @@ router.post("/transact", async (req, res) => {
 
 
 // Get the List of transactions for the user
-// Use the url: https://localhost:3000/api/transaction/getTransactions?id=addIdInPlaceOfThisText
-router.get("/getTransactions", async (req, res) => {
+// Use the URL: https://localhost:3000/api/transaction/getTransactions?id=addIdInPlaceOfThisText
+router.get("/getTransactions", checkAuth, async (req, res) => {
   try {
-  // User ID
-  const userID = req.query.id;
+    // Extracting user ID from the authenticated request
+    const userID = req.user.id;
 
-  // Finding user
-  const user = await User.findById(userID);
+    // Finding the user by ID
+    const user = await User.findById(userID);
 
-  // Find all transactions with this account number as senderAccountNumber
-  const transactions = await Transaction.find({ senderAccountNumber: user.accountNumber });
-  
-  res.status(200).json({ transactionList: transactions });
-  
+
+    const decryptedAccountNumber = decrypt(user.accountNumber);
+    // Find all transactions where the user's account number is the senderAccountNumber
+    const transactions = await Transaction.find({ senderAccountNumber: decryptedAccountNumber });
+
+    // Respond with the list of transactions
+    res.status(200).json({ transactionList: transactions });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
