@@ -23,64 +23,6 @@
   padding: 20px;
 }
 
-/* Centering the form content */
-.form-container {
-  width: 35vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Center items horizontally */
-  margin-bottom: 20px; /* Add some space between the form and the button */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  background-color: #2d2d2d81;
-  border-radius: 40px;
-  padding-top: 6.5vh;
-  padding-bottom: 6.5vh;
-  margin-top: 15px;
-  backdrop-filter: blur(5px); /* Apply background blur */
-  -webkit-backdrop-filter: blur(5px); /* Apply background blur for Safari */
-  border: 2px solid transparent; /* Transparent border for the glow effect */
-  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.5); /* Glowing effect */
-}
-
-/* Input and form group styling */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-  width: 100%; /* Ensure the form group takes full width */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
-}
-
-.form-group-horizontal {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.form-group-horizontal .form-group {
-  width: 48%; /* Adjust width to fit two inputs side by side with some space */
-}
-
-label {
-  margin-bottom: 5px;
-  font-family: "PantonNarrow-Bold", sans-serif;
-}
-
-.input-field {
-  padding: 12px;
-  font-size: 14px;
-  width: 100%; /* Ensure input fields take full width */
-  box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  color: #19aa6b;
-  border-radius: 20px;
-  border: 1px solid #2d2d2d;
-  background-color: #2d2d2dcc;
-  font-family: "PantonNarrow-Regular", sans-serif;
-}
-
-.login-input-field {
-  width: 25vw; /* Ensure input fields in login view take full width */
-}
 
 button {
   width: 65%; /* Ensure buttons take full width */
