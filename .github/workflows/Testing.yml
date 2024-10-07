@@ -27,8 +27,12 @@ jobs:
         run: npm install
         working-directory: ./server
 
+      - name: Create test results directory
+        run: mkdir -p server/test-results
+        working-directory: ./server
+
       - name: Run tests
-        run: npx mocha tests/generatecrypto.test.mjs
+        run: npx mocha tests/generatecrypto.test.mjs --reporter mocha-junit-reporter --reporter-options mochaFile=server/test-results/results.xml
         working-directory: ./server
 
       - name: Upload test results
