@@ -42,11 +42,15 @@ jobs:
       - name: Add delay
         run: sleep 5
 
+      - name: Debug:List GitHub workspace
+        run: ls -la ${{ github.workspace }}
+        working-directory: ./server
+
       - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: server/test-results/results.xml
+          path: ${{ github.workspace }}/server/test-results/results.xml
           if-no-files-found: warn
           include-hidden-files: false
 
@@ -54,5 +58,5 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: Mocha Tests
-          path: server/test-results/results.xml
+          path: ${{ github.workspace }}/server/test-results/results.xml
           reporter: mocha-json
