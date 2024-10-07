@@ -2,9 +2,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 16.x, 18.x, 20.x ]
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
       - name: Checkout repository
@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: ${{ github.workspace }}/server/test-results/results.json
+          path: ${{ github.workspace }}/server/test-results/test-results.json
           if-no-files-found: warn
           include-hidden-files: false
 
@@ -58,5 +58,5 @@ jobs:
         uses: dorny/test-reporter@v1
         with:
           name: Mocha Tests
-          path: ${{ github.workspace }}/server/test-results/results.json
+          path: ${{ github.workspace }}/server/test-results/test-results.json
           reporter: mocha-json
