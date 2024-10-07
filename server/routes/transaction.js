@@ -4,6 +4,7 @@ const Transaction = require("../models/transaction");
 const User = require("../models/user");
 const { encrypt } = require("../helpers/encryption");
 const user = require("../models/user");
+const checkAuth = require("../check-auth")(); // Call the function to get the middleware
 
 router.post("/transact", async (req, res) => {
   try {
@@ -51,28 +52,33 @@ router.get("/getTransactions", async (req, res) => {
   }
 });
 
-// Get the List of approved transactions (payments) for the user
-// Use the url: https://localhost:3000/api/transaction/getPayments?id=addidInPlaceOfThisText
-router.get("/getPayments", async (req, res) => {
+// Get the List of approved transactions (payments) for the authenticated user
+router.get("/getPayments", checkAuth, async (req, res) => {
   try {
-  // User ID
-  const userID = req.query.id;
+    // Get user ID from the JWT token (added via checkAuth middleware)
+    const userID = req.user.userId;
 
-  // Finding user
-  const user = await User.findById(userID);
+    // Find user by ID
+    const user = await User.findById(userID);
 
-  // Find all approved transactions with this account number as senderAccountNumber
-  const transactions = await Transaction.find({ 
-    senderAccountNumber: user.accountNumber,
-    approvalStatus: "approved"
-  });
-  
-  res.status(200).json({ transactionList: transactions });
-  
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find all approved transactions where the user's account number is the sender
+    const transactions = await Transaction.find({
+      senderAccountNumber: user.accountNumber,
+      approvalStatus: "approved"
+    });
+
+    // Respond with the list of approved transactions
+    res.status(200).json({ transactionList: transactions });
+
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
+
 
 // Approves a transaction
 // Use the url: https://localhost:3000/api/transaction/approveTransaction?id=transactionIdPlaceholder

@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/CustomerDashboard.css";
 import { isAuthenticated } from "../utils/auth";
+import { getUserName } from '../services/dataRequestService';
+import { getUserAccountNum } from '../services/dataRequestService';
+import { getPayments } from '../services/dataRequestService';
+import { getBalance } from '../services/dataRequestService';
+
+
 
 function CustomerDashboard() {
   const navigate = useNavigate();
@@ -34,6 +40,43 @@ function CustomerDashboard() {
     navigate("/transactions");
   };
 
+  const [username, setUsername] = useState('');
+  const [accountNum, setAccountNum] = useState('');
+  const [ballance, setBallance] = useState('');
+  interface Receipt {
+    TransactionDate: string;
+    TransactionDescription: string;
+    transferAmount: number;
+  }
+
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
+
+useEffect(() => {
+// Fetch the user's name when the component loads
+async function fetchUsername() {
+  const name = await getUserName();
+  if (name) setUsername(name);
+}
+async function fetchUserAccountNum() {
+    const AN = await getUserAccountNum();
+    if (AN) setAccountNum(AN);
+  }
+  async function fetchUserReceipts() {
+    const receipts = await getPayments();
+    if (receipts) setReceipts(receipts);
+  }
+
+  async function fetchBalance() {
+    const B = await getBalance();
+    if (B) setBallance(B);
+  }
+
+fetchUsername();
+fetchUserAccountNum();
+fetchBalance();
+fetchUserReceipts();
+}, []);
+
   const handleLogOutClick = () => {
     localStorage.removeItem("token");
     navigate("/login");
@@ -61,7 +104,7 @@ function CustomerDashboard() {
         {/* Greeting, Banking Details, and Payment Button Container */}
         <div className="greeting-banking-container">
           <div className="greeting-section">
-            <h2>Hello, [Customer's Name]</h2>
+            <h2>Hello, {username}</h2>
             <button
               className="make-payment-button"
               onClick={handleLocalPaymentClick}
@@ -73,31 +116,32 @@ function CustomerDashboard() {
           <div className="banking-details">
             <h2>Banking Details</h2>
             <div className="details-box">
-              <p>Acc No: XXXXXXXXXXXX</p>
+              <p>Acc No: {accountNum}</p>
               <p>
-                <strong>Available Balance</strong>: $1500.00
-              </p>
+                <strong>Available Balance</strong>: $ {ballance}</p>
             </div>
           </div>
         </div>
 
-        {/* Payment Receipts Section */}
-        <div className="payment-receipts">
-          <h3>Payment Receipts</h3>
-          <div className="details-box">
-            <div className="receipt-item">
-              <span>2024/08/20 Sch Fees $200</span>
-              <button className="payment-button">Pay again</button>
+                {/* Payment Receipts Section */}
+                <div className="payment-receipts">
+                    <h3>Payment Receipts</h3>
+                    <div className="details-box">
+                        {receipts.length > 0 ? (
+                            receipts.map((receipt, index) => (
+                                <div key={index} className="receipt-item">
+                                    <span>{receipt.TransactionDate} {receipt.TransactionDescription} ${receipt.transferAmount}</span>
+                                    <button className="pay-again-button">Pay again</button>
+                                </div>
+                            ))
+                        ) : (
+                            <p>No receipts found.</p>
+                        )}
+                    </div>
+                </div>
             </div>
-            <div className="receipt-item">
-              <span>2024/08/20 Home R $100</span>
-              <button className="payment-button">Pay again</button>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default CustomerDashboard;

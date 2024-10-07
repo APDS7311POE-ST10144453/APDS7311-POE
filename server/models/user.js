@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Decimal128 } = mongoose.Types;
 
 const userschema = mongoose.Schema({
   username: {
@@ -26,6 +27,10 @@ const userschema = mongoose.Schema({
     type: String,
     enum: ["customer", "employee"],
     default: "customer",
+  },
+  balance: {
+    type: Decimal128,
+    required: true,
   },
 });
 
