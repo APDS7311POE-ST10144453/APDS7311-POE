@@ -120,7 +120,7 @@ function CustomerPaymentForm() {
                     </div>
                     <div className="form-group">
                         <label htmlFor="swift-code">Enter SWIFT Code:</label>
-                        <SwiftCodeTextBox /> {/* Replace the input field with the SwiftCodeTextBox component */}
+                        <SwiftCodeTextBox value={swiftCode} onChange={(value: string) => setSwiftCode(value)} /> {/* Replace the input field with the SwiftCodeTextBox component */}
                     </div>
                     <div className="form-buttons">
                         <button type="submit" className="pay-now-button">PAY Now</button>
