@@ -30,7 +30,7 @@ export default function checkEnvPlugin(): Plugin {
 
         if (invalidVars.includes('REACT_APP_SWIFT_CODE_VALIDATOR_API_KEY')) {
           console.log('Please set a valid API key for the Swift Code Validator. You can get one from:');
-          console.log('https://api-ninjas.com/api/swift-code-lookup');
+          console.log('https://api-ninjas.com/');
         }
 
         process.exit(1); // Exit the application with an error code
