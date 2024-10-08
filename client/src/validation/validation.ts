@@ -7,11 +7,11 @@ export function getNameErrors(name: string): string[]
   // Validating for SQL injection
   if (validateSQLInjection(name))
   {
-    errors.push(getSQLInjectionError("Full Name"));
+    errors.push(getSQLInjectionError("Field"));
   }
   else if (!nameLengthRegex.test(name))
   {
-    errors.push("Your name must be greater than 3 characters");
+    errors.push("This field must contain more than 3 characters");
   }
   return errors;
 }
@@ -58,7 +58,7 @@ export function getAccountNumberErrors(accountNumber: string): string[]
 
   if (accountNumber === "")
   {
-    errors.push("Please enter your Account Number");
+    errors.push("Please enter an Account Number");
   }
   else if (validateSQLInjection(accountNumber))
   {
@@ -66,11 +66,11 @@ export function getAccountNumberErrors(accountNumber: string): string[]
   }
   else if (accountNumber.length != 10)
   {
-    errors.push("Your account number must be 10 characters in length");
+    errors.push("Account number must be 10 characters in length");
   }
   else if (!allDigitsRegex.test(accountNumber))
   {
-    errors.push("Your account number must only contain digits");
+    errors.push("Account number must only contain digits");
   }
   return errors;
 }
@@ -109,6 +109,40 @@ export function getConfirmPasswordErrors(password: string, confirmPassword: stri
   {
     errors.push("Passwords do not match");
   }
+  return errors;
+}
+
+export function getTransferAmountErrors(amount: string): string[]
+{
+  var errors: string[] = [];
+  const amountFormatRegex = /^\d+(\.\d{0,2})?$/;
+  if (amount === "")
+  {
+    errors.push('Transfer amount cannot be empty');
+  }
+  else if (validateSQLInjection(amount))
+  {
+    errors.push(getSQLInjectionError("Transfer Amount"));
+  }
+  else if (!amountFormatRegex.test(amount))
+  {
+    errors.push("Transfer amount is in an incorrect format");
+  }
+  return errors;
+}
+
+export function getDescriptionErrors(description: string)
+{
+  var errors: string[] = [];
+  if (description === "")
+  {
+    errors.push("Please enter a description");
+  }
+  else if (validateSQLInjection(description))
+  {
+    errors.push(getSQLInjectionError("Description"));
+  }
+
   return errors;
 }
 
