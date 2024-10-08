@@ -78,8 +78,7 @@ export function getAccountNumberErrors(accountNumber: string): string[]
 export function getPasswordErrors(password: string): string[]
 {
   var errors: string[] = [];
-  const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
+  const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/;
   // Validating for SQL injection
   if (validateSQLInjection(password))
   {
