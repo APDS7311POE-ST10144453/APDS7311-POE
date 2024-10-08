@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "../css/PaymentForm.css";
 import SwiftCodeTextBox from "../components/SwiftCodeTextBox"; // Import the SwiftCodeTextBox component
-import { useEffect, useRef } from "react";
-import "../css/PaymentForm.css";
 import { isAuthenticated } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { getUserAccountNum } from "../services/dataRequestService";
@@ -207,6 +205,38 @@ function CustomerPaymentForm() {
               }
             />
             <text className="global-error-text">{errors["description"]}</text>
+          </div>
+          <div className="form-group">
+            <label htmlFor="currency">Currency:</label>
+            <select
+              className="input-field"
+              id="currency"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            >
+                <option value="ZAR">ZAR</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="AUD">AUD</option>
+                <option value="CAD">CAD</option>
+                <option value="CHF">CHF</option>
+                <option value="CNY">CNY</option>
+                <option value="INR">INR</option>
+                <option value="BRL">BRL</option>
+                <option value="MXN">MXN</option>
+                <option value="RUB">RUB</option>
+                <option value="KRW">KRW</option>
+                <option value="SGD">SGD</option>
+                <option value="HKD">HKD</option>
+                <option value="NOK">NOK</option>
+                <option value="SEK">SEK</option>
+                <option value="NZD">NZD</option>
+                <option value="TRY">TRY</option>
+
+              {/* Add more currencies as needed */}
+            </select>
           </div>
           <div className="form-group">
             <label htmlFor="swift-code">Enter SWIFT Code:</label>
