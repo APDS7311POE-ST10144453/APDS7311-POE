@@ -1,4 +1,3 @@
-import React, { useRef } from "react";
 import { useState } from "react";
 import "../css/LoginAndRegister.css"; // Using the same CSS for both login and register
 import useFormValidationErrors from "../validation/useFormValidationErrors";
@@ -152,7 +151,7 @@ export default function Register() {
                 <input
                   type="text"
                   name="idNumber"
-                  placeholder="10 Digit ZA ID Number"
+                  placeholder="13 Digit ZA ID Number"
                   value={data.idNumber}
                   onChange={handleChange}
                   className="input-field"
