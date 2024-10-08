@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import '../css/Transaction.css';
+import { isAuthenticated } from "../utils/auth";
 
 interface TransactionStatusProps {
   status: 'approved' | 'pending' | 'denied' | string;
@@ -27,6 +29,21 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
 };
 
 function Transactions() {
+  const navigate = useNavigate();
+  const alertShown = useRef(false);
+
+  const handleMainMenuClick = () => {
+    navigate("/customer-dashboard");
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated() && !alertShown.current) {
+      alert("You are not logged in. Please log in to continue.");
+      alertShown.current = true; // Set the ref to true after showing the alert
+      navigate("/login");
+    }
+  }, [navigate]);
+  
   interface Transaction {
     transactionDate: string;
     transactionDescription: string;
@@ -93,7 +110,7 @@ function Transactions() {
     <div className="dashboard-container">
       {/* Side Navigation Bar */}
       <div className="side-nav">
-        <button className="nav-button">Dashboard</button>
+        <button className="nav-button" onClick={handleMainMenuClick} >Dashboard</button>
         <button className="nav-button">Transactions</button>
       </div>
 
