@@ -41,8 +41,8 @@ router.post("/transact", async (req, res) => {
 // Use the URL: https://localhost:3000/api/transaction/getTransactions?id=addIdInPlaceOfThisText
 router.get("/getTransactions", checkAuth, async (req, res) => {
   try {
-    // Extracting user ID from the authenticated request
-    const userID = req.user.id;
+    // Get user ID from the JWT token (added via checkAuth middleware)
+    const userID = req.user.userId;
 
     // Finding the user by ID
     const user = await User.findById(userID);
