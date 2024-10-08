@@ -20,6 +20,7 @@ function CustomerPaymentForm() {
   const [swiftCode, setSwiftCode] = useState("");
   const [currency, setCurrency] = useState("USD"); // Example currency
   const [description, setdescription] = useState(""); // Description of the transaction
+  const [isSwiftCodeValid, setIsSwiftCodeValid] = useState<boolean>(false);
   const navigate = useNavigate();
   const alertShown = useRef(false); // Ref to track if the alert has been shown
 
@@ -49,6 +50,10 @@ function CustomerPaymentForm() {
     const AN = await getUserAccountNum();
     if (AN) setAccountNum(AN);
   }
+
+  const handleIsValidChange = (valid: boolean) => {
+    setIsSwiftCodeValid(valid);
+  };
 
   const handlePayClick = async (e: any) => {
     fetchUserAccountNum();
@@ -87,11 +92,11 @@ function CustomerPaymentForm() {
       setFieldError("description", descriptionErrors);
       return;
     }
-    // TODO: Add swift code validation here
-    // if (swiftCode has errors)
-    // {
-    //   return;
-    // }
+    
+    if (!isSwiftCodeValid)
+     {
+       return;
+     }
 
     try {
       const response = await fetch(
@@ -240,7 +245,7 @@ function CustomerPaymentForm() {
           </div>
           <div className="form-group">
             <label htmlFor="swift-code">Enter SWIFT Code:</label>
-            <SwiftCodeTextBox value={swiftCode} onChange={setSwiftCode} />{" "}
+            <SwiftCodeTextBox value={swiftCode} onChange={(data) => {setSwiftCode(data)}} onIsValidChange={handleIsValidChange} />{" "}
             {/* Assuming SwiftCodeTextBox takes a value and onChange prop */}
           </div>
           <div className="form-buttons">
