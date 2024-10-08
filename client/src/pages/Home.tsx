@@ -6,7 +6,7 @@ export default function Home() {
     <div className="overall-container">
       <div className="home-container">
         <div className="text-container">
-          <h1>
+          <h1 className="h1-heading">
             Unlock your full <br />
             <span className="potential">POTENTIAL</span> <br />
             with E-Z Banking.
@@ -17,8 +17,10 @@ export default function Home() {
             your home.
           </p>
         </div>
-        <img src={businessMan} alt="Business Man" className="business-image" />
+        <div className="image-container">
+    <img src={businessMan} alt="Business Man" className="business-image" />
+  </div>
       </div>
-    </div>
-  );
+    </div>
+  );
 }
