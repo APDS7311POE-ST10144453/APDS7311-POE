@@ -297,7 +297,6 @@ router.get("/getBalance", checkAuth, async (req, res) => {
     }
 
     const balance = user.balance.toString();
-    console.log("User balance:", balance);
 
     res.status(200).json({ balance: balance });
   } catch (err) {

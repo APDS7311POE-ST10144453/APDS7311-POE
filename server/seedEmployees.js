@@ -37,8 +37,6 @@ async function seedEmployees() {
       const encryptedIdNumber = encrypt(employee.idNumber);
       const encryptedAccountNumber = encrypt(employee.accountNumber);
 
-      
-
       // Create the employee with hashed password and encrypted fields
       await User.create({
         username: employee.username,
