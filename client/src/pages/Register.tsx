@@ -1,5 +1,15 @@
-import React, { useState } from "react";
+import React, { useRef } from "react";
+import { useState } from "react";
 import "../css/LoginAndRegister.css"; // Using the same CSS for both login and register
+import useFormValidationErrors from "../validation/useFormValidationErrors";
+import {
+  getAccountNumberErrors,
+  getConfirmPasswordErrors,
+  getIdNumberErrors,
+  getNameErrors,
+  getPasswordErrors,
+  getUsernameErrors,
+} from "../validation/validation";
 
 export default function Register() {
   const [data, setData] = useState({
@@ -11,36 +21,71 @@ export default function Register() {
     confirmPassword: "",
   });
 
+  // custom hook for error validation
+  const { errors, setFieldError, clearFieldError } = useFormValidationErrors([
+    "name",
+    "username",
+    "idNumber",
+    "accountNumber",
+    "password",
+    "confirmPassword",
+  ]);
+
   const [responseMessage, setResponseMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [passwordError, setPasswordError] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setData({
       ...data,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
-    setPasswordError(""); // Clear password error message when user starts typing
-  };
-
-  const validatePassword = () => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(data.password)) {
-      setPasswordError("Password must be at least 8 characters long, contain at least 1 uppercase letter, 1 number, and 1 special character.");
-      return false;
-    }
-    if (data.password !== data.confirmPassword) {
-      setPasswordError("Passwords do not match.");
-      return false;
-    }
-    return true;
   };
 
   const registerUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!validatePassword()) {
+
+    // Validation
+    clearFieldError("name"); // Full Name
+    const nameErrors = getNameErrors(data.name);
+    if (nameErrors.length > 0) {
+      setFieldError("name", nameErrors);
       return;
     }
+    clearFieldError("username"); // Username
+    const usernameErrors = getUsernameErrors(data.username);
+    if (usernameErrors.length > 0) {
+      setFieldError("username", usernameErrors);
+      return;
+    }
+    clearFieldError("idNumber"); // ID Number
+    const idNumberErrors = getIdNumberErrors(data.idNumber);
+    if (idNumberErrors.length > 0) {
+      setFieldError("idNumber", idNumberErrors);
+      return;
+    }
+    clearFieldError("accountNumber"); // Account Number
+    const accountNumberErrors = getAccountNumberErrors(data.accountNumber);
+    if (accountNumberErrors.length > 0) {
+      setFieldError("accountNumber", accountNumberErrors);
+      return;
+    }
+    clearFieldError("password"); // Password
+    const passwordErrors = getPasswordErrors(data.password);
+    if (passwordErrors.length > 0) {
+      setFieldError("password", passwordErrors);
+      return;
+    }
+    clearFieldError("confirmPassword"); // Confirm Password
+    const confirmPasswordErrors = getConfirmPasswordErrors(
+      data.password,
+      data.confirmPassword
+    );
+    if (confirmPasswordErrors.length > 0) {
+      setFieldError("confirmPassword", confirmPasswordErrors);
+      return;
+    }
+
     try {
       console.log("User register attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/register", {
@@ -87,6 +132,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
+              <text className="global-error-text">{errors["name"]}</text>
             </div>
             <div className="form-group">
               <label>Username</label>
@@ -98,6 +144,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
+              <text className="global-error-text">{errors["username"]}</text>
             </div>
             <div className="form-group-horizontal">
               <div className="form-group">
@@ -110,6 +157,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                <text className="global-error-text">{errors["idNumber"]}</text>
               </div>
               <div className="form-group">
                 <label>Account Number</label>
@@ -121,6 +169,9 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                <text className="global-error-text">
+                  {errors["accountNumber"]}
+                </text>
               </div>
             </div>
             <div className="form-group-horizontal">
@@ -133,7 +184,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                {passwordError && <div className="error-message">{passwordError}</div>}
+                <text className="global-error-text">{errors["password"]}</text>
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
@@ -144,6 +195,9 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                <text className="global-error-text">
+                  {errors["confirmPassword"]}
+                </text>
               </div>
             </div>
             <button type="submit">Register</button>

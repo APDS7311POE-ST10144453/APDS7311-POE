@@ -57,8 +57,7 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-image">
-      </div>
+      <div className="login-image"></div>
 
       <div className="login-form">
         <div className="form-container">
@@ -99,7 +98,11 @@ export default function Login() {
           </form>
           {errorMessage && <p className="error">{errorMessage}</p>}
           {successMessage && <p className="success">{successMessage}</p>}
-          <button className="employeeLogin-button" type="button" onClick={handleEmployeeLoginClick}>
+          <button
+            className="employeeLogin-button"
+            type="button"
+            onClick={handleEmployeeLoginClick}
+          >
             Employee Login
           </button>
         </div>
