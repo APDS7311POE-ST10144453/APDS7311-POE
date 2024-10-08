@@ -138,82 +138,87 @@ function CustomerPaymentForm() {
       <div className="form-container">
         <h1 className="form-title">Payment Form</h1>
         <form className="payment-form" onSubmit={handlePayClick}>
-          <div className="form-group">
-            <label htmlFor="recipient-name">Recipient's Name:</label>
-            <input
-              className="input-field"
-              type="text"
-              id="recipient-name"
-              value={recipientName}
-              onChange={(e) => setRecipientName(e.target.value)}
-              placeholder="Enter Recipient's Name"
-            />
-            <text className="global-error-text">{errors["recipientName"]}</text>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="recipient-name">Recipient's Name:</label>
+              <input
+                className="input-field"
+                type="text"
+                id="recipient-name"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                placeholder="Enter Recipient's Name"
+              />
+              <text className="global-error-text">{errors["recipientName"]}</text>
+            </div>
+            <div className="form-group">
+              <label htmlFor="recipient-bank">Recipient's Bank:</label>
+              <input
+                className="input-field"
+                type="text"
+                id="recipient-bank"
+                value={recipientBank}
+                onChange={(e) => setRecipientBank(e.target.value)}
+                placeholder="Enter Recipient's Bank"
+              />
+              <text className="global-error-text">{errors["recipientBank"]}</text>
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="recipient-bank">Recipient's Bank:</label>
-            <input
-              className="input-field"
-              type="text"
-              id="recipient-bank"
-              value={recipientBank}
-              onChange={(e) => setRecipientBank(e.target.value)}
-              placeholder="Enter Recipient's Bank"
-            />
-            <text className="global-error-text">{errors["recipientBank"]}</text>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="recipient-account-no">
+                Recipient's account no:
+              </label>
+              <input
+                className="input-field"
+                type="text"
+                id="recipient-account-no"
+                value={recipientAccountNumber}
+                onChange={(e) => setRecipientAccountNumber(e.target.value)}
+                placeholder="Enter Recipient's Account No"
+              />
+              <text className="global-error-text">
+                {errors["recipientAccountNumber"]}
+              </text>
+            </div>
+            <div className="form-group">
+              <label htmlFor="amount-transfer">Amount to transfer:</label>
+              <input
+                className="input-field"
+                type="text"
+                id="amount-transfer"
+                value={transferAmount}
+                onChange={(e) => setTransferAmount(e.target.value)}
+                placeholder="Enter transfer amount"
+              />
+              <text className="global-error-text">
+                {errors["transferAmount"]}
+              </text>
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="recipient-account-no">
-              Recipient's account no:
-            </label>
-            <input
-              className="input-field"
-              type="text"
-              id="recipient-account-no"
-              value={recipientAccountNumber}
-              onChange={(e) => setRecipientAccountNumber(e.target.value)}
-              placeholder="Enter Recipient's Account No"
-            />
-            <text className="global-error-text">
-              {errors["recipientAccountNumber"]}
-            </text>
-          </div>
-          <div className="form-group">
-            <label htmlFor="amount-transfer">Amount to transfer:</label>
-            <input
-              className="input-field"
-              type="text"
-              id="amount-transfer"
-              value={transferAmount}
-              onChange={(e) => setTransferAmount(e.target.value)}
-              placeholder="Enter Amount you want to pay"
-            />
-            <text className="global-error-text">
-              {errors["transferAmount"]}
-            </text>
-          </div>
-          <div className="form-group">
-            <label htmlFor="description">Description:</label>
-            <input
-              className="input-field"
-              type="text"
-              id="description"
-              placeholder="Enter payment description"
-              value={description}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setdescription(e.target.value)
-              }
-            />
-            <text className="global-error-text">{errors["description"]}</text>
-          </div>
-          <div className="form-group">
-            <label htmlFor="currency">Currency:</label>
-            <select
-              className="input-field"
-              id="currency"
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-            >
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="description">Description:</label>
+              <input
+                className="input-field"
+                type="text"
+                id="description"
+                placeholder="Enter payment description"
+                value={description}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setdescription(e.target.value)
+                }
+              />
+              <text className="global-error-text">{errors["description"]}</text>
+            </div>
+            <div className="form-group">
+              <label htmlFor="currency">Currency:</label>
+              <select
+                className="input-field"
+                id="currency"
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+              >
                 <option value="ZAR">ZAR</option>
                 <option value="USD">USD</option>
                 <option value="EUR">EUR</option>
@@ -234,14 +239,16 @@ function CustomerPaymentForm() {
                 <option value="SEK">SEK</option>
                 <option value="NZD">NZD</option>
                 <option value="TRY">TRY</option>
-
-              {/* Add more currencies as needed */}
-            </select>
+                {/* Add more currencies as needed */}
+              </select>
+            </div>
           </div>
-          <div className="form-group">
-            <label htmlFor="swift-code">Enter SWIFT Code:</label>
-            <SwiftCodeTextBox value={swiftCode} onChange={setSwiftCode} />{" "}
-            {/* Assuming SwiftCodeTextBox takes a value and onChange prop */}
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="swift-code">Enter SWIFT Code:</label>
+              <SwiftCodeTextBox value={swiftCode} onChange={setSwiftCode} />{" "}
+              {/* Assuming SwiftCodeTextBox takes a value and onChange prop */}
+            </div>
           </div>
           <div className="form-buttons">
             <button type="submit" className="pay-now-button">
