@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ErrorTextBox from "./ErrorTextBox";
 import "../css/SwiftCodeTextBox.css";
-const API_KEY = "CcES+jV4ZAnevw2ULFMBiw==O5erOBpo9XDXEGFT";
+const API_KEY = import.meta.env.REACT_APP_SWIFT_CODE_VALIDATOR_API_KEY;
 
 interface SwiftCodeTextBoxProps {
   value: string;

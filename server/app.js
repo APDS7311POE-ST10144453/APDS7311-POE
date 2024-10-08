@@ -1,3 +1,5 @@
+require("./helpers/checkEnv")();
+
 const express = require("express");
 const app = express();
 const urlprefix = "/api";
@@ -27,7 +29,11 @@ mongoose
 
 app.use(
   cors({
-    origin: ["https://localhost:3000", "https://localhost:5173", "https://localhost:5173/api"],
+    origin: [
+      "https://localhost:3000",
+      "https://localhost:5173",
+      "https://localhost:5173/api",
+    ],
     methods: "GET,POST,PUT,DELETE,OPTIONS",
     allowedHeaders:
       "Origin, X-Requested-With, Content-Type, Accept, Authorization",
@@ -55,7 +61,7 @@ app.get(urlprefix + "/", (req, res) => {
 const userRoutes = require("./routes/user");
 app.use(urlprefix + "/user", userRoutes);
 
-const transactionRoutes = require("./routes/transaction")
+const transactionRoutes = require("./routes/transaction");
 app.use(urlprefix + "/transaction", transactionRoutes);
 
 module.exports = app;
