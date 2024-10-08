@@ -17,14 +17,6 @@ function useFormValidationErrors(fields: string[]) {
     }));
   };
 
-  // Function to add error messages to a specific field without overwriting
-  const addFieldError = (fieldName: string, errorMessage: string) => {
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [fieldName]: [...prevErrors[fieldName], errorMessage],
-    }));
-  };
-
   // Function to clear error messages for a specific field
   const clearFieldError = (fieldName: string) => {
     setErrors((prevErrors) => ({
@@ -37,7 +29,6 @@ function useFormValidationErrors(fields: string[]) {
   return {
     errors,
     setFieldError,
-    addFieldError,
     clearFieldError,
   };
 }

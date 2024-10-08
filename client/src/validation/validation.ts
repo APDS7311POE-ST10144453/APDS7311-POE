@@ -64,7 +64,7 @@ export function getAccountNumberErrors(accountNumber: string): string[]
   {
     errors.push(getSQLInjectionError("Account Number"));
   }
-  else if (accountNumber.length === 10)
+  else if (accountNumber.length != 10)
   {
     errors.push("Your account number must be 10 characters in length");
   }
@@ -105,7 +105,7 @@ export function getConfirmPasswordErrors(password: string, confirmPassword: stri
   {
     errors.push(getSQLInjectionError(confirmPassword));
   }
-  else if (confirmPassword === password)
+  else if (confirmPassword != password)
   {
     errors.push("Passwords do not match");
   }

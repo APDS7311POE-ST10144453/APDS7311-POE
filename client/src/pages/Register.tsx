@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useState } from "react";
 import "../css/LoginAndRegister.css"; // Using the same CSS for both login and register
-import useFormValidationErrors from "../useFormValidationErrors";
+import useFormValidationErrors from "../validation/useFormValidationErrors";
 import {
   getAccountNumberErrors,
   getConfirmPasswordErrors,
@@ -9,7 +9,7 @@ import {
   getNameErrors,
   getPasswordErrors,
   getUsernameErrors,
-} from "../validation";
+} from "../validation/validation";
 
 export default function Register() {
   const [data, setData] = useState({
@@ -28,6 +28,7 @@ export default function Register() {
     "idNumber",
     "accountNumber",
     "password",
+    "confirmPassword",
   ]);
 
   const [responseMessage, setResponseMessage] = useState("");
@@ -74,6 +75,15 @@ export default function Register() {
     const passwordErrors = getPasswordErrors(data.password);
     if (passwordErrors.length > 0) {
       setFieldError("password", passwordErrors);
+      return;
+    }
+    clearFieldError("confirmPassword"); // Confirm Password
+    const confirmPasswordErrors = getConfirmPasswordErrors(
+      data.password,
+      data.confirmPassword
+    );
+    if (confirmPasswordErrors.length > 0) {
+      setFieldError("confirmPassword", confirmPasswordErrors);
       return;
     }
 
@@ -123,7 +133,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
-              <text>{errors["name"]}</text>
+              <text className="global-error-text">{errors["name"]}</text>
             </div>
             <div className="form-group">
               <label>Username</label>
@@ -135,7 +145,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
-              <text>{errors["username"]}</text>
+              <text className="global-error-text">{errors["username"]}</text>
             </div>
             <div className="form-group-horizontal">
               <div className="form-group">
@@ -148,7 +158,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                <text>{errors["idNumber"]}</text>
+                <text className="global-error-text">{errors["idNumber"]}</text>
               </div>
               <div className="form-group">
                 <label>Account Number</label>
@@ -160,7 +170,9 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                <text>{errors["accountNumber"]}</text>
+                <text className="global-error-text">
+                  {errors["accountNumber"]}
+                </text>
               </div>
             </div>
             <div className="form-group-horizontal">
@@ -173,7 +185,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                <text>{errors["password"]}</text>
+                <text className="global-error-text">{errors["password"]}</text>
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
@@ -184,6 +196,9 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
+                <text className="global-error-text">
+                  {errors["confirmPassword"]}
+                </text>
               </div>
             </div>
             <button type="submit">Register</button>
