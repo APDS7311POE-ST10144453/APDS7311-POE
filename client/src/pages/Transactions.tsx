@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import '../css/Transaction.css';
 import { isAuthenticated } from "../utils/auth";
-
+import { createLookupHash } from "../utils/hashHelper";
 interface TransactionStatusProps {
   status: 'approved' | 'pending' | 'denied' | 'completed';
 }
+
 
 const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
   const getStatusColor = (): string => {
