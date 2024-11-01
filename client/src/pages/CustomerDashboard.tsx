@@ -28,10 +28,13 @@ function CustomerDashboard() {
   const [accountNum, setAccountNum] = useState("");
   const [ballance, setBallance] = useState("");
   interface Receipt {
-    id: string;
-    TransactionDate: string;
-    TransactionDescription: string;
-    transferAmount: number;
+    _id: string;
+    transactionDate: string;
+    transactionDescription: string;
+    transferAmount: {
+      $numberDecimal: string;
+    };
+    approvalStatus: string;
   }
 
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -134,17 +137,39 @@ function CustomerDashboard() {
           <h3>Payment Receipts</h3>
           <div className="details-box">
             {receipts.length > 0 ? (
-              receipts.map((receipt) => (
-                <div key={receipt.id} className="receipt-item">
-                  <span>
-                    {receipt.TransactionDate} {receipt.TransactionDescription} $
-                    {receipt.transferAmount}
-                  </span>
-                  <button className="pay-again-button">Pay again</button>
+              receipts.map((receipt, index) => (
+                <div key={`${receipt._id}-${index}`} className="receipt-card">
+                  <div className="receipt-header">
+                    <h4>Payment Receipt</h4>
+                    <span className="receipt-date">
+                      {new Date(receipt.transactionDate).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                  <div className="receipt-body">
+                    <div className="receipt-row">
+                      <span className="receipt-label">Description:</span>
+                      <span className="receipt-value">{receipt.transactionDescription}</span>
+                    </div>
+                    <div className="receipt-row">
+                      <span className="receipt-label">Amount:</span>
+                      <span className="receipt-value receipt-amount">
+                        ${parseFloat(receipt.transferAmount.$numberDecimal).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="receipt-footer">
+                    <button className="pay-again-button">Pay again</button>
+                  </div>
                 </div>
               ))
             ) : (
-              <p>No receipts found.</p>
+              <p>No completed payments found.</p>
             )}
           </div>
         </div>

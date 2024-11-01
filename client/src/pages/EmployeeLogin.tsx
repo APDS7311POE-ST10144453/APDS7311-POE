@@ -32,9 +32,11 @@ function EmployeeLogin() {
       if (response.ok) {
         const result = await response.json();
         console.log(result);
+        localStorage.setItem('token', result.token);
+        console.log("Token after login:", localStorage.getItem("token"));
         setSuccessMessage('Employee logged in successfully');
-        console.log('Redirecting to /employee-dashboard');
-        window.location.href = '/employee-dashboard'; // Redirect to employee dashboard
+        console.log("Redirecting to /employee-dashboard");
+        window.location.href = "/employee-dashboard"; // Redirect to employee dashboard
       } else {
         const error = await response.json();
         setErrorMessage(error.message || 'Login failed');
@@ -59,6 +61,7 @@ function EmployeeLogin() {
                 type="text"
                 name="username"
                 placeholder="Your Username"
+                autoComplete="username"
                 value={data.username}
                 onChange={handleChange}
                 className="input-field login-input-field"
@@ -69,6 +72,7 @@ function EmployeeLogin() {
               <input
                 type="password"
                 name="password"
+                autoComplete="current-password"
                 value={data.password}
                 onChange={handleChange}
                 className="input-field login-input-field"

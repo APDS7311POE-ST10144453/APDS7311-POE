@@ -9,6 +9,7 @@ const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth")();
 const ExpressBrute = require("express-brute");
+const { createLookupHash } = require("../helpers/hashHelper");  
 
 var store = new ExpressBrute.MemoryStore();
 var bruteforce = new ExpressBrute(store);
@@ -24,6 +25,8 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
   message: "Too many requests, please try again later.",
 });
+
+
 
 // User registration route using bcrypt to hash the password
 router.post(
@@ -114,6 +117,7 @@ router.post(
         name,
         idNumber: encryptedIdNumber,
         accountNumber: encryptedAccountNumber,
+        accountLookupHash: createLookupHash(accountNumber.trim()),
         password: hash,
         role: role,
         balance: 75363,

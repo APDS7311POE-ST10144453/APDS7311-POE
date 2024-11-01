@@ -2,14 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import '../css/Transaction.css';
 import { isAuthenticated } from "../utils/auth";
-
+import { createLookupHash } from "../utils/hashHelper";
 interface TransactionStatusProps {
-  status: 'approved' | 'pending' | 'denied' | string;
+  status: 'approved' | 'pending' | 'denied' | 'completed' | string;
 }
+
 
 const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
   const getStatusColor = () => {
     switch (status) {
+      case 'completed': return 'blue';
       case 'approved': return 'green';
       case 'pending': return 'orange';
       case 'denied': return 'red';
@@ -45,10 +47,12 @@ function Transactions() {
   }, [navigate]);
   
   interface Transaction {
+    _id: string;
+    senderLookupHash: string;
     transactionDate: string;
     transactionDescription: string;
     transferAmount: { $numberDecimal: string };
-    approvalStatus: 'approved' | 'pending' | 'denied';
+    approvalStatus: 'approved' | 'pending' | 'denied' | 'completed';
   }
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -120,13 +124,32 @@ function Transactions() {
           <h1>Transactions</h1>
           {transactions.length > 0 ? (
             transactions.map((transaction, index) => (
-              <div className="Transaction-details-box">
-                <div className="receipt-item" key={index}>
-                  <span>
-                    {new Date(transaction.transactionDate).toLocaleDateString()} {transaction.transactionDescription} ${transaction.transferAmount.$numberDecimal}
-                  </span>
-                  <div>
+              <div className="Transaction-details-box" key={index}>
+                <div className="receipt-item">
+                  <div className="transaction-header">
+                    <div className="transaction-date">
+                      {new Date(transaction.transactionDate).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
                     <TransactionStatus status={transaction.approvalStatus} />
+                  </div>
+                  
+                  <div className="transaction-details">
+                    <div className="detail-item">
+                      <span className="detail-label">Description</span>
+                      <span className="detail-value">{transaction.transactionDescription}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Amount</span>
+                      <span className="detail-value transaction-amount">
+                        ${parseFloat(transaction.transferAmount.$numberDecimal).toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -99,15 +99,23 @@ function CustomerPaymentForm() {
      }
 
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to make a payment');
+        return;
+      }
+
+      
+
       const response = await fetch(
         "https://localhost:3000/api/transaction/transact",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` // Add this line
           },
           body: JSON.stringify({
-            senderAccountNumber: accountNum, // Replace this with actual sender account number (e.g., from the logged-in user)
             recipientName,
             recipientBank,
             recipientAccountNumber,
@@ -115,7 +123,7 @@ function CustomerPaymentForm() {
             currency,
             swiftCode,
             transactionDescription: description,
-            transactionDate: new Date().toISOString(), // Add the current date
+            transactionDate: new Date().toISOString(),
           }),
         }
       );

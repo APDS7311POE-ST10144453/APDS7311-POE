@@ -30,7 +30,12 @@ const userschema = mongoose.Schema({
   },
   balance: {
     type: Decimal128,
-    required: true,
+    required: false,
+  },
+  accountLookupHash: {
+    type: String,
+    required: false,
+    index: true
   },
 });
 

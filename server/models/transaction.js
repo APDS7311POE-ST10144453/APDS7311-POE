@@ -6,6 +6,11 @@ const transactionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  senderLookupHash: {
+    type: String,
+    required: true,
+    index: true,
+  },
   recipientName: {
     type: String,
     required: true,
@@ -17,6 +22,11 @@ const transactionSchema = mongoose.Schema({
   recipientAccountNumber: {
     type: String,
     required: true,
+  },
+  recipientLookupHash: {
+    type: String,
+    required: true,
+    index: true,
   },
   transferAmount: {
     type: Decimal128,
@@ -30,17 +40,16 @@ const transactionSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  transactionDate: {
-    type: Date,
-    required: true,
-  },
   transactionDescription: {
     type: String,
-    required: true,
+  },
+  transactionDate: {
+    type: Date,
+    default: Date.now,
   },
   approvalStatus: {
     type: String,
-    enum: ["approved", "pending", "denied"],
+    enum: ["pending", "approved", "denied", "completed"],
     default: "pending",
   },
 });

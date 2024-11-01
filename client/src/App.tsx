@@ -8,6 +8,7 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import CustomerPaymentForm from "./pages/CustomerPaymentForm";
 import EmployeeLogin from "./pages/EmployeeLogin";
 import Transactions from "./pages/Transactions";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
 
 function App() {
   const location = useLocation();
@@ -29,6 +30,7 @@ function App() {
         />
         <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
       </Routes>
     </>
   );
