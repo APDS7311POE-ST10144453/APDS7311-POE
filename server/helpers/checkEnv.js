@@ -47,3 +47,5 @@ function checkEnvVariables() {
 }
 
 checkEnvVariables();
+
+module.exports = checkEnvVariables;

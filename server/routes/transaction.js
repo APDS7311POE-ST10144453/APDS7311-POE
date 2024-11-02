@@ -144,5 +144,56 @@ router.post("/denyTransaction", async (req, res) => {
   }
 });
 
+router.post("/transactFromReceipt", checkAuth, async (req, res) => {
+  try {
+    const userID = req.user.userId;
+    const user = await User.findById(userID);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const {
+      recipientName,
+      recipientBank,
+      recipientAccountNumber,
+      transferAmount,
+      currency,
+      swiftCode,
+      transactionDescription,
+    } = req.body;
+
+    // Find recipient using the lookup hash from the original transaction
+    const originalTransaction = await Transaction.findOne({
+      recipientAccountNumber: recipientAccountNumber,
+      approvalStatus: 'completed'
+    });
+
+    if (!originalTransaction) {
+      return res.status(404).json({ error: "Original transaction not found" });
+    }
+
+    const newTransaction = new Transaction({
+      senderAccountNumber: user.accountNumber,
+      recipientName,
+      recipientBank,
+      recipientAccountNumber,
+      recipientLookupHash: originalTransaction.recipientLookupHash,
+      senderLookupHash: createLookupHash(user.accountNumber.trim()),
+      transferAmount,
+      currency,
+      swiftCode,
+      transactionDescription,
+      transactionDate: new Date(),
+      approvalStatus: "pending",
+    });
+
+    await newTransaction.save();
+    res.status(201).json({ message: "Transaction successfully recorded" });
+  } catch (err) {
+    console.error("Error during transaction:", err);
+    res.status(400).json({ error: "Transaction failed: " + err.message });
+  }
+});
+
 // Export the router to be used in other parts of the application
 module.exports = router;

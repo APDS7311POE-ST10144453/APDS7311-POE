@@ -35,6 +35,11 @@ function CustomerDashboard() {
       $numberDecimal: string;
     };
     approvalStatus: string;
+    recipientName: string;
+    recipientBank: string;
+    recipientAccountNumber: string;
+    currency: string;
+    swiftCode: string;
   }
 
   const [receipts, setReceipts] = useState<Receipt[]>([]);
@@ -88,6 +93,49 @@ function CustomerDashboard() {
   const handleLogOutClick = () => {
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const handlePayAgain = async (receipt: Receipt) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to make a payment');
+        return;
+      }
+
+      // Send the encrypted account number directly without trying to re-encrypt
+      const response = await fetch(
+        "https://localhost:3000/api/transaction/transactFromReceipt",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            recipientName: receipt.recipientName,
+            recipientBank: receipt.recipientBank,
+            recipientAccountNumber: receipt.recipientAccountNumber, // Send encrypted account number
+            transferAmount: receipt.transferAmount.$numberDecimal,
+            currency: receipt.currency,
+            swiftCode: receipt.swiftCode,
+            transactionDescription: receipt.transactionDescription,
+            transactionDate: new Date().toISOString(),
+          }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Payment initiated successfully!");
+        navigate("/transactions");
+      } else {
+        const errorData = await response.json();
+        alert(`Payment failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert(`Payment failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
   };
 
   return (
@@ -164,7 +212,12 @@ function CustomerDashboard() {
                     </div>
                   </div>
                   <div className="receipt-footer">
-                    <button className="pay-again-button">Pay again</button>
+                    <button 
+                      className="pay-again-button"
+                      onClick={() => handlePayAgain(receipt)}
+                    >
+                      Pay again
+                    </button>
                   </div>
                 </div>
               ))

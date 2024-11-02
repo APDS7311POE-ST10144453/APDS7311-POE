@@ -38,6 +38,11 @@ function Transactions() {
     navigate("/customer-dashboard");
   };
 
+  const handleLogOutClick = () => {
+    localStorage.removeItem('token');
+    navigate("/login");
+  };
+
   useEffect(() => {
     if (!isAuthenticated() && !alertShown.current) {
       alert("You are not logged in. Please log in to continue.");
@@ -114,8 +119,15 @@ function Transactions() {
     <div className="dashboard-container">
       {/* Side Navigation Bar */}
       <div className="side-nav">
-        <button className="nav-button" onClick={handleMainMenuClick} >Dashboard</button>
-        <button className="nav-button">Transactions</button>
+        <button className="nav-button" onClick={handleMainMenuClick}>
+          Main Menu
+        </button>
+        <button className="nav-button" onClick={() => {}}>
+          Transactions
+        </button>
+        <button className="nav-button" onClick={handleLogOutClick}>
+          Log Out
+        </button>
       </div>
 
       {/* Main Dashboard Content */}
