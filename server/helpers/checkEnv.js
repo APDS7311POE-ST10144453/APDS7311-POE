@@ -3,10 +3,11 @@ const crypto = require('crypto');
 
 function checkEnvVariables() {
   const placeholders = {
-    CONNECTION_STRING: "your_mongodb_connection_string",
-    JWT_SECRET: "your_jwt_secret",
-    ENCRYPTION_KEY: "your_encryption_key",
-    MY_SECRET_PEPPER: "your_secret_pepper",
+    CONNECTION_STRING: "CONNECTION_STRING_HERE",
+    JWT_SECRET: "JWT_SECRET_HERE",
+    ENCRYPTION_KEY: "ENCRYPTION_KEY_HERE",
+    MY_SECRET_PEPPER: "MY_SECRET_PEPPER_HERE",
+    NODE_ENV: "NODE_ENV_HERE"
   };
 
   let invalidVars = [];
@@ -33,6 +34,10 @@ function checkEnvVariables() {
       console.log("Please generate secure values for JWT_SECRET, ENCRYPTION_KEY, and MY_SECRET_PEPPER using the following command:");
       console.log("\nnode generatecrypto.js\n");
       console.log("Copy the generated values and paste them into the .env file");
+    }
+
+    if (invalidVars.includes("NODE_ENV")) {
+      console.log("Please set a valid NODE_ENV value in the /server .env. It can be 'development' or 'production'.");
     }
 
     if(invalidVars.lenth>0){

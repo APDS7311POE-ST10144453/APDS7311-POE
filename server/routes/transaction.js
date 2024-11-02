@@ -7,8 +7,9 @@ const user = require("../models/user");
 const checkAuth = require("../check-auth")(); // Call the function to get the middleware
 const crypto = require("crypto");
 const { createLookupHash } = require("../helpers/hashHelper");
+const { transactionLimiter } = require("../middleware/rateLimiter");
 
-router.post("/transact", checkAuth, async (req, res) => {
+router.post("/transact", transactionLimiter, checkAuth, async (req, res) => {
   try {
     // Get user ID from the JWT token
     const userID = req.user.userId;
@@ -58,7 +59,7 @@ router.post("/transact", checkAuth, async (req, res) => {
 
 // Get the List of transactions for the user
 // Use the URL: https://localhost:3000/api/transaction/getTransactions?id=addIdInPlaceOfThisText
-router.get("/getTransactions", checkAuth, async (req, res) => {
+router.get("/getTransactions", transactionLimiter, checkAuth, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId);
     if (!user) {
@@ -77,7 +78,7 @@ router.get("/getTransactions", checkAuth, async (req, res) => {
 });
 
 // Get the List of approved transactions (payments) for the authenticated user
-router.get("/getPayments", checkAuth, async (req, res) => {
+router.get("/getPayments", transactionLimiter, checkAuth, async (req, res) => {
   try {
     const userID = req.user.userId;
     const user = await User.findById(userID);
@@ -100,7 +101,7 @@ router.get("/getPayments", checkAuth, async (req, res) => {
 
 // Approves a transaction
 // Use the url: https://localhost:3000/api/transaction/approveTransaction?id=transactionIdPlaceholder
-router.post("/approveTransaction", async (req, res) => {
+router.post("/approveTransaction", transactionLimiter, async (req, res) => {
   try {
     // Getting transactionid
     const transactionID = req.query.id;
@@ -123,7 +124,7 @@ router.post("/approveTransaction", async (req, res) => {
 
 // Denies a transaction
 // Use the url: https://localhost:3000/api/transaction/denyTransaction?id=transactionIdPlaceholder
-router.post("/denyTransaction", async (req, res) => {
+router.post("/denyTransaction", transactionLimiter, async (req, res) => {
   try {
     // Getting transactionid
     const transactionID = req.query.id;
@@ -144,7 +145,7 @@ router.post("/denyTransaction", async (req, res) => {
   }
 });
 
-router.post("/transactFromReceipt", checkAuth, async (req, res) => {
+router.post("/transactFromReceipt", transactionLimiter, checkAuth, async (req, res) => {
   try {
     const userID = req.user.userId;
     const user = await User.findById(userID);

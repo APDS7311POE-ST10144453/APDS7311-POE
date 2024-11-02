@@ -6,8 +6,10 @@ const jwt = require("jsonwebtoken");
 const { encrypt, decrypt } = require("../helpers/encryption");
 const Transaction = require("../models/transaction");
 const checkAuth = require("../check-auth")();
+const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");
 
-router.post("/login", async (req, res) => {
+
+router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
 
@@ -51,7 +53,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Get all pending transactions
-router.get('/getPendingTransactions', checkAuth, async (req, res) => {
+router.get('/getPendingTransactions', employeeActionLimiter, checkAuth, async (req, res) => {
   try {
     const transactions = await Transaction.find({ 
       approvalStatus: { $in: ['pending', 'approved'] }
@@ -64,7 +66,7 @@ router.get('/getPendingTransactions', checkAuth, async (req, res) => {
 });
 
 // Verify a transaction
-router.post('/verifyTransaction/:id', checkAuth, async (req, res) => {
+router.post('/verifyTransaction/:id', employeeActionLimiter, checkAuth, async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
     if (!transaction) {
@@ -82,7 +84,7 @@ router.post('/verifyTransaction/:id', checkAuth, async (req, res) => {
 });
 
 // Submit to SWIFT
-router.post('/submitToSwift/:id', checkAuth, async (req, res) => {
+router.post('/submitToSwift/:id', employeeActionLimiter, checkAuth, async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
     if (!transaction) {

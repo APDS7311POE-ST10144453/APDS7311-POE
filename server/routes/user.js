@@ -8,29 +8,22 @@ const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth")();
-const ExpressBrute = require("express-brute");
-const { createLookupHash } = require("../helpers/hashHelper");  
+const MongoStore = require('rate-limit-mongo');
 
-var store = new ExpressBrute.MemoryStore();
-var bruteforce = new ExpressBrute(store);
+//Migrated from ExpressBrute to rate-limit-mongo because of unfixable critical vulnerabilities
+const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");
+
 
 const passwordComplexityRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,64}$/;
 const sqlInjectionRegex =
   /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|EXEC|UNION|WHERE)\b|;|--)/i;
 
-// Rate limiter middleware to limit repeated requests to public APIs
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: "Too many requests, please try again later.",
-});
-
-
 
 // User registration route using bcrypt to hash the password
 router.post(
   "/register",
+  loginLimiter,
   [
     body("username")
       .notEmpty()
@@ -135,7 +128,7 @@ router.post(
 // User login route using username, account number, and password to find the user
 router.post(
   "/login",
-  limiter, // Apply rate limiter middleware to this route
+  loginLimiter, // Apply rate limiter middleware to this route
   [
     // Validate and sanitize input fields
     body("username")
@@ -152,7 +145,6 @@ router.post(
       .isNumeric()
       .withMessage("Account number must be numeric"),
   ],
-  bruteforce.prevent,
   async (req, res) => {
     // Check for validation errors
     const errors = validationResult(req);
@@ -246,7 +238,7 @@ router.get("/account", checkAuth, async (req, res) => {
 });
 
 // Get the user's name based on the JWT token
-router.get("/getUserName", checkAuth, async (req, res) => {
+router.get("/getUserName", employeeActionLimiter, checkAuth, async (req, res) => {
   try {
     // Extract the userId from the token (provided by checkAuth middleware)
     const userId = req.user.userId;
@@ -267,7 +259,7 @@ router.get("/getUserName", checkAuth, async (req, res) => {
 });
 
 // Get the user's name based on the JWT token
-router.get("/getaccountNum", checkAuth, async (req, res) => {
+router.get("/getaccountNum", employeeActionLimiter, checkAuth, async (req, res) => {
   try {
     // Extract the userId from the token (provided by checkAuth middleware)
     const userId = req.user.userId;
@@ -290,7 +282,7 @@ router.get("/getaccountNum", checkAuth, async (req, res) => {
 });
 
 // Get the user's name based on the JWT token
-router.get("/getBalance", checkAuth, async (req, res) => {
+router.get("/getBalance", employeeActionLimiter, checkAuth, async (req, res) => {
   try {
     const userId = req.user.userId;
 
