@@ -27,8 +27,7 @@ const employees = [
 
 async function seedEmployees() {
   try {
-    await mongoose.connect(process.env.CONNECTION_STRING, {
-    });
+    await mongoose.connect(process.env.CONNECTION_STRING, clientOptions);
 
     for (const employee of employees) {
       // Hash the password

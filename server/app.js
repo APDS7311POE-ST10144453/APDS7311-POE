@@ -13,6 +13,8 @@ const sanitizeXSS = require("./middleware/xssSanitizer");
 const logger = require('./utils/logger');
 const userRoutes = require("./routes/user");
 const employeeRoutes = require("./routes/employee");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const transactionRoutes = require("./routes/transaction");
 
 require("dotenv").config();
@@ -60,13 +62,15 @@ app.use(helmet.contentSecurityPolicy({
   directives: {
     defaultSrc: ["'self'"],
     scriptSrc: ["'self'"],
-    styleSrc: ["'self'"],
-    imgSrc: ["'self'", "https://localhost:3000"],
-    connectSrc: ["'self'"],
-    fontSrc: ["'self'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", "https://localhost:3000", "data:"],
+    connectSrc: ["'self'", "https://api.api-ninjas.com"],
+    fontSrc: ["'self'", "https:", "data:"],
     objectSrc: ["'none'"],
     mediaSrc: ["'self'"],
     frameSrc: ["'none'"],
+    formAction: ["'self'"],
+    upgradeInsecureRequests: [],
   },
 }));
 
@@ -94,29 +98,94 @@ app.use(
 // Body Parser
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(mongoSanitize({
+  replaceWith: '_',
+  onSanitize: ({ req, key }) => {
+    logger.warn(`Attempted NoSQL injection: ${key}`);
+  }
+}));
 
-// Error Handler
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  res.status(500).json({ 
-    message: 'Something broke!',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+const errorHandler = (err, req, res, next) => {
+  // Log error details
+  logger.error({
+    message: err.message,
+    stack: err.stack,
+    path: req.path,
+    method: req.method,
+    ip: req.ip,
+    timestamp: new Date().toISOString()
   });
-});
+
+  // Handle specific error types
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Validation failed',
+      errors: Object.values(err.errors).map(e => e.message)
+    });
+  }
+
+  if (err.name === 'UnauthorizedError') {
+    return res.status(401).json({
+      status: 'error',
+      message: 'Invalid token or no token provided'
+    });
+  }
+
+  if (err.name === 'MongoError' && err.code === 11000) {
+    return res.status(409).json({
+      status: 'error',
+      message: 'Duplicate key error'
+    });
+  }
+
+  // Default error
+  res.status(err.status || 500).json({
+    status: 'error',
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message
+  });
+};
+
+app.use(errorHandler);
 
 // Insert routes here
-
 app.use(urlprefix + "/user", userRoutes);
 
-
 app.use(urlprefix + "/employee", employeeRoutes);
-
 
 app.use(urlprefix + "/transaction", transactionRoutes);
 
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
+});
+
+app.use((req, res, next) => {
+  // HSTS
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  
+  // Prevent clickjacking
+  res.setHeader('X-Frame-Options', 'DENY');
+  
+  // XSS protection
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  
+  // Prevent MIME type sniffing
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  
+  // Referrer policy
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Permissions policy
+  res.setHeader('Permissions-Policy', 
+    'geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), accelerometer=()');
+  
+  // Remove powered by header
+  res.removeHeader('X-Powered-By');
+  
+  next();
 });
 
 module.exports = app;

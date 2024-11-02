@@ -9,6 +9,7 @@ const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth")();
 const MongoStore = require('rate-limit-mongo');
+const hashHelper = require("../helpers/hashHelper");
 
 //Migrated from ExpressBrute to rate-limit-mongo because of unfixable critical vulnerabilities
 const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");
@@ -28,10 +29,12 @@ router.post(
     body("username")
       .notEmpty()
       .withMessage("Username is required")
-      .matches(sqlInjectionRegex)
-      .withMessage(
-        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
-      )
+      .custom(value => {
+        if (sqlInjectionRegex.test(value)) {
+          throw new Error("SQL Injection detected. Please do not use SQL keywords");
+        }
+        return true;
+      })
       .trim()
       .escape(),
     body("name")
@@ -39,41 +42,49 @@ router.post(
       .withMessage("Name is required")
       .isLength({ min: 3, max: 50 })
       .withMessage("Name must be between 3 and 50 characters")
-      .matches(sqlInjectionRegex)
-      .withMessage(
-        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
-      )
+      .custom(value => {
+        if (sqlInjectionRegex.test(value)) {
+          throw new Error("Invalid input detected");
+        }
+        return true;
+      })
       .trim()
       .escape(),
     body("idNumber")
       .isLength({ min: 13, max: 13 })
-      .withMessage("ID number is required and is 10 digits")
-      .matches(sqlInjectionRegex)
-      .withMessage(
-        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
-      )
+      .withMessage("ID number must be 13 digits")
+      .custom(value => {
+        if (sqlInjectionRegex.test(value)) {
+          throw new Error("Invalid input detected");
+        }
+        return true;
+      })
       .trim()
       .escape(),
     body("accountNumber")
       .isLength({ min: 10, max: 10 })
-      .withMessage("Account number is required")
-      .matches(sqlInjectionRegex)
-      .withMessage(
-        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
-      )
+      .withMessage("Account number must be 10 digits")
+      .custom(value => {
+        if (sqlInjectionRegex.test(value)) {
+          throw new Error("Invalid input detected");
+        }
+        return true;
+      })
       .trim()
       .escape(),
     body("password")
       .isLength({ min: 8, max: 64 })
-      .withMessage("Password is required")
+      .withMessage("Password must be between 8 and 64 characters")
       .matches(passwordComplexityRegex)
       .withMessage(
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
       )
-      .matches(sqlInjectionRegex)
-      .withMessage(
-        "SQL Injection detected. Please do not use SELECT, INSERT, UPDATE, DELETE, DROP, ALTER, EXEC, UNION OR WHERE"
-      )
+      .custom(value => {
+        if (sqlInjectionRegex.test(value)) {
+          throw new Error("Invalid input detected");
+        }
+        return true;
+      })
       .trim()
       .escape(),
   ],
@@ -82,18 +93,31 @@ router.post(
       const { username, name, idNumber, accountNumber, password, role } =
         req.body;
 
-      // Check if the username already exists
+      // Add detailed validation logging
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        console.log("Validation errors:", errors.array());
+        return res.status(400).json({ 
+          message: "Validation failed", 
+          errors: errors.array() 
+        });
+      }
+
+      // Check existing user
       const existingUser = await User.findOne({ username });
       if (existingUser) {
+        console.log("Username already exists:", username);
         return res.status(400).json({ message: "Username already exists" });
       }
 
+      // SQL Injection check
       if (
         sqlInjectionRegex.test(username) ||
         sqlInjectionRegex.test(password) ||
         sqlInjectionRegex.test(idNumber) ||
         sqlInjectionRegex.test(accountNumber)
       ) {
+        console.log("SQL Injection detected in input");
         return res.status(400).json({ message: "Invalid input detected" });
       }
 
@@ -110,9 +134,9 @@ router.post(
         name,
         idNumber: encryptedIdNumber,
         accountNumber: encryptedAccountNumber,
-        accountLookupHash: createLookupHash(accountNumber.trim()),
+        accountLookupHash: hashHelper.createLookupHash(accountNumber.trim()),
         password: hash,
-        role: role,
+        role: role || "customer",
         balance: 75363,
       });
 
@@ -120,7 +144,11 @@ router.post(
       await newUser.save();
       res.status(201).json({ message: "User registered successfully" });
     } catch (err) {
-      res.status(400).json({ error: err.message });
+      console.error("Registration error:", err);
+      res.status(400).json({ 
+        error: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      });
     }
   }
 );

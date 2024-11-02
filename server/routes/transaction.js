@@ -6,11 +6,48 @@ const { encrypt, decrypt } = require("../helpers/encryption");
 const user = require("../models/user");
 const checkAuth = require("../check-auth")(); // Call the function to get the middleware
 const crypto = require("crypto");
-const { createLookupHash } = require("../helpers/hashHelper");
+const hashHelper = require("../helpers/hashHelper");
 const { transactionLimiter } = require("../middleware/rateLimiter");
+const { body, validationResult } = require("express-validator");
 
-router.post("/transact", transactionLimiter, checkAuth, async (req, res) => {
+const transactionValidation = [
+  body('transferAmount')
+    .isNumeric()
+    .isFloat({ min: 0.01, max: 1000000 })
+    .withMessage('Invalid transfer amount'),
+  body('recipientAccountNumber')
+    .isLength({ min: 10, max: 10 })
+    .matches(/^\d{10}$/)
+    .withMessage('Invalid account number format'),
+  body('swiftCode')
+    .matches(/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/)
+    .withMessage('Invalid SWIFT code format'),
+  body('transactionDescription')
+    .trim()
+    .escape()
+    .isLength({ max: 500 })
+    .withMessage('Description too long'),
+  body('recipientName')
+    .trim()
+    .escape()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Invalid recipient name'),
+  body('recipientBank')
+    .trim()
+    .escape()
+    .isLength({ min: 2, max: 100 })
+    .withMessage('Invalid bank name')
+];
+
+router.post("/transact", [transactionLimiter, checkAuth, transactionValidation], async (req, res) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: "Validation failed", 
+        details: errors.array() 
+      });
+    }
     // Get user ID from the JWT token
     const userID = req.user.userId;
 
@@ -37,8 +74,8 @@ router.post("/transact", transactionLimiter, checkAuth, async (req, res) => {
       recipientName,
       recipientBank,
       recipientAccountNumber: encrypt(recipientAccountNumber),
-      recipientLookupHash: createLookupHash(recipientAccountNumber.trim()), // Using plain account number
-      senderLookupHash: createLookupHash(user.accountNumber.trim()), // Using plain account number
+      recipientLookupHash: hashHelper.createLookupHash(recipientAccountNumber.trim()), // Using plain account number
+      senderLookupHash: hashHelper.createLookupHash(user.accountNumber.trim()), // Using plain account number
       transferAmount,
       currency,
       swiftCode,
@@ -179,7 +216,7 @@ router.post("/transactFromReceipt", transactionLimiter, checkAuth, async (req, r
       recipientBank,
       recipientAccountNumber,
       recipientLookupHash: originalTransaction.recipientLookupHash,
-      senderLookupHash: createLookupHash(user.accountNumber.trim()),
+      senderLookupHash: hashHelper.createLookupHash(user.accountNumber.trim()),
       transferAmount,
       currency,
       swiftCode,

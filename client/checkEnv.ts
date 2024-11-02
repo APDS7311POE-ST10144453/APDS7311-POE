@@ -11,8 +11,7 @@ export default function checkEnvPlugin(): Plugin {
       dotenv.config({ path: envPath });
 
       const placeholders = {
-        REACT_APP_SWIFT_CODE_VALIDATOR_API_KEY:
-          "your_swift_code_validator_api_key",
+        VITE_SWIFT_CODE_VALIDATOR_API_KEY: "your_swift_code_validator_api_key",
       };
 
       const invalidVars: string[] = [];
