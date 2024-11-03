@@ -12,7 +12,6 @@ const employees = [
     accountNumber: "1234567890",
     password: "password1",
     role: "employee",
-    
   },
   {
     username: "employee2",
