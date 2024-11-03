@@ -13,8 +13,6 @@ const sanitizeXSS = require("./middleware/xssSanitizer");
 const logger = require("./utils/logger");
 const userRoutes = require("./routes/user");
 const employeeRoutes = require("./routes/employee");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
 const transactionRoutes = require("./routes/transaction");
 
 require("dotenv").config();

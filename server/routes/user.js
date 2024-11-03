@@ -103,7 +103,6 @@ router.post(
       // Check existing user
       const existingUser = await User.findOne({ username });
       if (existingUser) {
-        console.log("Username already exists:", username);
         return res.status(400).json({ message: "Username already exists" });
       }
 
@@ -114,7 +113,6 @@ router.post(
         sqlInjectionRegex.test(idNumber) ||
         sqlInjectionRegex.test(accountNumber)
       ) {
-        console.log("SQL Injection detected in input");
         return res.status(400).json({ message: "Invalid input detected" });
       }
 
