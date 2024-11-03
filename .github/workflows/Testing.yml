@@ -204,3 +204,42 @@ jobs:
           npm run build
         working-directory: ./server
       - run: echo "Build complete"
+
+  bundle-analysis:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+
+      - name: Build with bundle analysis
+        working-directory: ./client
+        run: npm run build:analyze
+
+      - name: Check bundle size
+        working-directory: ./client
+        run: |
+          MAX_SIZE_KB=250
+          BUNDLE_SIZE_KB=$(du -k dist/assets/*.js | awk '{sum += $1} END {print sum}')
+          if [ "$BUNDLE_SIZE_KB" -gt "$MAX_SIZE_KB" ]; then
+            echo "Bundle size ($BUNDLE_SIZE_KB KB) exceeds maximum allowed size ($MAX_SIZE_KB KB)"
+            exit 1
+          fi
+          echo "Bundle size ($BUNDLE_SIZE_KB KB) is within limits"
+
+      - name: Upload bundle analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: client/dist/stats.html
+          retention-days: 7

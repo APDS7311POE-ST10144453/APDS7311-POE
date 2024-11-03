@@ -5,10 +5,11 @@
   "scripts": {
     "start": "node server",
     "dev": "npm install && nodemon server",
-    "test1": "mocha --reporter json --reporter-option output=test-results/test-results.json",
     "test": "NODE_ENV=test mocha --require dotenv/config --reporter json --reporter-option output=test-results/test-results.json",
     "lint": "NODE_NO_WARNINGS=1 eslint . --config eslint.config.js",
-    "lint:fix": "NODE_NO_WARNINGS=1 eslint . --config eslint.config.js --fix"
+    "lint:fix": "NODE_NO_WARNINGS=1 eslint . --config eslint.config.js --fix",
+    "rebuild": "npm rebuild bcrypt --build-from-source",
+    "migrate:passwords": "node migrations/passwordMigration.js"
   },
   "author": "",
   "license": "ISC",
@@ -34,7 +35,9 @@
     "winston": "^3.16.0"
   },
   "devDependencies": {
+    "chai": "^4.3.7",
     "eslint": "^8.56.0",
-    "eslint-plugin-security": "^2.1.1"
+    "eslint-plugin-security": "^2.1.1",
+    "mocha": "^10.2.0"
   }
 }

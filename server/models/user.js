@@ -23,6 +23,10 @@ const userschema = mongoose.Schema({
     type: String,
     required: true,
   },
+  passwordSalt: {
+    type: String,
+    required: true,
+  },
   role: {
     type: String,
     enum: ["customer", "employee"],

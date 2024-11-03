@@ -6,12 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:analyze": "ANALYZE=true vite build",
     "lint": "NODE_NO_WARNINGS=1 eslint . --format stylish && NODE_NO_WARNINGS=1 eslint . --max-warnings 0 --format json --output-file eslint-results.json",
     "lint:fix": "NODE_NO_WARNINGS=1 eslint . --fix && npm run lint",
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.7.3",
     "dotenv": "^16.4.5",
     "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
@@ -19,22 +19,19 @@
     "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
-    "@eslint/js": "^8.56.0",
-    "@types/dotenv": "^6.1.1", 
+    "@types/dotenv": "^6.1.1",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "@vitejs/plugin-react-swc": "^3.5.0",
-    "globals": "^13.24.0",
-    "typescript": "^5.3.3",
-    "vite": "^5.1.4",
-    "@eslint/eslintrc": "^3.0.0",
     "eslint": "^8.56.0",
-    "@eslint/config-array": "^3.0.0",
-    "@eslint/object-schema": "^2.0.0",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "typescript-eslint": "^7.1.1"
+    "rollup-plugin-visualizer": "^5.12.0",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
   }
 }

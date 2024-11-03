@@ -3,9 +3,9 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
+const { hashPassword, verifyPassword } = require("../helpers/passwordHelper");
 const checkAuth = require("../check-auth")();
 const hashHelper = require("../helpers/hashHelper");
 
@@ -117,7 +117,7 @@ router.post(
       }
 
       // Hash the password
-      const hash = await bcrypt.hash(password, 10);
+      const { salt, hash } = await hashPassword(password);
 
       //Encrypt the idNumber and accountNumber
       const encryptedIdNumber = encrypt(idNumber);
@@ -131,6 +131,7 @@ router.post(
         accountNumber: encryptedAccountNumber,
         accountLookupHash: hashHelper.createLookupHash(accountNumber.trim()),
         password: hash,
+        passwordSalt: salt,
         role: role || "customer",
         balance: 75363,
       });
@@ -198,7 +199,7 @@ router.post(
       }
 
       // Compare the provided password with the hashed password in the database
-      const isMatch = await bcrypt.compare(password, user.password);
+      const isMatch = await verifyPassword(password, user.password, user.passwordSalt);
 
       if (!isMatch) {
         return res.status(401).json({

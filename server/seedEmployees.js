@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const User = require("./models/user");
-const bcrypt = require("bcrypt");
 require("dotenv").config();
 const {encrypt} = require("./helpers/encryption");
+const { hashPassword } = require("./helpers/passwordHelper");
 
 const employees = [
   {
@@ -12,7 +12,6 @@ const employees = [
     accountNumber: "1234567890",
     password: "password1",
     role: "employee",
-    
   },
   {
     username: "employee2",
@@ -24,13 +23,18 @@ const employees = [
   },
 ];
 
+// Add MongoDB client options
+const clientOptions = {
+  serverApi: { version: '1', strict: true, deprecationErrors: true }
+};
+
 async function seedEmployees() {
   try {
     await mongoose.connect(process.env.CONNECTION_STRING, clientOptions);
 
     for (const employee of employees) {
       // Hash the password
-      const hashedPassword = await bcrypt.hash(employee.password, 10);
+      const { salt, hash } = await hashPassword(employee.password);
 
       // Encrypt the idNumber and accountNumber
       const encryptedIdNumber = encrypt(employee.idNumber);
@@ -42,7 +46,8 @@ async function seedEmployees() {
         name: employee.name,
         idNumber: encryptedIdNumber,
         accountNumber: encryptedAccountNumber,
-        password: hashedPassword,
+        password: hash,
+        passwordSalt: salt,
         role: employee.role,
       });
     }
@@ -51,6 +56,7 @@ async function seedEmployees() {
     mongoose.disconnect();
   } catch (error) {
     console.error("Error seeding employees:", error);
+    mongoose.disconnect();
   }
 }
 
