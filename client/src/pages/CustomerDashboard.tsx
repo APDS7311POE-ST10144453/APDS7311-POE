@@ -37,7 +37,7 @@ import { Logger } from "../utils/logger";
  *     </div>
  *   );
  * }
- * 
+ *
  * export default App;
  * ```
  */
@@ -122,7 +122,8 @@ function CustomerDashboard(): JSX.Element {
         }
       } catch (error) {
         const logger = new Logger();
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         logger.error(`Error fetching user data: ${errorMessage}`);
       }
     }
