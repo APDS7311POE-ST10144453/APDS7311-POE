@@ -1,13 +1,78 @@
 name: Deploy Backend
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  dependencies:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
+      - name: Install dependencies
+        run: |
+          cd server && npm install
+          cd ../client && npm install
+
+  security-checks:
+    needs: dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [backend, frontend]
+        include:
+          - target: backend
+            path: ./server/package.json
+          - target: frontend
+            path: ./client/package.json
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Cache Snyk
+        uses: actions/cache@v4
+        with:
+          path: ~/.snyk
+          key: ${{ runner.os }}-snyk-${{ hashFiles('**/.snyk') }}
+          restore-keys: |
+            ${{ runner.os }}-snyk-
+
+      - name: Run Snyk Security Check
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --severity-threshold=high --file=${{ matrix.path }}
+
+      - name: Monitor Dependencies
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --file=${{ matrix.path }}
+
+  build-and-deploy:
+    needs: security-checks
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -16,6 +81,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install --verbose
@@ -30,11 +96,10 @@ jobs:
         working-directory: ./server
 
       - name: Deploy to Server
-        run: |
-          # Deployment script here
         working-directory: ./server
         env:
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           MY_SECRET_PEPPER: ${{ secrets.MY_SECRET_PEPPER }}
+        run: echo "Add your deployment commands here"

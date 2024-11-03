@@ -1,6 +1,6 @@
 export function getNameErrors(name: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   // name must be greater than 3 but less than 50
   const nameLengthRegex = /^.{4,49}$/;
 
@@ -18,7 +18,7 @@ export function getNameErrors(name: string): string[]
 
 export function getUsernameErrors(username: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
 
   if (username === "")
   {
@@ -33,7 +33,7 @@ export function getUsernameErrors(username: string): string[]
 
 export function getIdNumberErrors(idNumber: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const idFormatRegex = /^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{4}[01]\d{1}\d{1}$/
 
   if (idNumber === "")
@@ -53,7 +53,7 @@ export function getIdNumberErrors(idNumber: string): string[]
 
 export function getAccountNumberErrors(accountNumber: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const allDigitsRegex = /^\d+$/
 
   if (accountNumber === "")
@@ -77,7 +77,7 @@ export function getAccountNumberErrors(accountNumber: string): string[]
 
 export function getPasswordErrors(password: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/;
   // Validating for SQL injection
   if (validateSQLInjection(password))
@@ -95,7 +95,7 @@ export function getPasswordErrors(password: string): string[]
 
 export function getConfirmPasswordErrors(password: string, confirmPassword: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   if (confirmPassword === "")
   {
     errors.push('Confirm Password cannot be empty');
@@ -113,7 +113,7 @@ export function getConfirmPasswordErrors(password: string, confirmPassword: stri
 
 export function getTransferAmountErrors(amount: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const amountFormatRegex = /^\d+(\.\d{0,2})?$/;
   if (amount === "")
   {
@@ -132,7 +132,7 @@ export function getTransferAmountErrors(amount: string): string[]
 
 export function getDescriptionErrors(description: string)
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   if (description === "")
   {
     errors.push("Please enter a description");

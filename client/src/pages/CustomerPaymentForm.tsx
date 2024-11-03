@@ -158,10 +158,10 @@ function CustomerPaymentForm() {
               type="text"
               id="recipient-name"
               value={recipientName}
-              onChange={(e) => setRecipientName(e.target.value)}
+              onChange={(e) => { setRecipientName(e.target.value); }}
               placeholder="Enter Recipient's Name"
             />
-            <text className="global-error-text">{errors["recipientName"]}</text>
+            <text className="global-error-text">{errors.recipientName}</text>
           </div>
           <div className="form-group">
             <label htmlFor="recipient-bank">Recipient's Bank:</label>
@@ -170,10 +170,10 @@ function CustomerPaymentForm() {
               type="text"
               id="recipient-bank"
               value={recipientBank}
-              onChange={(e) => setRecipientBank(e.target.value)}
+              onChange={(e) => { setRecipientBank(e.target.value); }}
               placeholder="Enter Recipient's Bank"
             />
-            <text className="global-error-text">{errors["recipientBank"]}</text>
+            <text className="global-error-text">{errors.recipientBank}</text>
           </div>
           <div className="form-group">
             <label htmlFor="recipient-account-no">
@@ -184,11 +184,11 @@ function CustomerPaymentForm() {
               type="text"
               id="recipient-account-no"
               value={recipientAccountNumber}
-              onChange={(e) => setRecipientAccountNumber(e.target.value)}
+              onChange={(e) => { setRecipientAccountNumber(e.target.value); }}
               placeholder="Enter Recipient's Account No"
             />
             <text className="global-error-text">
-              {errors["recipientAccountNumber"]}
+              {errors.recipientAccountNumber}
             </text>
           </div>
           <div className="form-group">
@@ -198,11 +198,11 @@ function CustomerPaymentForm() {
               type="text"
               id="amount-transfer"
               value={transferAmount}
-              onChange={(e) => setTransferAmount(e.target.value)}
+              onChange={(e) => { setTransferAmount(e.target.value); }}
               placeholder="Enter Amount you want to pay"
             />
             <text className="global-error-text">
-              {errors["transferAmount"]}
+              {errors.transferAmount}
             </text>
           </div>
           <div className="form-group">
@@ -214,10 +214,10 @@ function CustomerPaymentForm() {
               placeholder="Enter payment description"
               value={description}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setdescription(e.target.value)
+                { setdescription(e.target.value); }
               }
             />
-            <text className="global-error-text">{errors["description"]}</text>
+            <text className="global-error-text">{errors.description}</text>
           </div>
           <div className="form-group">
             <label htmlFor="currency">Currency:</label>
@@ -225,7 +225,7 @@ function CustomerPaymentForm() {
               className="input-field"
               id="currency"
               value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
+              onChange={(e) => { setCurrency(e.target.value); }}
             >
                 <option value="ZAR">ZAR</option>
                 <option value="USD">USD</option>

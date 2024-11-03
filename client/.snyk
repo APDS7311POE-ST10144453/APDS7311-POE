@@ -1,0 +1,6 @@
+version: v1.25.0
+ignore:
+  'SNYK-JS-AXIOS-6032459':
+    - '*':
+        reason: No direct exposure to vulnerable endpoints
+        expires: 2024-12-31T00:00:00.000Z

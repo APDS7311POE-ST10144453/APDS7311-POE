@@ -1,0 +1,31 @@
+name: "CodeQL Config"
+
+queries:
+  - uses: security-extended
+  - uses: security-and-quality/javascript-code-scanning.qls
+    from: codeql-javascript
+
+paths:
+  - server
+  - client
+paths-ignore:
+  - '**/node_modules/**'
+  - '**/*.test.js'
+  - '**/*.spec.js'
+  - '**/*.test.ts'
+  - '**/*.spec.ts'
+  - '**/dist/**'
+  - '**/build/**'
+  - '**/*.config.js'
+  - '**/*.min.js'
+
+extraction:
+  javascript:
+    index:
+      include:
+        - server
+        - client
+      exclude:
+        - '**/node_modules/**'
+        - '**/*.test.js'
+      threads: 10

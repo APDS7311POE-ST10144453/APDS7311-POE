@@ -131,7 +131,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
-              <text className="global-error-text">{errors["name"]}</text>
+              <text className="global-error-text">{errors.name}</text>
             </div>
             <div className="form-group">
               <label>Username</label>
@@ -143,7 +143,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
-              <text className="global-error-text">{errors["username"]}</text>
+              <text className="global-error-text">{errors.username}</text>
             </div>
             <div className="form-group-horizontal">
               <div className="form-group">
@@ -156,7 +156,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                <text className="global-error-text">{errors["idNumber"]}</text>
+                <text className="global-error-text">{errors.idNumber}</text>
               </div>
               <div className="form-group">
                 <label>Account Number</label>
@@ -169,7 +169,7 @@ export default function Register() {
                   className="input-field"
                 />
                 <text className="global-error-text">
-                  {errors["accountNumber"]}
+                  {errors.accountNumber}
                 </text>
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                <text className="global-error-text">{errors["password"]}</text>
+                <text className="global-error-text">{errors.password}</text>
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
@@ -195,7 +195,7 @@ export default function Register() {
                   className="input-field"
                 />
                 <text className="global-error-text">
-                  {errors["confirmPassword"]}
+                  {errors.confirmPassword}
                 </text>
               </div>
             </div>

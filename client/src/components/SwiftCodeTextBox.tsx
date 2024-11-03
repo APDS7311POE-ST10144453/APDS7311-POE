@@ -1,6 +1,14 @@
 import React, { useState } from "react";
 import ErrorTextBox from "./ErrorTextBox";
 import "../css/SwiftCodeTextBox.css";
+
+// Define interface for API response
+interface SwiftCodeResponse {
+  bank_name: string;
+  [key: string]: string; // Allow other properties
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const API_KEY = import.meta.env.VITE_SWIFT_CODE_VALIDATOR_API_KEY;
 
 const SwiftCodeTextBox: React.FC<{
@@ -18,7 +26,7 @@ const SwiftCodeTextBox: React.FC<{
     return swiftRegex.test(swift);
   };
 
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const swiftCode = e.target.value.toUpperCase(); // Convert to uppercase
     onChange(swiftCode);
     setHasError(false);
@@ -44,13 +52,15 @@ const SwiftCodeTextBox: React.FC<{
       const url = `https://api.api-ninjas.com/v1/swiftcode?swift=${swiftCode}`;
       const response = await fetch(url, {
         headers: {
-          "X-Api-Key": API_KEY || '',
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/strict-boolean-expressions
+          "X-Api-Key": API_KEY || "",
           "Content-Type": "application/json"
         },
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as SwiftCodeResponse[];
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unnecessary-condition
         if (data && data.length > 0) {
           setHasError(false);
           onIsValidChange(true);
@@ -75,7 +85,7 @@ const SwiftCodeTextBox: React.FC<{
     }
   };
 
-  const getErrorMessage = () => {
+  const getErrorMessage = (): string => {
     if (!value) return "Please enter a SWIFT code";
     if (value.length < 8) return "SWIFT code must be at least 8 characters";
     if (!isValidSwiftFormat(value)) return "Invalid SWIFT code format";
@@ -85,7 +95,11 @@ const SwiftCodeTextBox: React.FC<{
 
   return (
     <div>
-      <ErrorTextBox value={value} onChange={handleInputChange} error={hasError} />
+      <ErrorTextBox 
+        value={value} 
+        onChange={(e) => void handleInputChange(e)} 
+        error={hasError} 
+      />
       {loading && <p className="loading-message">Validating SWIFT code...</p>}
       {hasError && <p className="error-message">{getErrorMessage()}</p>}
       {!hasError && bankName && (

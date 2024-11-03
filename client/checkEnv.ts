@@ -1,12 +1,14 @@
 import { Plugin } from "vite";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import { Logger } from "./utils/logger";
 
 export default function checkEnvPlugin(): Plugin {
+  const logger = new Logger();
+  
   return {
     name: "vite-plugin-check-env",
-    configResolved() {
-      // Load environment variables from .env file
+    configResolved(): void {
       const envPath = path.resolve(__dirname, ".env");
       dotenv.config({ path: envPath });
 
@@ -23,23 +25,21 @@ export default function checkEnvPlugin(): Plugin {
       }
 
       if (invalidVars.length > 0) {
-        console.log(
-          "The following environment variables are invalid or placeholders:"
-        );
+        logger.error("The following environment variables are invalid or placeholders:");
         invalidVars.forEach((key) => {
-          console.log(`- ${key}`);
+          logger.error(`- ${key}`);
         });
 
         if (invalidVars.includes("REACT_APP_SWIFT_CODE_VALIDATOR_API_KEY")) {
-          console.log(
+          logger.error(
             "Please set a valid API key for the Swift Code Validator. You can get one from:"
           );
-          console.log("https://api-ninjas.com/api/swift-code-lookup");
+          logger.error("https://api-ninjas.com/api/swift-code-lookup");
         }
 
-        process.exit(1); // Exit the application with an error code
+        process.exit(1);
       } else {
-        console.log("All environment variables are set correctly.");
+        logger.info("All environment variables are set correctly.");
       }
     },
   };

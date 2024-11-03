@@ -10,7 +10,7 @@ import EmployeeLogin from "./pages/EmployeeLogin";
 import Transactions from "./pages/Transactions";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 
-function App() {
+function App(): JSX.Element {
   const location = useLocation();
 
   return (

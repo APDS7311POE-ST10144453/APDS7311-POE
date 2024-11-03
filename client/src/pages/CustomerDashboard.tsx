@@ -9,7 +9,17 @@ import {
   getBalance,
 } from "../services/dataRequestService";
 
-function CustomerDashboard() {
+interface UserResponse {
+  name: string;
+  accountNumber: string;
+  balance: string;
+}
+
+interface PaymentsResponse {
+  payments: Receipt[];
+}
+
+function CustomerDashboard(): JSX.Element {
   const navigate = useNavigate();
   const alertShown = useRef(false); // Ref to track if the alert has been shown
   const [authChecked, setAuthChecked] = useState(false); // State to track if auth check is done
@@ -44,61 +54,65 @@ function CustomerDashboard() {
 
   const [receipts, setReceipts] = useState<Receipt[]>([]);
 
-  const handleLocalPaymentClick = () => {
+  const handleLocalPaymentClick = (): void => {
     navigate("/customer-payment-form");
   };
 
-  const handleMainMenuClick = () => {
+  const handleMainMenuClick = (): void => {
     navigate("/");
   };
 
-  const handleTransactionClick = () => {
+  const handleTransactionClick = (): void => {
     navigate("/transactions");
   };
 
   useEffect(() => {
     if (!authChecked) {
-      return; // Do nothing until auth check is done
+      return;
     }
 
     // Fetch the user's name when the component loads
-    async function fetchUsername() {
-      const name = await getUserName();
-      if (name) setUsername(name);
-    }
-    async function fetchUserAccountNum() {
-      const AN = await getUserAccountNum();
-      if (AN) setAccountNum(AN);
-    }
-    async function fetchUserReceipts() {
-      const receipts = await getPayments();
-      if (receipts) setReceipts(receipts);
+    async function fetchUserData(): Promise<void> {
+      try {
+        const [nameResponse, accountResponse, balanceResponse, paymentsResponse] = await Promise.all([
+          getUserName() as Promise<string>,
+          getUserAccountNum() as Promise<string>,
+          getBalance() as Promise<string>,
+          getPayments() as Promise<Receipt[]>
+        ]);
+
+        if (typeof nameResponse === 'string') {
+          setUsername(nameResponse);
+        }
+        if (typeof accountResponse === 'string') {
+          setAccountNum(accountResponse);
+        }
+        if (typeof balanceResponse === 'string') {
+          setBallance(balanceResponse);
+        }
+        if (Array.isArray(paymentsResponse)) {
+          setReceipts(paymentsResponse);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
     }
 
-    async function fetchBalance() {
-      const B = await getBalance();
-      if (B) setBallance(B);
-    }
-
-    fetchUsername();
-    fetchUserAccountNum();
-    fetchBalance();
-    fetchUserReceipts();
+    void fetchUserData();
   }, [authChecked]);
-
   if (!authChecked) {
-    return null; // Render nothing until auth check is done
+      return <></>; // Render nothing until auth check is done
   }
 
-  const handleLogOutClick = () => {
+  const handleLogOutClick = (): void => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
-  const handlePayAgain = async (receipt: Receipt) => {
+  const handlePayAgain = async (receipt: Receipt): Promise<void> => {
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
+      if (token == null) {
         alert('Please log in to make a payment');
         return;
       }
@@ -129,7 +143,10 @@ function CustomerDashboard() {
         alert("Payment initiated successfully!");
         navigate("/transactions");
       } else {
-        const errorData = await response.json();
+        interface ErrorResponse {
+          error: string;
+        }
+        const errorData = await response.json() as ErrorResponse;
         alert(`Payment failed: ${errorData.error}`);
       }
     } catch (error) {

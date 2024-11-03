@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import "../css/Navbar.css";
 import piggyBankImage from "../assets/Images/piggy-bank.png"; // Import the image if it's in the src folder
 
-export default function Navbar() {
+export default function Navbar(): JSX.Element {
   return (
     <nav className="navbar">
       <div className="brand">
