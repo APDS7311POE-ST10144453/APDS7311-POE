@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../css/EmployeeDashboard.css";
+import { Logger } from "../utils/logger";
 
 interface Transaction {
   _id: string;
@@ -13,28 +14,37 @@ interface Transaction {
   currency: string;
   swiftCode: string;
   transactionDescription: string;
-  
   transactionDate: Date;
   approvalStatus: 'approved' | 'pending' | 'denied' | 'completed';
 }
 
-function EmployeeDashboard() {
+interface TransactionResponse {
+  transactions: Transaction[];
+  message?: string;
+}
+
+interface ErrorResponse {
+  message: string;
+}
+
+function EmployeeDashboard(): JSX.Element {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);  // Add error state
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchPendingTransactions();
+    void fetchPendingTransactions();
   }, []);
 
-  const fetchPendingTransactions = async () => {
+  const fetchPendingTransactions = async (): Promise<void> => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (!((token != null) && token.length > 0)) {
         setError("No authentication token found");
         setLoading(false);
         return;
       }
+
       const response = await fetch(
         "https://localhost:3000/api/employee/getPendingTransactions",
         {
@@ -46,25 +56,25 @@ function EmployeeDashboard() {
       );
       
       if (response.ok) {
-        const data = await response.json();
-        console.log("Received data:", data);  // Debug log
-        console.log("Transactions:", data.transactions);
+        const data = await response.json() as TransactionResponse;
         setTransactions(data.transactions);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json() as ErrorResponse;
         throw new Error(errorData.message || "Failed to fetch transactions");
       }
     } catch (error) {
-      console.error("Error in fetchPendingTransactions:", error);
-      setError(error instanceof Error ? error.message : "An error occurred");
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleVerify = async (transactionId: string) => {
+  const handleVerify = async (transactionId: string): Promise<void> => {
     try {
       const token = localStorage.getItem("token");
+      if (!((token != null) && token.length > 0)) return;
+
       const response = await fetch(
         `https://localhost:3000/api/employee/verifyTransaction/${transactionId}`,
         {
@@ -77,20 +87,24 @@ function EmployeeDashboard() {
       );
 
       if (response.ok) {
-        // Refresh the transactions list
-        fetchPendingTransactions();
+        void fetchPendingTransactions();
       } else {
-        const error = await response.json();
-        alert(error.message);
+        const errorData = await response.json() as ErrorResponse;
+        alert(errorData.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      const logger = new Logger();
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      logger.error(`Transaction verification failed: ${errorMessage}`);
+      alert(`Error: ${errorMessage}`);
     }
   };
 
-  const handleSubmitToSwift = async (transactionId: string) => {
+  const handleSubmitToSwift = async (transactionId: string): Promise<void> => {
     try {
       const token = localStorage.getItem("token");
+      if (!((token != null) && token.length > 0)) return;
+
       const response = await fetch(
         `https://localhost:3000/api/employee/submitToSwift/${transactionId}`,
         {
@@ -103,19 +117,20 @@ function EmployeeDashboard() {
       );
 
       if (response.ok) {
-        const result = await response.json();
+        const result = await response.json() as ErrorResponse;
         alert(result.message);
-        fetchPendingTransactions();
+        void fetchPendingTransactions();
       } else {
-        const error = await response.json();
-        alert(error.message);
+        const errorData = await response.json() as ErrorResponse;
+        alert(errorData.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      alert(`Error: ${errorMessage}`);
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date): string => {
     return new Date(date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -125,7 +140,7 @@ function EmployeeDashboard() {
     });
   };
 
-  const getStatusClass = (status: string) => {
+  const getStatusClass = (status: string): string => {
     return `status-${status.toLowerCase()}`;
   };
 
@@ -133,7 +148,7 @@ function EmployeeDashboard() {
     return <div>Loading...</div>;
   }
 
-  if (error) {
+  if (error != null) {
     return <div className="error-message">Error: {error}</div>;
   }
 
@@ -185,14 +200,18 @@ function EmployeeDashboard() {
             <div className="transaction-actions">
               <button
                 className="action-button"
-                onClick={() => handleVerify(transaction._id)}
+                onClick={() => {
+                  void handleVerify(transaction._id);
+                }}
                 disabled={transaction.approvalStatus !== "pending"}
               >
                 Verify Transaction
               </button>
               <button
                 className="action-button"
-                onClick={() => handleSubmitToSwift(transaction._id)}
+                onClick={() => {
+                  void handleSubmitToSwift(transaction._id);
+                }}
                 disabled={transaction.approvalStatus !== "approved"}
               >
                 Submit to SWIFT

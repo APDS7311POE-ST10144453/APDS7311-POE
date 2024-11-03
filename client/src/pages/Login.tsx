@@ -1,8 +1,26 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../css/LoginAndRegister.css";
+import { Logger } from "../utils/logger";
 
-export default function Login() {
-  const [data, setData] = useState({
+interface LoginData {
+  username: string;
+  accountNumber: string;
+  password: string;
+}
+
+interface LoginResponse {
+  token: string;
+  message?: string;
+}
+
+interface ErrorResponse {
+  message: string;
+}
+
+export default function Login(): JSX.Element {
+  const navigate = useNavigate();
+  const [data, setData] = useState<LoginData>({
     username: "",
     accountNumber: "",
     password: "",
@@ -11,17 +29,16 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setData({
       ...data,
       [e.target.name]: e.target.value,
     });
   };
 
-  const loginUser = async (event: React.FormEvent<HTMLFormElement>) => {
+  const loginUser = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     try {
-      console.log("User login attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/login", {
         method: "POST",
         headers: {
@@ -29,39 +46,38 @@ export default function Login() {
         },
         body: JSON.stringify(data),
       });
-      
 
       if (response.ok) {
-        const result = await response.json();
-        console.log(result);
-
-        localStorage.setItem("token", result.token);
-
-        setSuccessMessage("User logged in successfully");
-        console.log("Redirecting to /customer-dashboard");
-        window.location.href = "/customer-dashboard"; // Redirect to customer dashboard
+        const result = await response.json() as LoginResponse;
+        if (result.token && result.token.length > 0) {
+          localStorage.setItem("token", result.token);
+          setSuccessMessage("User logged in successfully");
+          navigate("/customer-dashboard");
+        } else {
+          throw new Error("Invalid token received");
+        }
       } else {
-        const error = await response.json();
+        const error = await response.json() as ErrorResponse;
         setErrorMessage(error.message || "Login failed");
       }
     } catch (error) {
-      console.error("An error occurred, please try again later.", error);
-      setErrorMessage("An error occurred, please try again later.");
+      const logger = new Logger();
+      const errorMessage = error instanceof Error ? error.message : "An error occurred";
+      logger.error(`Login failed: ${errorMessage}`);
+      setErrorMessage(`An error occurred: ${errorMessage}`);
     }
   };
 
-  const handleEmployeeLoginClick = () => {
-    console.log("Redirecting to /employee-login");
-    window.location.href = "/employee-login"; // Redirect to employee login
+  const handleEmployeeLoginClick = (): void => {
+    navigate("/employee-login");
   };
 
   return (
     <div className="login-container">
       <div className="login-image"></div>
-
       <div className="login-form">
         <div className="form-container">
-          <form onSubmit={loginUser}>
+          <form onSubmit={(e) => void loginUser(e)}>
             <div className="form-group">
               <label>Username</label>
               <input

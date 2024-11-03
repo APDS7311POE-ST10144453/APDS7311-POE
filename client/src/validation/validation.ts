@@ -130,7 +130,7 @@ export function getTransferAmountErrors(amount: string): string[]
   return errors;
 }
 
-export function getDescriptionErrors(description: string)
+export function getDescriptionErrors(description: string): string[]
 {
   const errors: string[] = [];
   if (description === "")
@@ -149,7 +149,7 @@ function getSQLInjectionError(fieldName: string): string
 {
   return (`
     ${fieldName} invalid: Please refrain from using the following terms and symbols\n
-    \'SELECT\', \'INSERT\', \'UPDATE\', \'DELETE\', \'DROP\', \'ALTER\', \'EXEC\', \'UNION\', \'WHERE\', --, ;`)
+    'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'EXEC', 'UNION', 'WHERE', --, ;`)
 }
 
 function validateSQLInjection(input: string): boolean

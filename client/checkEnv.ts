@@ -1,7 +1,7 @@
 import { Plugin } from "vite";
 import * as dotenv from "dotenv";
 import * as path from "path";
-import { Logger } from "./utils/logger";
+import { Logger } from "./src/utils/logger";
 
 export default function checkEnvPlugin(): Plugin {
   const logger = new Logger();

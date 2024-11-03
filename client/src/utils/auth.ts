@@ -4,9 +4,9 @@ interface DecodedToken {
   exp: number;
 }
 
-export function isAuthenticated() {
+export function isAuthenticated(): boolean {
   const token = localStorage.getItem("token");
-  if (!token) {
+  if (!(token != null && token.length > 0)) {
     return false;
   }
 
@@ -20,7 +20,6 @@ export function isAuthenticated() {
 
     return true;
   } catch(error){
-    console.log(error);
     return false;
   }
 }

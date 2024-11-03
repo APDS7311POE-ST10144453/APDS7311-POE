@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import '../css/Transaction.css';
 import { isAuthenticated } from "../utils/auth";
 
 interface TransactionStatusProps {
-  status: 'approved' | 'pending' | 'denied' | 'completed' | string;
+  status: 'approved' | 'pending' | 'denied' | 'completed';
 }
 
-
 const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
-  const getStatusColor = () => {
+  const getStatusColor = (): string => {
     switch (status) {
       case 'completed': return 'blue';
       case 'approved': return 'green';
@@ -30,15 +29,15 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
   );
 };
 
-function Transactions() {
+function Transactions(): JSX.Element {
   const navigate = useNavigate();
   const alertShown = useRef(false);
 
-  const handleMainMenuClick = () => {
+  const handleMainMenuClick = (): void => {
     navigate("/customer-dashboard");
   };
 
-  const handleLogOutClick = () => {
+  const handleLogOutClick = (): void => {
     localStorage.removeItem('token');
     navigate("/login");
   };
@@ -46,7 +45,7 @@ function Transactions() {
   useEffect(() => {
     if (!isAuthenticated() && !alertShown.current) {
       alert("You are not logged in. Please log in to continue.");
-      alertShown.current = true; // Set the ref to true after showing the alert
+      alertShown.current = true;
       navigate("/login");
     }
   }, [navigate]);
@@ -64,16 +63,13 @@ function Transactions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
+
     const token = localStorage.getItem('token');
     
-    if (!token) {
+    if (!(token != null && token.length > 0)) {
       setError("No authentication token found. Please log in again.");
       setLoading(false);
       return;
@@ -90,39 +86,44 @@ function Transactions() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status.toString()}, message: ${errorText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { transactionList: Transaction[] };
       if (Array.isArray(data.transactionList)) {
         setTransactions(data.transactionList);
       } else {
         throw new Error("Received data is not in the expected format");
       }
     } catch (error) {
-      console.error('Error fetching transactions:', error);
-      setError(`Failed to fetch transactions: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setError(`Failed to fetch transactions: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void fetchTransactions();
+  }, [fetchTransactions]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
+  if (error != null) {
     return <div>Error: {error}</div>;
   }
 
   return (
     <div className="dashboard-container">
-      {/* Side Navigation Bar */}
       <div className="side-nav">
         <button className="nav-button" onClick={handleMainMenuClick}>
           Main Menu
         </button>
-        <button className="nav-button" onClick={() => {}}>
+        <button className="nav-button" onClick={(): void => {
+          void fetchTransactions();
+        }}>
           Transactions
         </button>
         <button className="nav-button" onClick={handleLogOutClick}>
@@ -130,7 +131,6 @@ function Transactions() {
         </button>
       </div>
 
-      {/* Main Dashboard Content */}
       <div className="main-content">
         <div className="payment-receipts">
           <h1>Transactions</h1>

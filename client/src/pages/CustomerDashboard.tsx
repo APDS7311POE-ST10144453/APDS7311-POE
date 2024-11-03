@@ -8,16 +8,7 @@ import {
   getPayments,
   getBalance,
 } from "../services/dataRequestService";
-
-interface UserResponse {
-  name: string;
-  accountNumber: string;
-  balance: string;
-}
-
-interface PaymentsResponse {
-  payments: Receipt[];
-}
+import { Logger } from "../utils/logger";
 
 function CustomerDashboard(): JSX.Element {
   const navigate = useNavigate();
@@ -74,34 +65,41 @@ function CustomerDashboard(): JSX.Element {
     // Fetch the user's name when the component loads
     async function fetchUserData(): Promise<void> {
       try {
-        const [nameResponse, accountResponse, balanceResponse, paymentsResponse] = await Promise.all([
+        const [
+          nameResponse,
+          accountResponse,
+          balanceResponse,
+          paymentsResponse,
+        ] = await Promise.all([
           getUserName() as Promise<string>,
           getUserAccountNum() as Promise<string>,
           getBalance() as Promise<string>,
-          getPayments() as Promise<Receipt[]>
+          getPayments() as Promise<Receipt[]>,
         ]);
 
-        if (typeof nameResponse === 'string') {
+        if (typeof nameResponse === "string") {
           setUsername(nameResponse);
         }
-        if (typeof accountResponse === 'string') {
+        if (typeof accountResponse === "string") {
           setAccountNum(accountResponse);
         }
-        if (typeof balanceResponse === 'string') {
+        if (typeof balanceResponse === "string") {
           setBallance(balanceResponse);
         }
         if (Array.isArray(paymentsResponse)) {
           setReceipts(paymentsResponse);
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        const logger = new Logger();
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error(`Error fetching user data: ${errorMessage}`);
       }
     }
 
     void fetchUserData();
   }, [authChecked]);
   if (!authChecked) {
-      return <></>; // Render nothing until auth check is done
+    return <></>; // Render nothing until auth check is done
   }
 
   const handleLogOutClick = (): void => {
@@ -111,9 +109,9 @@ function CustomerDashboard(): JSX.Element {
 
   const handlePayAgain = async (receipt: Receipt): Promise<void> => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token == null) {
-        alert('Please log in to make a payment');
+        alert("Please log in to make a payment");
         return;
       }
 
@@ -124,7 +122,7 @@ function CustomerDashboard(): JSX.Element {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             recipientName: receipt.recipientName,
@@ -146,12 +144,16 @@ function CustomerDashboard(): JSX.Element {
         interface ErrorResponse {
           error: string;
         }
-        const errorData = await response.json() as ErrorResponse;
+        const errorData = (await response.json()) as ErrorResponse;
         alert(`Payment failed: ${errorData.error}`);
       }
     } catch (error) {
       console.error("Error:", error);
-      alert(`Payment failed: ${error instanceof Error ? error.message : String(error)}`);
+      alert(
+        `Payment failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   };
 
@@ -202,36 +204,46 @@ function CustomerDashboard(): JSX.Element {
           <h3>Payment Receipts</h3>
           <div className="details-box">
             {receipts.length > 0 ? (
-              receipts.map((receipt, index) => (
-                <div key={`${receipt._id}-${index}`} className="receipt-card">
+              receipts.map((receipt) => (
+                <div key={`receipt-${receipt._id}`} className="receipt-card">
                   <div className="receipt-header">
                     <h4>Payment Receipt</h4>
                     <span className="receipt-date">
-                      {new Date(receipt.transactionDate).toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
+                      {new Date(receipt.transactionDate).toLocaleString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
                     </span>
                   </div>
                   <div className="receipt-body">
                     <div className="receipt-row">
                       <span className="receipt-label">Description:</span>
-                      <span className="receipt-value">{receipt.transactionDescription}</span>
+                      <span className="receipt-value">
+                        {receipt.transactionDescription}
+                      </span>
                     </div>
                     <div className="receipt-row">
                       <span className="receipt-label">Amount:</span>
                       <span className="receipt-value receipt-amount">
-                        ${parseFloat(receipt.transferAmount.$numberDecimal).toFixed(2)}
+                        $
+                        {parseFloat(
+                          receipt.transferAmount.$numberDecimal
+                        ).toFixed(2)}
                       </span>
                     </div>
                   </div>
                   <div className="receipt-footer">
-                    <button 
+                    <button
                       className="pay-again-button"
-                      onClick={() => handlePayAgain(receipt)}
+                      onClick={() => {
+                        void handlePayAgain(receipt);
+                      }}
                     >
                       Pay again
                     </button>

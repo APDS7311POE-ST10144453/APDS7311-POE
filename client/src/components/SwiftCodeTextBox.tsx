@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ErrorTextBox from "./ErrorTextBox";
 import "../css/SwiftCodeTextBox.css";
-
+import { Logger } from "../utils/logger";
 // Define interface for API response
 interface SwiftCodeResponse {
   bank_name: string;
@@ -76,6 +76,9 @@ const SwiftCodeTextBox: React.FC<{
         setBankName("");
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const logger = new Logger();
+      logger.error(`SWIFT code validation failed: ${errorMessage}`);
       console.error("Error fetching SWIFT code data:", error);
       setHasError(true);
       onIsValidChange(false);

@@ -1,8 +1,24 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../css/LoginAndRegister.css';
 
-function EmployeeLogin() {
-  const [data, setData] = useState({
+interface LoginData {
+  username: string;
+  password: string;
+}
+
+interface LoginResponse {
+  token: string;
+  message?: string;
+}
+
+interface ErrorResponse {
+  message: string;
+}
+
+function EmployeeLogin(): JSX.Element {
+  const navigate = useNavigate();
+  const [data, setData] = useState<LoginData>({
     username: '',
     password: '',
   });
@@ -10,17 +26,16 @@ function EmployeeLogin() {
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setData({
       ...data,
       [e.target.name]: e.target.value,
     });
   };
 
-  const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
+  const loginUser = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
-      console.log('Employee login attempt, data passed: ', data);
       const response = await fetch('https://localhost:3000/api/employee/login', {
         method: 'POST',
         headers: {
@@ -30,15 +45,14 @@ function EmployeeLogin() {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log(result);
-        localStorage.setItem('token', result.token);
-        console.log("Token after login:", localStorage.getItem("token"));
-        setSuccessMessage('Employee logged in successfully');
-        console.log("Redirecting to /employee-dashboard");
-        window.location.href = "/employee-dashboard"; // Redirect to employee dashboard
+        const result = await response.json() as LoginResponse;
+        if (result.token && result.token.length > 0) {
+          localStorage.setItem('token', result.token);
+          setSuccessMessage('Employee logged in successfully');
+          navigate('/employee-dashboard');
+        }
       } else {
-        const error = await response.json();
+        const error = await response.json() as ErrorResponse;
         setErrorMessage(error.message || 'Login failed');
       }
     } catch (error) {
@@ -54,7 +68,9 @@ function EmployeeLogin() {
 
       <div className="login-form">
         <div className="form-container">
-          <form onSubmit={loginUser}>
+          <form onSubmit={(e) => {
+            void loginUser(e);
+          }}>
             <div className="form-group">
               <label>Username</label>
               <input
