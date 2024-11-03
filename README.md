@@ -1,5 +1,6 @@
 [![Node.js CI](https://github.com/APDS7311POE-ST10144453/APDS7311-POE/actions/workflows/Testing.yml/badge.svg)](https://github.com/APDS7311POE-ST10144453/APDS7311-POE/actions/workflows/Testing.yml)  
 [![Deploy Backend](https://github.com/APDS7311POE-ST10144453/APDS7311-POE/actions/workflows/main.yml/badge.svg)](https://github.com/APDS7311POE-ST10144453/APDS7311-POE/actions/workflows/main.yml)
+[![Known Vulnerabilities](https://snyk.io/test/github/APDS7311POE-ST10144453/APDS7311-POE/badge.svg)](https://snyk.io/test/github/APDS7311POE-ST10144453/APDS7311-POE)
 
 # APDS POE
 
