@@ -2,6 +2,7 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 const app = require("./app"); // Import the app from app.js
+const port = process.env.PORT || 3000;
 
 // Read the certificate and key files
 const options = {
