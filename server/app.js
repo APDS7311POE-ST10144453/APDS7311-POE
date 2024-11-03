@@ -1,4 +1,4 @@
-require("./helpers/checkEnv")();
+require("./helpers/checkEnv");
 
 const express = require("express");
 const app = express();
