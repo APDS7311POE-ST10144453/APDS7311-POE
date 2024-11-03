@@ -7,7 +7,6 @@ interface TransactionStatusProps {
   status: 'approved' | 'pending' | 'denied' | 'completed';
 }
 
-
 const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
   const getStatusColor = (): string => {
     switch (status) {

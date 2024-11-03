@@ -1,8 +1,8 @@
-import {jwtDecode} from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 
 /**
  * Interface representing a decoded JWT token.
- * 
+ *
  * @property {number} exp - The expiration time of the token as a Unix timestamp.
  */
 interface DecodedToken {
@@ -20,7 +20,7 @@ export function isAuthenticated(): boolean {
     return false;
   }
 
-  try{
+  try {
     const decoded: DecodedToken = jwtDecode(token);
     const currentTime = Date.now() / 1000;
 
@@ -29,7 +29,7 @@ export function isAuthenticated(): boolean {
     }
 
     return true;
-  } catch(error){
+  } catch (error) {
     return false;
   }
 }

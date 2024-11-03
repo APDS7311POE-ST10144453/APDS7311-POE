@@ -14,23 +14,23 @@ import {
  * Register component handles the user registration form.
  * It includes form fields for name, username, ID number, account number, password, and confirm password.
  * It performs client-side validation before submitting the form data to the server.
- * 
+ *
  * @returns {JSX.Element} The Register component.
- * 
+ *
  * @component
- * 
+ *
  * @example
  * return (
  *   <Register />
  * )
- * 
+ *
  * @remarks
  * This component uses a custom hook `useFormValidationErrors` for managing form validation errors.
  * It also handles the form submission and displays success or error messages based on the server response.
- * 
+ *
  * @function
  * @name Register
- * 
+ *
  * @typedef {Object} FormData
  * @property {string} name - The full name of the user.
  * @property {string} username - The username of the user.
@@ -38,7 +38,7 @@ import {
  * @property {string} accountNumber - The account number of the user.
  * @property {string} password - The password of the user.
  * @property {string} confirmPassword - The confirmation of the password.
- * 
+ *
  * @typedef {Object} ValidationErrors
  * @property {string[]} name - Validation errors for the name field.
  * @property {string[]} username - Validation errors for the username field.
@@ -46,23 +46,23 @@ import {
  * @property {string[]} accountNumber - Validation errors for the account number field.
  * @property {string[]} password - Validation errors for the password field.
  * @property {string[]} confirmPassword - Validation errors for the confirm password field.
- * 
+ *
  * @typedef {Object} ServerResponse
  * @property {string} message - The response message from the server.
- * 
+ *
  * @typedef {Object} ServerError
  * @property {string} message - The error message from the server.
- * 
+ *
  * @hook
  * @name useFormValidationErrors
  * @param {string[]} fields - The list of fields to validate.
  * @returns {Object} The validation errors and functions to set and clear errors.
- * 
+ *
  * @function
  * @name handleChange
  * @param {React.ChangeEvent<HTMLInputElement>} e - The change event from the input field.
  * @returns {void}
- * 
+ *
  * @function
  * @name registerUser
  * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
@@ -99,7 +99,9 @@ export default function Register(): JSX.Element {
     });
   };
 
-  const registerUser = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const registerUser = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     // Validation
@@ -153,18 +155,21 @@ export default function Register(): JSX.Element {
       });
 
       if (response.ok) {
-        const result = await response.json() as { message: string };
+        const result = (await response.json()) as { message: string };
         setResponseMessage(result.message);
         // wait a second before redirect
         setTimeout(() => {
           window.location.href = "/login"; // Redirect to login
         }, 2000);
       } else {
-        const error = await response.json() as { message: string };
+        const error = (await response.json()) as { message: string };
         setErrorMessage(error.message || "Registration failed");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "An error occurred, please try again later.";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred, please try again later.";
       setErrorMessage(errorMessage);
     }
   };
@@ -175,9 +180,11 @@ export default function Register(): JSX.Element {
 
       <div className="login-form">
         <div className="form-container">
-          <form onSubmit={(e: React.FormEvent<HTMLFormElement>): void => {
-            void registerUser(e);
-          }}>
+          <form
+            onSubmit={(e: React.FormEvent<HTMLFormElement>): void => {
+              void registerUser(e);
+            }}
+          >
             <div className="form-group">
               <label>Full Name</label>
               <input
