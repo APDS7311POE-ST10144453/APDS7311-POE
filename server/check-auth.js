@@ -1,10 +1,6 @@
 const jwt = require('jsonwebtoken');
-
-console.log("checkAuth middleware called");
-
 const checkAuth = () => {
   return (req, res, next) => {
-    console.log(req, res, next);  // Log req, res, and next to debug
     try {
       if (!req.headers.authorization) {
         throw new Error("Authentication token not found.");

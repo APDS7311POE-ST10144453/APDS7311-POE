@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { encrypt, decrypt } = require("../helpers/encryption");
 const Transaction = require("../models/transaction");
 const checkAuth = require("../check-auth")();
 const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");

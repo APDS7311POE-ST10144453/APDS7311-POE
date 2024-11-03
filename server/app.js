@@ -13,8 +13,6 @@ const sanitizeXSS = require("./middleware/xssSanitizer");
 const logger = require('./utils/logger');
 const userRoutes = require("./routes/user");
 const employeeRoutes = require("./routes/employee");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
 const transactionRoutes = require("./routes/transaction");
 
 require("dotenv").config();
@@ -100,11 +98,12 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(mongoSanitize({
   replaceWith: '_',
-  onSanitize: ({ req, key }) => {
+  onSanitize: ({ key }) => {
     logger.warn(`Attempted NoSQL injection: ${key}`);
   }
 }));
 
+// eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   // Log error details
   logger.error({

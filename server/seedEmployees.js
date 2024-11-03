@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("./models/user");
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
 require("dotenv").config();
 const {encrypt} = require("./helpers/encryption");
 
@@ -47,7 +46,7 @@ async function seedEmployees() {
         role: employee.role,
       });
     }
-
+    // eslint-disable-next-line no-console
     console.log("Employees seeded successfully");
     mongoose.disconnect();
   } catch (error) {

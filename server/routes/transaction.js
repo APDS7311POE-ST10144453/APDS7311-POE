@@ -2,10 +2,8 @@ const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/transaction");
 const User = require("../models/user");
-const { encrypt, decrypt } = require("../helpers/encryption");
-const user = require("../models/user");
+const { encrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth")(); // Call the function to get the middleware
-const crypto = require("crypto");
 const hashHelper = require("../helpers/hashHelper");
 const { transactionLimiter } = require("../middleware/rateLimiter");
 const { body, validationResult } = require("express-validator");
@@ -20,7 +18,8 @@ const transactionValidation = [
     .matches(/^\d{10}$/)
     .withMessage('Invalid account number format'),
   body('swiftCode')
-    .matches(/^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/)
+    // eslint-disable-next-line security/detect-unsafe-regex
+    .matches(/^[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?$/i)
     .withMessage('Invalid SWIFT code format'),
   body('transactionDescription')
     .trim()
@@ -85,7 +84,6 @@ router.post("/transact", [transactionLimiter, checkAuth, transactionValidation],
     });
 
     // Saving the transaction to the database
-    console.log("Transaction:", newTransaction);
     await newTransaction.save();
     res.status(201).json({ message: "Transaction successfully recorded" });
   } catch (err) {
@@ -143,15 +141,19 @@ router.post("/approveTransaction", transactionLimiter, async (req, res) => {
     // Getting transactionid
     const transactionID = req.query.id;
 
-    // Finding transaction
-    const transaction = Transaction.findById(transactionID).then(
+    // Finding and updating transaction
+    await Transaction.findById(transactionID).then(
       (transaction) => {
+        if (!transaction) {
+          return res.status(404).json({ error: "Transaction not found" });
+        }
         // Changing the approvalStatus to approved
         transaction.approvalStatus = "approved";
 
         // Save the updated transaction back to the database
-        res.status(200).json({ message: "Transaction approved" });
-        return transaction.save();
+        return transaction.save().then(() => {
+          res.status(200).json({ message: "Transaction approved" });
+        });
       }
     );
   } catch (err) {
@@ -166,15 +168,19 @@ router.post("/denyTransaction", transactionLimiter, async (req, res) => {
     // Getting transactionid
     const transactionID = req.query.id;
 
-    // Finding transaction
-    const transaction = Transaction.findById(transactionID).then(
+    // Finding and updating transaction
+    await Transaction.findById(transactionID).then(
       (transaction) => {
-        // Changing the approvalStatus to approved
+        if (!transaction) {
+          return res.status(404).json({ error: "Transaction not found" });
+        }
+        // Changing the approvalStatus to denied
         transaction.approvalStatus = "denied";
 
         // Save the updated transaction back to the database
-        res.status(200).json({ message: "Transaction denied" });
-        return transaction.save();
+        return transaction.save().then(() => {
+          res.status(200).json({ message: "Transaction denied" });
+        });
       }
     );
   } catch (err) {

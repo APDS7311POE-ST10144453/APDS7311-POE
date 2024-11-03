@@ -1,22 +1,39 @@
+/* eslint-disable no-console */
 require('dotenv').config();
-const crypto = require('crypto');
 
 function checkEnvVariables() {
-  const placeholders = {
-    CONNECTION_STRING: "CONNECTION_STRING_HERE",
-    JWT_SECRET: "JWT_SECRET_HERE",
-    ENCRYPTION_KEY: "ENCRYPTION_KEY_HERE",
-    MY_SECRET_PEPPER: "MY_SECRET_PEPPER_HERE",
-    NODE_ENV: "NODE_ENV_HERE"
-  };
 
   let invalidVars = [];
 
-  for (const [key, placeholder] of Object.entries(placeholders)) {
+  const validKeys = ['CONNECTION_STRING', 'JWT_SECRET', 'ENCRYPTION_KEY', 'MY_SECRET_PEPPER', 'NODE_ENV'];
+
+  validKeys.forEach(key => {
+    let placeholder;
+    switch (key) {
+      case 'CONNECTION_STRING':
+        placeholder = "CONNECTION_STRING_HERE";
+        break;
+      case 'JWT_SECRET':
+        placeholder = "JWT_SECRET_HERE";
+        break;
+      case 'ENCRYPTION_KEY':
+        placeholder = "ENCRYPTION_KEY_HERE";
+        break;
+      case 'MY_SECRET_PEPPER':
+        placeholder = "MY_SECRET_PEPPER_HERE";
+        break;
+      case 'NODE_ENV':
+        placeholder = "NODE_ENV_HERE";
+        break;
+      default:
+        placeholder = null;
+    }
+    
+    // eslint-disable-next-line security/detect-object-injection
     if (process.env[key] === placeholder) {
       invalidVars.push(key);
     }
-  }
+  });
 
   if (invalidVars.length > 0) {
     console.log("The following environment variables are invalid or placeholders:");

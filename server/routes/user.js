@@ -4,11 +4,9 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const rateLimit = require("express-rate-limit");
 const { body, validationResult } = require("express-validator");
 const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth")();
-const MongoStore = require('rate-limit-mongo');
 const hashHelper = require("../helpers/hashHelper");
 
 //Migrated from ExpressBrute to rate-limit-mongo because of unfixable critical vulnerabilities
@@ -96,7 +94,6 @@ router.post(
       // Add detailed validation logging
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        console.log("Validation errors:", errors.array());
         return res.status(400).json({ 
           message: "Validation failed", 
           errors: errors.array() 
@@ -106,7 +103,6 @@ router.post(
       // Check existing user
       const existingUser = await User.findOne({ username });
       if (existingUser) {
-        console.log("Username already exists:", username);
         return res.status(400).json({ message: "Username already exists" });
       }
 
@@ -117,7 +113,6 @@ router.post(
         sqlInjectionRegex.test(idNumber) ||
         sqlInjectionRegex.test(accountNumber)
       ) {
-        console.log("SQL Injection detected in input");
         return res.status(400).json({ message: "Invalid input detected" });
       }
 
@@ -144,7 +139,6 @@ router.post(
       await newUser.save();
       res.status(201).json({ message: "User registered successfully" });
     } catch (err) {
-      console.error("Registration error:", err);
       res.status(400).json({ 
         error: err.message,
         stack: process.env.NODE_ENV === 'development' ? err.stack : undefined

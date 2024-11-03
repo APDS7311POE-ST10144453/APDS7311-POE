@@ -11,5 +11,6 @@ const options = {
 
 // Create HTTPS server
 https.createServer(options, app).listen(3000, () => {
+  // eslint-disable-next-line no-console
   console.log("Server is running on https://localhost:3000");
 });

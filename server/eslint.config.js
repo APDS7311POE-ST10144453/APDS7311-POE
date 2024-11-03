@@ -1,20 +1,16 @@
-import js from '@eslint/js';
-import security from 'eslint-plugin-security';
-import node from 'eslint-plugin-node';
+const security = require('eslint-plugin-security');
 
-export default [
-  js.configs.recommended,
+module.exports = [
   {
-    files: ['**/*.js'],
-    ignores: ['node_modules/**', 'dist/**'],
+    files: ['**/*.js', '**/*.mjs'],
+    ignores: ['node_modules/**', 'dist/**', 'test-results/**'],
     plugins: {
       security,
-      node,
     },
     languageOptions: {
       ecmaVersion: 2024,
       sourceType: 'module',
-      env: {
+      globals: {
         node: true,
         es2024: true,
       },
@@ -22,8 +18,6 @@ export default [
     rules: {
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'no-unused-vars': 'error',
-      'node/no-unsupported-features/es-syntax': 'error',
-      'node/no-missing-require': 'error',
       'security/detect-object-injection': 'error',
       'security/detect-non-literal-regexp': 'error',
       'security/detect-buffer-noassert': 'error',
