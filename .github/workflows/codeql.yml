@@ -69,8 +69,8 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        cd server && npm ci
-        cd ../client && npm ci
+        cd server && npm install
+        cd ../client && npm install
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
