@@ -68,7 +68,18 @@ jobs:
             project: APDS-Frontend
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
+      - name: Install Dependencies
+        run: |
+          cd ${{ matrix.path }}
+          npm install
+          
       - name: Cache OWASP Dependency Check
         uses: actions/cache@v4
         with:
@@ -87,6 +98,7 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableRetired
+            --nodePackageSkipDevDependencies false
 
       - name: Upload dependency check report
         uses: actions/upload-artifact@v4
