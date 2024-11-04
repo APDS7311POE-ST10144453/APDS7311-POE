@@ -6,13 +6,13 @@ concurrency:
 
 on:
   push:
-    branches: [main]
+    branches: [main, Part3Updates]
     paths:
       - 'server/**'
       - 'client/**'
       - '.github/workflows/Testing.yml'
   pull_request:
-    branches: [main]
+    branches: [main, Part3Updates]
     paths:
       - 'server/**'
       - 'client/**'
