@@ -80,6 +80,7 @@ jobs:
         config-file: .github/codeql/codeql-config.yml
         ram: 6144
         threads: 10
+        packs: +security-and-quality/javascript-code-scanning.qls@latest
         debug: true
         trap-caching: true
 
