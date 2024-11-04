@@ -170,8 +170,9 @@ jobs:
       - name: Run ESLint on client
         working-directory: ./client
         run: |
+          npm install
           npm run lint
-          
+
       - name: Run ESLint on server
         working-directory: ./server
         run: |
@@ -198,11 +199,18 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Build application
+      - name: Build server
         run: |
+          cd server
           npm install
           npm run build
-        working-directory: ./server
+
+      - name: Build client
+        run: |
+          cd client
+          npm install
+          npm run build
+
       - run: echo "Build complete"
 
   bundle-analysis:

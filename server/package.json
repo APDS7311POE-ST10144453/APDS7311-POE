@@ -9,7 +9,8 @@
     "lint": "NODE_NO_WARNINGS=1 eslint . --config eslint.config.js",
     "lint:fix": "NODE_NO_WARNINGS=1 eslint . --config eslint.config.js --fix",
     "rebuild": "npm rebuild bcrypt --build-from-source",
-    "migrate:passwords": "node migrations/passwordMigration.js"
+    "migrate:passwords": "node migrations/passwordMigration.js",
+    "build": "echo 'No build step required for Node.js backend'"
   },
   "author": "",
   "license": "ISC",
