@@ -19,12 +19,19 @@ export default [{
     ecmaVersion: 2024,
     globals: {
       ...globals.browser,
+      ...globals.node,
       React: true,
+      JSX: true,
+      process: true,
+      __dirname: true
     },
     parser: tsParser,
     parserOptions: {
       project: ['./tsconfig.app.json', './tsconfig.node.json'],
       tsconfigRootDir: import.meta.dirname,
+      ecmaFeatures: {
+        jsx: true
+      }
     },
   },
   plugins: {
