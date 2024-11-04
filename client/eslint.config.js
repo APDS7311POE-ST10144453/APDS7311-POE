@@ -35,8 +35,8 @@ export default [{
   },
   rules: {
     ...js.configs.recommended.rules,
-    ...tseslint.configs.recommended.rules,
-    ...tseslint.configs.stylistic.rules,
+    ...tseslint.plugin.configs.recommended.rules,
+    ...tseslint.plugin.configs.stylistic.rules,
     ...reactHooks.configs.recommended.rules,
     ...react.configs.recommended.rules,
     ...react.configs['jsx-runtime'].rules,
