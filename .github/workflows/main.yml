@@ -40,12 +40,23 @@ jobs:
         target: [backend, frontend]
         include:
           - target: backend
-            path: ./server/package.json
+            path: ./server
           - target: frontend
-            path: ./client/package.json
+            path: ./client
     steps:
       - uses: actions/checkout@v4
       
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          cd ${{ matrix.path }}
+          npm install
+
       - name: Cache Snyk
         uses: actions/cache@v4
         with:
@@ -60,7 +71,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: test
-          args: --severity-threshold=high --file=${{ matrix.path }}
+          args: --severity-threshold=high --file=${{ matrix.path }}/package.json
 
       - name: Monitor Dependencies
         uses: snyk/actions/node@master
@@ -68,7 +79,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
-          args: --file=${{ matrix.path }}
+          args: --file=${{ matrix.path }}/package.json
 
   build-and-deploy:
     needs: security-checks

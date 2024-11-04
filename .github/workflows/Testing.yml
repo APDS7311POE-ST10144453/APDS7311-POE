@@ -48,10 +48,9 @@ jobs:
             ${{ runner.os }}-npm-
 
       - name: Install dependencies
-        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: |
-          cd server && npm ci
-          cd ../client && npm ci
+          cd server && npm install
+          cd ../client && npm install
 
   security:
     needs: dependencies
@@ -239,7 +238,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./client
-        run: npm ci
+        run: npm install
 
       - name: Build with bundle analysis
         working-directory: ./client
