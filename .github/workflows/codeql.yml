@@ -1,0 +1,102 @@
+name: "CodeQL Analysis"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.jsx'
+      - '**.tsx'
+      - '.github/workflows/codeql.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.jsx'
+      - '**.tsx'
+      - '.github/workflows/codeql.yml'
+  schedule:
+    - cron: '0 0 * * 0'
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Cache CodeQL
+      uses: actions/cache@v4
+      with:
+        path: ~/.codeql
+        key: codeql-${{ runner.os }}-${{ matrix.language }}-${{ hashFiles('**/*.js', '**/*.ts') }}
+        restore-keys: |
+          codeql-${{ runner.os }}-${{ matrix.language }}-
+
+    - name: Cache npm dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          **/node_modules
+        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-npm-
+
+    - name: Install Dependencies
+      run: |
+        cd server && npm install
+        cd ../client && npm install
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        queries: security-extended
+        config-file: .github/codeql/codeql-config.yml
+        ram: 6144
+        threads: 10
+        debug: true
+        trap-caching: true
+
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+        upload: true
+        output: sarif-results
+
+    - name: Upload SARIF results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: codeql-sarif-results
+        path: sarif-results
+        retention-days: 7

@@ -1,0 +1,6 @@
+version: v1.25.0
+ignore:
+  'npm:node-forge:20220216':
+    - '*':
+        reason: No direct usage of vulnerable functions
+        expires: 2024-12-31T00:00:00.000Z
