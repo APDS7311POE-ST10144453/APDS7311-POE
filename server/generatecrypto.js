@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 
