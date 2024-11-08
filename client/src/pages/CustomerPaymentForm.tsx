@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../css/PaymentForm.css";
-import SwiftCodeTextBox from "../components/SwiftCodeTextBox"; // Import the SwiftCodeTextBox component
+import SwiftCodeTextBox from "../components/SwiftCodeTextBox";
 import { isAuthenticated } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
 import { getUserAccountNum } from "../services/dataRequestService";
@@ -11,20 +11,39 @@ import {
   getNameErrors,
   getTransferAmountErrors,
 } from "../validation/validation";
+import { Logger } from "../utils/logger";
 
-function CustomerPaymentForm() {
+interface PaymentResponse {
+  error?: string;
+  message?: string;
+}
+
+/**
+ * CustomerPaymentForm component renders a payment form for customers to fill out and submit.
+ * It includes fields for recipient's name, bank, account number, transfer amount, currency, SWIFT code, and description.
+ * The form validates the input fields and ensures the user is authenticated before allowing submission.
+ * On successful submission, it sends a payment request to the server.
+ *
+ * @returns {JSX.Element} The rendered payment form component.
+ *
+ * @component
+ * @example
+ * return (
+ *   <CustomerPaymentForm />
+ * )
+ */
+function CustomerPaymentForm(): JSX.Element {
   const [recipientName, setRecipientName] = useState("");
   const [recipientBank, setRecipientBank] = useState("");
   const [recipientAccountNumber, setRecipientAccountNumber] = useState("");
   const [transferAmount, setTransferAmount] = useState("");
   const [swiftCode, setSwiftCode] = useState("");
-  const [currency, setCurrency] = useState("USD"); // Example currency
-  const [description, setdescription] = useState(""); // Description of the transaction
+  const [currency, setCurrency] = useState("USD");
+  const [description, setdescription] = useState("");
   const [isSwiftCodeValid, setIsSwiftCodeValid] = useState<boolean>(false);
   const navigate = useNavigate();
-  const alertShown = useRef(false); // Ref to track if the alert has been shown
+  const alertShown = useRef(false);
 
-  // custom hook for input validation
   const { errors, setFieldError, clearFieldError } = useFormValidationErrors([
     "recipientName",
     "recipientBank",
@@ -36,43 +55,46 @@ function CustomerPaymentForm() {
   useEffect(() => {
     if (!isAuthenticated() && !alertShown.current) {
       alert("You are not logged in. Please log in to continue.");
-      alertShown.current = true; // Set the ref to true after showing the alert
+      alertShown.current = true;
       navigate("/login");
     }
   }, [navigate]);
 
-  const handleBackClick = () => {
+  const handleBackClick = (): void => {
     navigate("/customer-dashboard");
   };
-  const [accountNum, setAccountNum] = useState("");
 
-  async function fetchUserAccountNum() {
-    const AN = await getUserAccountNum();
-    if (AN) setAccountNum(AN);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [, setAccountNum] = useState("");
+
+  async function fetchUserAccountNum(): Promise<void> {
+    const accountNumber = await getUserAccountNum();
+    if (accountNumber != null) {
+      setAccountNum(accountNumber);
+    }
   }
 
-  const handleIsValidChange = (valid: boolean) => {
+  const handleIsValidChange = (valid: boolean): void => {
     setIsSwiftCodeValid(valid);
   };
 
-  const handlePayClick = async (e: any) => {
-    fetchUserAccountNum();
-    e.preventDefault(); // Prevent the default form submission
+  const handlePayClick = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    void fetchUserAccountNum();
+    e.preventDefault();
 
-    // Input Validation
-    clearFieldError("recipientName"); // Recipient Name
+    clearFieldError("recipientName");
     const nameErrors = getNameErrors(recipientName);
     if (nameErrors.length > 0) {
       setFieldError("recipientName", nameErrors);
       return;
     }
-    clearFieldError("recipientBank"); // Recipient Bank
+    clearFieldError("recipientBank");
     const recipientBankErrors = getNameErrors(recipientBank);
     if (recipientBankErrors.length > 0) {
       setFieldError("recipientBank", recipientBankErrors);
       return;
     }
-    clearFieldError("recipientAccountNumber"); // Recipient Account Number
+    clearFieldError("recipientAccountNumber");
     const recipientAccountNumberErrors = getAccountNumberErrors(
       recipientAccountNumber
     );
@@ -80,13 +102,13 @@ function CustomerPaymentForm() {
       setFieldError("recipientAccountNumber", recipientAccountNumberErrors);
       return;
     }
-    clearFieldError("transferAmount"); // Transfer Amount
+    clearFieldError("transferAmount");
     const transferAmountErrors = getTransferAmountErrors(transferAmount);
     if (transferAmountErrors.length > 0) {
       setFieldError("transferAmount", transferAmountErrors);
       return;
     }
-    clearFieldError("description"); // Description
+    clearFieldError("description");
     const descriptionErrors = getDescriptionErrors(description);
     if (descriptionErrors.length > 0) {
       setFieldError("description", descriptionErrors);
@@ -99,15 +121,21 @@ function CustomerPaymentForm() {
      }
 
     try {
+      const token = localStorage.getItem('token');
+      if (!((token != null) && token.length > 0)) {
+        alert('Please log in to make a payment');
+        return;
+      }
+
       const response = await fetch(
         "https://localhost:3000/api/transaction/transact",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
           },
           body: JSON.stringify({
-            senderAccountNumber: accountNum, // Replace this with actual sender account number (e.g., from the logged-in user)
             recipientName,
             recipientBank,
             recipientAccountNumber,
@@ -115,26 +143,23 @@ function CustomerPaymentForm() {
             currency,
             swiftCode,
             transactionDescription: description,
-            transactionDate: new Date().toISOString(), // Add the current date
+            transactionDate: new Date().toISOString(),
           }),
         }
       );
 
-      console.log("Server response:", response); // Log the raw response from the server
-
       if (response.ok) {
-        const data = await response.json();
-        console.log("Response data:", data); // Log the parsed response data
         alert("Payment Successful!");
         navigate("/customer-dashboard");
       } else {
-        const errorData = await response.json();
-        console.log("Error data:", errorData); // Log the error data
-        alert(`Payment failed: ${errorData.error}`);
+        const errorData = await response.json() as PaymentResponse;
+        alert(`Payment failed: ${String((errorData.error != null) || 'Unknown error')}`);
       }
-    } catch (error: any) {
-      console.error("Fetch error:", error); // Log the fetch error
-      alert(`Payment failed: ${error.message}`);
+    } catch (error: unknown) {
+      const logger = new Logger();
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      logger.error(`Payment processing failed: ${errorMessage}`);
+      alert(`Payment failed: ${errorMessage}`);
     }
   };
 
@@ -142,45 +167,45 @@ function CustomerPaymentForm() {
     <div className="page-container">
       <div className="form-container">
         <h1 className="form-title">Payment Form</h1>
-        <form className="payment-form" onSubmit={handlePayClick}>
+        <form className="payment-form" onSubmit={(e) => void handlePayClick(e)}>
           <div className="form-group">
-            <label htmlFor="recipient-name">Recipient's Name:</label>
+            <label htmlFor="recipient-name">Recipient&apos;s Name:</label>
             <input
               className="input-field"
               type="text"
               id="recipient-name"
               value={recipientName}
-              onChange={(e) => setRecipientName(e.target.value)}
+              onChange={(e) => { setRecipientName(e.target.value); }}
               placeholder="Enter Recipient's Name"
             />
-            <text className="global-error-text">{errors["recipientName"]}</text>
+            <text className="global-error-text">{errors.recipientName}</text>
           </div>
           <div className="form-group">
-            <label htmlFor="recipient-bank">Recipient's Bank:</label>
+            <label htmlFor="recipient-bank">Recipient&apos;s Bank:</label>
             <input
               className="input-field"
               type="text"
               id="recipient-bank"
               value={recipientBank}
-              onChange={(e) => setRecipientBank(e.target.value)}
+              onChange={(e) => { setRecipientBank(e.target.value); }}
               placeholder="Enter Recipient's Bank"
             />
-            <text className="global-error-text">{errors["recipientBank"]}</text>
+            <text className="global-error-text">{errors.recipientBank}</text>
           </div>
           <div className="form-group">
             <label htmlFor="recipient-account-no">
-              Recipient's account no:
+              Recipient&apos;s account no:
             </label>
             <input
               className="input-field"
               type="text"
               id="recipient-account-no"
               value={recipientAccountNumber}
-              onChange={(e) => setRecipientAccountNumber(e.target.value)}
+              onChange={(e) => { setRecipientAccountNumber(e.target.value); }}
               placeholder="Enter Recipient's Account No"
             />
             <text className="global-error-text">
-              {errors["recipientAccountNumber"]}
+              {errors.recipientAccountNumber}
             </text>
           </div>
           <div className="form-group">
@@ -190,11 +215,11 @@ function CustomerPaymentForm() {
               type="text"
               id="amount-transfer"
               value={transferAmount}
-              onChange={(e) => setTransferAmount(e.target.value)}
+              onChange={(e) => { setTransferAmount(e.target.value); }}
               placeholder="Enter Amount you want to pay"
             />
             <text className="global-error-text">
-              {errors["transferAmount"]}
+              {errors.transferAmount}
             </text>
           </div>
           <div className="form-group">
@@ -206,10 +231,10 @@ function CustomerPaymentForm() {
               placeholder="Enter payment description"
               value={description}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setdescription(e.target.value)
+                { setdescription(e.target.value); }
               }
             />
-            <text className="global-error-text">{errors["description"]}</text>
+            <text className="global-error-text">{errors.description}</text>
           </div>
           <div className="form-group">
             <label htmlFor="currency">Currency:</label>
@@ -217,7 +242,7 @@ function CustomerPaymentForm() {
               className="input-field"
               id="currency"
               value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
+              onChange={(e) => { setCurrency(e.target.value); }}
             >
                 <option value="ZAR">ZAR</option>
                 <option value="USD">USD</option>
@@ -239,14 +264,11 @@ function CustomerPaymentForm() {
                 <option value="SEK">SEK</option>
                 <option value="NZD">NZD</option>
                 <option value="TRY">TRY</option>
-
-              {/* Add more currencies as needed */}
             </select>
           </div>
           <div className="form-group">
             <label htmlFor="swift-code">Enter SWIFT Code:</label>
-            <SwiftCodeTextBox value={swiftCode} onChange={(data) => {setSwiftCode(data)}} onIsValidChange={handleIsValidChange} />{" "}
-            {/* Assuming SwiftCodeTextBox takes a value and onChange prop */}
+            <SwiftCodeTextBox value={swiftCode} onChange={(data) => {setSwiftCode(data)}} onIsValidChange={handleIsValidChange} />
           </div>
           <div className="form-buttons">
             <button type="submit" className="pay-now-button">

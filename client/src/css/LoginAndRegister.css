@@ -7,7 +7,7 @@
 /* Left side for the image */
 .login-image {
   width: 50vw; /* Ensures it takes up exactly half of the viewport width */
-  background-image: url('../assets/Images/login-photo.jpg');
+  background-image: url("../assets/Images/login-photo.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat; /* Ensures the image doesn't repeat */
@@ -23,9 +23,8 @@
   padding: 20px;
 }
 
-
 button {
-  width: 65%; /* Ensure buttons take full width */
+  width: 100%; /* Ensure buttons take full width */
   max-width: 100%;
   align-self: center;
   box-sizing: border-box; /* Include padding and border in the element's total width and height */
@@ -60,10 +59,10 @@ button {
 
 @font-face {
   font-family: "PantonNarrow-Bold";
-  src: '../assets/Fonts/Ubuntu-Bold.ttf';
+  src: "../assets/Fonts/Ubuntu-Bold.ttf";
 }
 
 @font-face {
   font-family: "PantonNarrow-Regular";
-  src: '../assets/Fonts/Ubuntu-Regular.ttf';
+  src: "../assets/Fonts/Ubuntu-Regular.ttf";
 }

@@ -8,8 +8,15 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import CustomerPaymentForm from "./pages/CustomerPaymentForm";
 import EmployeeLogin from "./pages/EmployeeLogin";
 import Transactions from "./pages/Transactions";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
 
-function App() {
+/**
+ * The main application component that sets up the routing for the app.
+ * It conditionally renders the `Navbar` component based on the current path.
+ *
+ * @returns {JSX.Element} The rendered application component.
+ */
+function App(): JSX.Element {
   const location = useLocation();
 
   return (
@@ -29,6 +36,7 @@ function App() {
         />
         <Route path="/employee-login" element={<EmployeeLogin />} />
         <Route path="/transactions" element={<Transactions />} />
+        <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
       </Routes>
     </>
   );
