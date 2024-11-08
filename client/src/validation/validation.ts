@@ -1,6 +1,12 @@
+/**
+ * Validates the name field for length and SQL injection.
+ *
+ * @param {string} name - The name to validate.
+ * @returns {string[]} - An array of error messages, if any.
+ */
 export function getNameErrors(name: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   // name must be greater than 3 but less than 50
   const nameLengthRegex = /^.{4,49}$/;
 
@@ -16,9 +22,15 @@ export function getNameErrors(name: string): string[]
   return errors;
 }
 
+/**
+ * Validates the username field for presence and SQL injection.
+ *
+ * @param {string} username - The username to validate.
+ * @returns {string[]} - An array of error messages, if any.
+ */
 export function getUsernameErrors(username: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
 
   if (username === "")
   {
@@ -31,9 +43,15 @@ export function getUsernameErrors(username: string): string[]
   return errors;
 }
 
+/**
+ * Validates the South African ID number for format and SQL injection.
+ *
+ * @param {string} idNumber - The ID number to validate.
+ * @returns {string[]} - An array of error messages, if any.
+ */
 export function getIdNumberErrors(idNumber: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const idFormatRegex = /^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{4}[01]\d{1}\d{1}$/
 
   if (idNumber === "")
@@ -51,9 +69,15 @@ export function getIdNumberErrors(idNumber: string): string[]
   return errors;
 }
 
+/**
+ * Validates the account number for length, digit-only content, and SQL injection.
+ *
+ * @param {string} accountNumber - The account number to validate.
+ * @returns {string[]} - An array of error messages, if any.
+ */
 export function getAccountNumberErrors(accountNumber: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const allDigitsRegex = /^\d+$/
 
   if (accountNumber === "")
@@ -75,9 +99,15 @@ export function getAccountNumberErrors(accountNumber: string): string[]
   return errors;
 }
 
+/**
+ * Validates the password for complexity requirements and SQL injection.
+ *
+ * @param {string} password - The password to validate.
+ * @returns {string[]} - An array of error messages, if any.
+ */
 export function getPasswordErrors(password: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const passwordComplexityRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/;
   // Validating for SQL injection
   if (validateSQLInjection(password))
@@ -93,9 +123,16 @@ export function getPasswordErrors(password: string): string[]
   return errors;
 }
 
+/**
+ * Validates that confirm password matches the password and checks for SQL injection.
+ *
+ * @param {string} password - The original password.
+ * @param {string} confirmPassword - The password confirmation.
+ * @returns {string[]} - An array of error messages, if any.
+ */
 export function getConfirmPasswordErrors(password: string, confirmPassword: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   if (confirmPassword === "")
   {
     errors.push('Confirm Password cannot be empty');
@@ -111,9 +148,15 @@ export function getConfirmPasswordErrors(password: string, confirmPassword: stri
   return errors;
 }
 
+/**
+ * Validates the transfer amount for format and SQL injection.
+ *
+ * @param {string} amount - The amount to validate.
+ * @returns {string[]} - An array of error messages, if any.
+ */
 export function getTransferAmountErrors(amount: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   const amountFormatRegex = /^\d+(\.\d{0,2})?$/;
   if (amount === "")
   {
@@ -130,9 +173,15 @@ export function getTransferAmountErrors(amount: string): string[]
   return errors;
 }
 
-export function getDescriptionErrors(description: string)
+/**
+ * Validates the description field for presence and SQL injection.
+ *
+ * @param {string} description - The description to validate.
+ * @returns {string[]} - An array of error messages, if any.
+ */
+export function getDescriptionErrors(description: string): string[]
 {
-  var errors: string[] = [];
+  const errors: string[] = [];
   if (description === "")
   {
     errors.push("Please enter a description");
@@ -145,13 +194,25 @@ export function getDescriptionErrors(description: string)
   return errors;
 }
 
+/**
+ * Generates a standardized SQL injection error message for a given field.
+ *
+ * @param {string} fieldName - The field name for the error message.
+ * @returns {string} - The SQL injection error message.
+ */
 function getSQLInjectionError(fieldName: string): string
 {
   return (`
     ${fieldName} invalid: Please refrain from using the following terms and symbols\n
-    \'SELECT\', \'INSERT\', \'UPDATE\', \'DELETE\', \'DROP\', \'ALTER\', \'EXEC\', \'UNION\', \'WHERE\', --, ;`)
+    'SELECT', 'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER', 'EXEC', 'UNION', 'WHERE', --, ;`)
 }
 
+/**
+ * Checks if a string contains SQL injection patterns.
+ *
+ * @param {string} input - The input to check.
+ * @returns {boolean} - True if SQL injection patterns are found; otherwise, false.
+ */
 function validateSQLInjection(input: string): boolean
 {
   const sqlInjectionRegex = /\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|EXEC|UNION|WHERE)\b|;|--/i;
