@@ -154,6 +154,10 @@ router.post("/approveTransaction", transactionLimiter, async (req, res) => {
   try {
     // Getting transactionid
     const transactionID = req.query.id;
+    const { error } = Joi.string().length(24).hex().validate(transactionID);
+    if (error) {
+      return res.status(400).json({ error: "Invalid transaction ID" });
+    }
 
     // Finding and updating transaction
     await Transaction.findById(transactionID).then((transaction) => {
@@ -179,6 +183,10 @@ router.post("/denyTransaction", transactionLimiter, async (req, res) => {
   try {
     // Getting transactionid
     const transactionID = req.query.id;
+    const { error } = Joi.string().length(24).hex().validate(transactionID);
+    if (error) {
+      return res.status(400).json({ error: "Invalid transaction ID" });
+    }
 
     // Finding and updating transaction
     await Transaction.findById(transactionID).then((transaction) => {
