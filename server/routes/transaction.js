@@ -7,6 +7,7 @@ const checkAuth = require("../check-auth")(); // Call the function to get the mi
 const hashHelper = require("../helpers/hashHelper");
 const { transactionLimiter } = require("../middleware/rateLimiter");
 const { body, validationResult } = require("express-validator");
+const Joi = require("joi");
 
 const transactionValidation = [
   body("transferAmount")
@@ -203,12 +204,24 @@ router.post(
   checkAuth,
   async (req, res) => {
     try {
-      const userID = req.user.userId;
-      const user = await User.findById(userID);
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
+      // Define validation schema for the request body
+      const schema = Joi.object({
+        recipientName: Joi.string().trim().required(),
+        recipientBank: Joi.string().trim().required(),
+        recipientAccountNumber: Joi.string().alphanum().min(10).max(20).required(),
+        transferAmount: Joi.number().positive().required(),
+        currency: Joi.string().length(3).required(),
+        swiftCode: Joi.string().alphanum().length(8).required(),
+        transactionDescription: Joi.string().trim().optional(),
+      });
+
+      // Validate request body
+      const { error, value } = schema.validate(req.body);
+      if (error) {
+        return res.status(400).json({ error: error.details[0].message });
       }
 
+      // Destructure validated values
       const {
         recipientName,
         recipientBank,
@@ -217,9 +230,15 @@ router.post(
         currency,
         swiftCode,
         transactionDescription,
-      } = req.body;
+      } = value;
 
-      // Find recipient using the lookup hash from the original transaction
+      const userID = req.user.userId;
+      const user = await User.findById(userID);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Find recipient using the validated recipientAccountNumber and approvalStatus
       const originalTransaction = await Transaction.findOne({
         recipientAccountNumber: recipientAccountNumber,
         approvalStatus: "completed",

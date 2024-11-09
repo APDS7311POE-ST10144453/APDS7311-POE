@@ -6,30 +6,43 @@ const Transaction = require("../models/transaction");
 const checkAuth = require("../check-auth")();
 const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");
 const { verifyPassword } = require("../helpers/passwordHelper");
+const Joi = require("joi");
 
 
 router.post("/login", loginLimiter, async (req, res) => {
   try {
-    const { username, password } = req.body;
+    // Define a schema for validation
+    const schema = Joi.object({
+      username: Joi.string().alphanum().min(3).max(30).required(),
+      password: Joi.string().required(),
+    });
+
+    // Validate the request body
+    const { error, value } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const { username, password } = value;
 
     // Find the employee by username and role
-    const employee = await User.findOne({ 
+    const employee = await User.findOne({
       username: username,
-      role: "employee"
+      role: "employee",
     });
 
     if (!employee) {
       return res.status(401).json({
-        message: "Authentication failed"
+        message: "Authentication failed",
       });
     }
 
-    // Compare password using the same helper as user login
-    const isMatch = await verifyPassword(password, employee.password, employee.passwordSalt);
+    // Compare password
+    const isMatch = await bcrypt.compare(password, employee.password);
 
     if (!isMatch) {
       return res.status(401).json({
-        message: "Authentication failed"
+        message: "Authentication failed",
       });
     }
 
@@ -43,7 +56,7 @@ router.post("/login", loginLimiter, async (req, res) => {
     res.status(200).json({
       token: token,
       expiresIn: 3600,
-      userId: employee._id
+      userId: employee._id,
     });
 
   } catch (error) {
