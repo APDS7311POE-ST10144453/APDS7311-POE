@@ -68,8 +68,10 @@ app.use(
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'none'"],
+      frameAncestors: ["'none'"], // Explicitly set frame-ancestors to none for additional security
       formAction: ["'self'"],
       upgradeInsecureRequests: [],
+      blockAllMixedContent: true,
     },
   })
 );
