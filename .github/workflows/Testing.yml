@@ -6,13 +6,13 @@ concurrency:
 
 on:
   push:
-    branches: [main, Part3Updates]
+    branches: [main]
     paths:
       - 'server/**'
       - 'client/**'
       - '.github/workflows/Testing.yml'
   pull_request:
-    branches: [main, Part3Updates]
+    branches: [main]
     paths:
       - 'server/**'
       - 'client/**'
@@ -125,6 +125,10 @@ jobs:
             **/node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Install dependencies
+        working-directory: ./server
+        run: npm install
+
       - name: Create test results directory
         run: mkdir -p test-results
         working-directory: ./server
@@ -178,16 +182,21 @@ jobs:
             **/node_modules
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
+      - name: Install dependencies for server
+        working-directory: ./server
+        run: npm install
+
+      - name: Install dependencies for client
+        working-directory: ./client
+        run: npm install
+
       - name: Run ESLint on client
         working-directory: ./client
-        run: |
-          npm install
-          npm run lint
+        run: npm run lint
 
       - name: Run ESLint on server
         working-directory: ./server
-        run: |
-          npm run lint
+        run: npm run lint
 
       - name: Upload ESLint results
         if: always()
