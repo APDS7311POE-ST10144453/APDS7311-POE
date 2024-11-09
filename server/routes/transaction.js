@@ -8,7 +8,6 @@ const hashHelper = require("../helpers/hashHelper");
 const { transactionLimiter } = require("../middleware/rateLimiter");
 const { body, validationResult } = require("express-validator");
 const Joi = require("joi");
-const { isValidObjectId } = require("mongoose");
 const mongoose = require("mongoose");
 const { ObjectId } = mongoose.Types;
 
