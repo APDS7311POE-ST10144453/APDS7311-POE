@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const Transaction = require("../models/transaction");
 const checkAuth = require("../check-auth")();
 const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");
-const { verifyPassword } = require("../helpers/passwordHelper");
 const Joi = require("joi");
 
 
