@@ -228,8 +228,13 @@ jobs:
       - name: Build client
         run: |
           cd client
+          echo "VITE_SWIFT_CODE_VALIDATOR_API_KEY=${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}" >> .env
+          echo "REACT_APP_ENCRYPTION_KEY=${{ secrets.REACT_APP_ENCRYPTION_KEY }}" >> .env
           npm install
           npm run build
+        env:
+          VITE_SWIFT_CODE_VALIDATOR_API_KEY: ${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}
+          REACT_APP_ENCRYPTION_KEY: ${{ secrets.REACT_APP_ENCRYPTION_KEY }}
 
       - run: echo "Build complete"
 
