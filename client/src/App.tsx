@@ -24,7 +24,8 @@ function App(): JSX.Element {
       {/* Conditionally render Navbar */}
       {location.pathname !== "/customer-dashboard" &&
         location.pathname !== "/customer-payment-form" &&
-        location.pathname !== "/transactions" && <Navbar />}
+        location.pathname !== "/transactions" &&
+        location.pathname !== "/employee-dashboard" && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />

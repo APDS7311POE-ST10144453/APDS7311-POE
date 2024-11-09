@@ -59,9 +59,7 @@ export default function Login(): JSX.Element {
     });
   };
 
-  const loginUser = async (
-    event: React.FormEvent<HTMLFormElement>
-  ): Promise<void> => {
+  const loginUser = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     try {
       const response = await fetch("https://localhost:3000/api/user/login", {

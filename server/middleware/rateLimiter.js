@@ -18,8 +18,8 @@ const loginLimiter = rateLimit({
     },
   }),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50, // TODO: Change before submission 50 attempts
-  message: "Too many login attempts, please try again after 15 minutes",
+  max: 50,
+  message: 'Too many login attempts, please try again after 15 minutes'
 });
 
 // Transaction rate limiter
@@ -35,9 +35,9 @@ const transactionLimiter = rateLimit({
       w: "majority",
     },
   }),
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10, // 10 transactions per hour
-  message: "Transaction limit reached, please try again later",
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 transactions per 15 minutes
+  message: 'Transaction limit reached, please try again later'
 });
 
 // Employee actions rate limiter
@@ -53,9 +53,9 @@ const employeeActionLimiter = rateLimit({
       w: "majority",
     },
   }),
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 100, // 100 actions per hour
-  message: "Action limit reached, please try again later",
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50, // 50 actions per 15 minutes
+  message: 'Action limit reached, please try again later'
 });
 
 module.exports = {

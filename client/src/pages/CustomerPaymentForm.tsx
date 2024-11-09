@@ -68,6 +68,8 @@ function CustomerPaymentForm(): JSX.Element {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [, setAccountNum] = useState("");
 
+
+
   async function fetchUserAccountNum(): Promise<void> {
     const accountNumber = await getUserAccountNum();
     if (accountNumber != null) {
@@ -79,9 +81,7 @@ function CustomerPaymentForm(): JSX.Element {
     setIsSwiftCodeValid(valid);
   };
 
-  const handlePayClick = async (
-    e: React.FormEvent<HTMLFormElement>
-  ): Promise<void> => {
+  const handlePayClick = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     void fetchUserAccountNum();
     e.preventDefault();
 
@@ -111,6 +111,7 @@ function CustomerPaymentForm(): JSX.Element {
       setFieldError("transferAmount", transferAmountErrors);
       return;
     }
+
     clearFieldError("description");
     const descriptionErrors = getDescriptionErrors(description);
     if (descriptionErrors.length > 0) {
@@ -123,9 +124,9 @@ function CustomerPaymentForm(): JSX.Element {
     }
 
     try {
-      const token = localStorage.getItem("token");
-      if (!(token != null && token.length > 0)) {
-        alert("Please log in to make a payment");
+      const token = localStorage.getItem('token');
+      if (!((token != null) && token.length > 0)) {
+        alert('Please log in to make a payment');
         return;
       }
 
@@ -135,7 +136,7 @@ function CustomerPaymentForm(): JSX.Element {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`
           },
           body: JSON.stringify({
             recipientName,
@@ -154,20 +155,15 @@ function CustomerPaymentForm(): JSX.Element {
         alert("Payment Successful!");
         navigate("/customer-dashboard");
       } else {
-        const errorData = (await response.json()) as PaymentResponse;
-        alert(
-          `Payment failed: ${String(
-            errorData.error != null || "Unknown error"
-          )}`
-        );
+        const errorData = await response.json() as PaymentResponse;
+        alert(`Payment failed: ${String((errorData.error != null) || 'Unknown error')}`);
       }
     } catch (error: unknown) {
       const logger = new Logger();
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error(`Payment processing failed: ${errorMessage}`);
       alert(`Payment failed: ${errorMessage}`);
-    }
+    } 
   };
 
   return (
@@ -182,9 +178,7 @@ function CustomerPaymentForm(): JSX.Element {
               type="text"
               id="recipient-name"
               value={recipientName}
-              onChange={(e) => {
-                setRecipientName(e.target.value);
-              }}
+              onChange={(e) => { setRecipientName(e.target.value); }}
               placeholder="Enter Recipient's Name"
             />
             <text className="global-error-text">{errors.recipientName}</text>
@@ -196,9 +190,7 @@ function CustomerPaymentForm(): JSX.Element {
               type="text"
               id="recipient-bank"
               value={recipientBank}
-              onChange={(e) => {
-                setRecipientBank(e.target.value);
-              }}
+              onChange={(e) => { setRecipientBank(e.target.value); }}
               placeholder="Enter Recipient's Bank"
             />
             <text className="global-error-text">{errors.recipientBank}</text>
@@ -212,9 +204,7 @@ function CustomerPaymentForm(): JSX.Element {
               type="text"
               id="recipient-account-no"
               value={recipientAccountNumber}
-              onChange={(e) => {
-                setRecipientAccountNumber(e.target.value);
-              }}
+              onChange={(e) => { setRecipientAccountNumber(e.target.value); }}
               placeholder="Enter Recipient's Account No"
             />
             <text className="global-error-text">
@@ -228,12 +218,12 @@ function CustomerPaymentForm(): JSX.Element {
               type="text"
               id="amount-transfer"
               value={transferAmount}
-              onChange={(e) => {
-                setTransferAmount(e.target.value);
-              }}
+              onChange={(e) => { setTransferAmount(e.target.value); }}
               placeholder="Enter Amount you want to pay"
             />
-            <text className="global-error-text">{errors.transferAmount}</text>
+            <text className="global-error-text">
+              {errors.transferAmount}
+            </text>
           </div>
           <div className="form-group">
             <label htmlFor="description">Description:</label>
@@ -243,9 +233,9 @@ function CustomerPaymentForm(): JSX.Element {
               id="description"
               placeholder="Enter payment description"
               value={description}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setdescription(e.target.value);
-              }}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                { setdescription(e.target.value); }
+              }
             />
             <text className="global-error-text">{errors.description}</text>
           </div>
@@ -255,9 +245,7 @@ function CustomerPaymentForm(): JSX.Element {
               className="input-field"
               id="currency"
               value={currency}
-              onChange={(e) => {
-                setCurrency(e.target.value);
-              }}
+              onChange={(e) => { setCurrency(e.target.value); }}
             >
               <option value="ZAR">ZAR</option>
               <option value="USD">USD</option>

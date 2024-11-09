@@ -1,11 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Transaction = require("../models/transaction");
 const checkAuth = require("../check-auth")();
 const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");
+const { verifyPassword } = require("../helpers/passwordHelper");
 
 
 router.post("/login", loginLimiter, async (req, res) => {
@@ -24,8 +24,8 @@ router.post("/login", loginLimiter, async (req, res) => {
       });
     }
 
-    // Compare password
-    const isMatch = await bcrypt.compare(password, employee.password);
+    // Compare password using the same helper as user login
+    const isMatch = await verifyPassword(password, employee.password, employee.passwordSalt);
 
     if (!isMatch) {
       return res.status(401).json({

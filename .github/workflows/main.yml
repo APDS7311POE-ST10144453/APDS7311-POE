@@ -6,7 +6,7 @@ concurrency:
 
 on:
   push:
-    branches: [ main, Part3Updates ]
+    branches: [ main ]
 
 jobs:
   dependencies:
@@ -66,6 +66,7 @@ jobs:
             ${{ runner.os }}-snyk-
 
       - name: Run Snyk Security Check
+        if: ${{ !env.ACT }}
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -73,13 +74,22 @@ jobs:
           command: test
           args: --severity-threshold=high --file=${{ matrix.path }}/package.json
 
+      - name: Skip Snyk in local environment
+        if: ${{ env.ACT }}
+        run: echo "Skipping Snyk security check in local environment"
+
       - name: Monitor Dependencies
+        if: ${{ !env.ACT }}
         uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           command: monitor
           args: --file=${{ matrix.path }}/package.json
+
+      - name: Skip Monitoring in local environment
+        if: ${{ env.ACT }}
+        run: echo "Skipping Snyk monitoring in local environment"
 
   build-and-deploy:
     needs: security-checks

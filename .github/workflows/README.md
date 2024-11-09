@@ -181,3 +181,161 @@ Pro Mac Mini with 10 cores and 16GB of RAM. Some tests took 10+ minutes to compl
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Docker Documentation](https://docs.docker.com/)
     
+
+### Running Specific Workflows
+
+#### 1. Testing Workflow (Testing.yml)
+```bash
+# Run all jobs
+act push \
+  -W .github/workflows/Testing.yml \
+  --container-architecture linux/amd64 \
+  -P ubuntu-latest=catthehacker/ubuntu:act-latest \
+  --artifact-server-path /tmp/artifacts \
+  -e event.json \
+  --secret-file .secrets \
+  -v \
+  --bind
+
+# Run specific jobs (e.g., only dependencies and tests)
+act push \
+  -W .github/workflows/Testing.yml \
+  --container-architecture linux/amd64 \
+  -P ubuntu-latest=catthehacker/ubuntu:act-latest \
+  --artifact-server-path /tmp/artifacts \
+  -e event.json \
+  --secret-file .secrets \
+  -v \
+  --bind \
+  -j dependencies \
+  -j tests
+```
+
+#### 2. Deployment Workflow (main.yml)
+```bash
+# Run all jobs
+act push \
+  -W .github/workflows/main.yml \
+  --container-architecture linux/amd64 \
+  -P ubuntu-latest=catthehacker/ubuntu:act-latest \
+  --artifact-server-path /tmp/artifacts \
+  -e event.json \
+  --secret-file .secrets \
+  -v \
+  --bind
+
+# Run specific jobs (e.g., only dependencies and security-checks)
+act push \
+  -W .github/workflows/main.yml \
+  --container-architecture linux/amd64 \
+  -P ubuntu-latest=catthehacker/ubuntu:act-latest \
+  --artifact-server-path /tmp/artifacts \
+  -e event.json \
+  --secret-file .secrets \
+  -v \
+  --bind \
+  -j dependencies \
+  -j security-checks
+```
+
+### Required Secrets for Workflows
+For both workflows to run successfully, ensure your `.secrets` file contains:
+
+```plaintext
+# Required for both workflows
+CONNECTION_STRING="your_mongodb_connection_string"
+JWT_SECRET="your_jwt_secret"
+ENCRYPTION_KEY="your_encryption_key"
+MY_SECRET_PEPPER="your_secret_pepper"
+GITHUB_TOKEN="your_github_token"
+
+# Additional secrets for main.yml
+SNYK_TOKEN="your_snyk_token"  # Required for security checks in main.yml
+```
+
+### Known Limitations
+
+1. **Deployment Steps**: 
+   - The actual deployment steps in main.yml will not execute locally
+   - The "Deploy to Server" step needs to be modified for local testing
+
+2. **Security Checks**:
+   - Snyk security checks require a valid SNYK_TOKEN
+   - Some security checks might not work properly in local environment
+
+3. **Bundle Analysis**:
+   - The bundle analysis job requires specific Node.js setup
+   - Some build tools might need additional configuration for local testing
+
+### Workflow-Specific Issues
+
+#### Testing.yml
+- The test reporter action might not work locally
+- ESLint results might need local path adjustments
+- Bundle analysis might require additional setup
+
+#### main.yml
+- Deployment steps should be skipped for local testing
+- Security checks might need modified configuration
+- Cache actions might behave differently locally
+
+### Modified Commands for Local Testing
+
+#### Testing.yml (Skip GitHub-specific steps)
+```bash
+act push \
+  -W .github/workflows/Testing.yml \
+  --container-architecture linux/amd64 \
+  -P ubuntu-latest=catthehacker/ubuntu:act-latest \
+  --artifact-server-path /tmp/artifacts \
+  -e event.json \
+  --secret-file .secrets \
+  -v \
+  --bind \
+  --env ACT=true
+```
+
+#### main.yml (Skip deployment)
+```bash
+act push \
+  -W .github/workflows/main.yml \
+  --container-architecture linux/amd64 \
+  -P ubuntu-latest=catthehacker/ubuntu:act-latest \
+  --artifact-server-path /tmp/artifacts \
+  -e event.json \
+  --secret-file .secrets \
+  -v \
+  --bind \
+  --env ACT=true \
+  -j dependencies \
+  -j build-and-deploy
+```
+
+### Additional Troubleshooting
+
+7. **Snyk Security Check Failures**:
+    ```bash
+    Error: Failed to run Snyk security check
+    ```
+    Solutions:
+    - Ensure SNYK_TOKEN is properly set in .secrets
+    - Try running Snyk locally first: `npx snyk test`
+    - For local testing, you might want to skip Snyk checks
+
+8. **Bundle Analysis Failures**:
+    ```bash
+    Error: Process completed with exit code 1
+    ```
+    Solutions:
+    - Ensure all build dependencies are installed
+    - Check if build:analyze script exists in package.json
+    - Modify bundle size limits for local testing
+
+9. **Deployment Step Failures**:
+    ```bash
+    Error: Deployment step failed
+    ```
+    Solutions:
+    - Skip deployment steps when testing locally
+    - Create mock deployment commands for testing
+    - Use conditional steps based on environment

@@ -27,6 +27,7 @@ export default function checkEnvPlugin(): Plugin {
       // Define placeholders for required environment variables
       const placeholders = {
         VITE_SWIFT_CODE_VALIDATOR_API_KEY: "your_swift_code_validator_api_key",
+        REACT_APP_ENCRYPTION_KEY: "your_encryption_key"
       };
 
       const invalidVars: string[] = [];

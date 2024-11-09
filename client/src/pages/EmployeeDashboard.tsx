@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "../css/EmployeeDashboard.css";
 import { Logger } from "../utils/logger";
+import { useNavigate } from "react-router-dom";
 
 interface Transaction {
   _id: string;
@@ -74,6 +75,7 @@ function EmployeeDashboard(): JSX.Element {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     void fetchPendingTransactions();
@@ -187,6 +189,11 @@ function EmployeeDashboard(): JSX.Element {
     return `status-${status.toLowerCase()}`;
   };
 
+  const handleLogout = (): void => {
+    localStorage.removeItem("token");
+    navigate("/employee-login");
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -198,7 +205,12 @@ function EmployeeDashboard(): JSX.Element {
   return (
     <div className="employee-dashboard-container">
       <div className="dashboard-header">
-        <h1>Employee Dashboard</h1>
+        <div className="header-content">
+          <h1>Employee Dashboard</h1>
+          <button className="logout-button" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </div>
       
       <div className="transactions-container">
