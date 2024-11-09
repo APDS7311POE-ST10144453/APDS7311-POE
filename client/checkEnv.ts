@@ -46,11 +46,11 @@ export default function checkEnvPlugin(): Plugin {
           logger.error(`- ${key}`);
         });
 
-        if (invalidVars.includes("REACT_APP_SWIFT_CODE_VALIDATOR_API_KEY")) {
+        if (invalidVars.includes("REACT_APP_ENCRYPTION_KEY")) {
           logger.error(
-            "Please set a valid API key for the Swift Code Validator. You can get one from:"
+            "Please set a valid encryption key for the application. You can generate one using the following command:"
           );
-          logger.error("https://api-ninjas.com/api/swift-code-lookup");
+          logger.error("https://api-ninjas.com/api/swiftcode");
         }
 
         process.exit(1);
