@@ -8,6 +8,7 @@ const hashHelper = require("../helpers/hashHelper");
 const { transactionLimiter } = require("../middleware/rateLimiter");
 const { body, validationResult } = require("express-validator");
 const Joi = require("joi");
+const { isValidObjectId } = require("mongoose");
 
 const transactionValidation = [
   body("transferAmount")
@@ -156,6 +157,11 @@ router.post("/approveTransaction", transactionLimiter, async (req, res) => {
     const transactionID = req.query.id;
     const { error } = Joi.string().length(24).hex().validate(transactionID);
     if (error) {
+      return res.status(400).json({ error: "Invalid transaction ID" });
+    }
+
+    // Validating transactionID
+    if (!isValidObjectId(transactionID)) {
       return res.status(400).json({ error: "Invalid transaction ID" });
     }
 

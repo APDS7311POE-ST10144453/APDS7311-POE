@@ -69,7 +69,7 @@ app.use(
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
       frameSrc: ["'none'"],
-      frameAncestors: ["'none'"], 
+      frameAncestors: ["'none'", "'self'"],
       formAction: ["'self'"],
       upgradeInsecureRequests: [],
       blockAllMixedContent: true,
