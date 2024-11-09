@@ -56,7 +56,7 @@ app.use(helmet.xssFilter());
 app.use(helmet.noSniff());
 app.use(helmet.hidePoweredBy());
 app.use(helmet.frameguard({ action: "deny" }));
-// sonar-disable-next-line security-hotspot
+
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
