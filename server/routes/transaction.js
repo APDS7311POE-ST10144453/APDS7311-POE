@@ -9,6 +9,8 @@ const { transactionLimiter } = require("../middleware/rateLimiter");
 const { body, validationResult } = require("express-validator");
 const Joi = require("joi");
 const { isValidObjectId } = require("mongoose");
+const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Types;
 
 const transactionValidation = [
   body("transferAmount")
@@ -155,28 +157,31 @@ router.post("/approveTransaction", transactionLimiter, async (req, res) => {
   try {
     // Getting transactionid
     const transactionID = req.query.id;
-    const { error } = Joi.string().length(24).hex().validate(transactionID);
-    if (error) {
-      return res.status(400).json({ error: "Invalid transaction ID" });
+    
+    // Validate if it's a valid ObjectId first
+    if (!ObjectId.isValid(transactionID)) {
+      return res.status(400).json({ error: "Invalid transaction ID format" });
     }
 
-    // Validating transactionID
-    if (!isValidObjectId(transactionID)) {
-      return res.status(400).json({ error: "Invalid transaction ID" });
-    }
+    // Convert to ObjectId for safe querying
+    const objectId = new ObjectId(transactionID);
+    
+    // Use the validated ObjectId in the query
+    const transaction = await Transaction.findOne({ 
+      _id: objectId 
+    });
 
-    // Finding and updating transaction
-    const transaction = await Transaction.findOne({ _id: { $eq: transactionID } });
+    // Check if the transaction exists
     if (!transaction) {
       return res.status(404).json({ error: "Transaction not found" });
     }
-    // Changing the approvalStatus to approved
-    transaction.approvalStatus = "approved";
 
-    // Save the updated transaction back to the database
-    await transaction.save().then(() => {
-      res.status(200).json({ message: "Transaction approved" });
-    });
+    // Change the approvalStatus to approved
+    transaction.approvalStatus = "approved";
+    await transaction.save(); // Save the updated transaction back to the database
+    
+    // Send a success response
+    res.status(200).json({ message: "Transaction approved" });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -186,25 +191,29 @@ router.post("/approveTransaction", transactionLimiter, async (req, res) => {
 // Use the url: https://localhost:3000/api/transaction/denyTransaction?id=transactionIdPlaceholder
 router.post("/denyTransaction", transactionLimiter, async (req, res) => {
   try {
-    // Getting transactionid
     const transactionID = req.query.id;
-    const { error } = Joi.string().length(24).hex().validate(transactionID);
-    if (error) {
-      return res.status(400).json({ error: "Invalid transaction ID" });
+    
+    // Validate if it's a valid ObjectId first
+    if (!ObjectId.isValid(transactionID)) {
+      return res.status(400).json({ error: "Invalid transaction ID format" });
     }
 
-    // Finding and updating transaction
-    const transaction = await Transaction.findOne({ _id: { $eq: transactionID } });
+    // Convert to ObjectId for safe querying
+    const objectId = new ObjectId(transactionID);
+    
+    // Use the validated ObjectId in the query
+    const transaction = await Transaction.findOne({ 
+      _id: objectId 
+    });
+
     if (!transaction) {
       return res.status(404).json({ error: "Transaction not found" });
     }
-    // Changing the approvalStatus to denied
-    transaction.approvalStatus = "denied";
 
-    // Save the updated transaction back to the database
-    await transaction.save().then(() => {
-      res.status(200).json({ message: "Transaction denied" });
-    });
+    transaction.approvalStatus = "denied";
+    await transaction.save();
+    
+    res.status(200).json({ message: "Transaction denied" });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
