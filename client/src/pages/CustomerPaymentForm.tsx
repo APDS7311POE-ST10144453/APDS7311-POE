@@ -66,7 +66,7 @@ function CustomerPaymentForm(): JSX.Element {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [accountNum, setAccountNum] = useState("");
+  const [_accountNum, setAccountNum] = useState("");
 
   async function fetchUserAccountNum(): Promise<void> {
     const accountNumber = await getUserAccountNum();
