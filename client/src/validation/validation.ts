@@ -44,7 +44,7 @@ export function getUsernameErrors(username: string): string[] {
 export function getIdNumberErrors(idNumber: string): string[] {
   const errors: string[] = [];
   const idFormatRegex =
-    /^\d{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])\d{4}[01]\d{1}\d{1}$/;
+    /^\d{2}(\d[1-9]|1[0-2])(\d[1-9]|[12]\d|3[01])\d{4}[01]\d\d$/;
 
   if (idNumber === "") {
     errors.push("Please enter your SA ID number");

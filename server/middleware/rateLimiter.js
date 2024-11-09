@@ -18,7 +18,7 @@ const loginLimiter = rateLimit({
     },
   }),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50,
+  max: 50, //TODO: Change this to 5
   message: 'Too many login attempts, please try again after 15 minutes'
 });
 

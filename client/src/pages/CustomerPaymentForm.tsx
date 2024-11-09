@@ -38,7 +38,7 @@ function CustomerPaymentForm(): JSX.Element {
   const [recipientAccountNumber, setRecipientAccountNumber] = useState<string>("");
   const [transferAmount, setTransferAmount] = useState<string>("");
   const [swiftCode, setSwiftCode] = useState("");
-  const [description, setdescription] = useState("");
+  const [description, setDescription] = useState("");
   const [currency, setCurrency] = useState("USD");
   const [isSwiftCodeValid, setIsSwiftCodeValid] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -66,9 +66,7 @@ function CustomerPaymentForm(): JSX.Element {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [, setAccountNum] = useState("");
-
-
+  const [accountNum, setAccountNum] = useState("");
 
   async function fetchUserAccountNum(): Promise<void> {
     const accountNumber = await getUserAccountNum();
@@ -234,7 +232,7 @@ function CustomerPaymentForm(): JSX.Element {
               placeholder="Enter payment description"
               value={description}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                { setdescription(e.target.value); }
+                { setDescription(e.target.value); }
               }
             />
             <text className="global-error-text">{errors.description}</text>

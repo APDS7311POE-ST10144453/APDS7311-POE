@@ -115,7 +115,7 @@ function Transactions(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    void fetchTransactions();
+    fetchTransactions();
   }, [fetchTransactions]);
 
   if (loading) {
@@ -133,7 +133,7 @@ function Transactions(): JSX.Element {
           Main Menu
         </button>
         <button className="nav-button" onClick={(): void => {
-          void fetchTransactions();
+          fetchTransactions();
         }}>
           Transactions
         </button>
@@ -146,8 +146,8 @@ function Transactions(): JSX.Element {
         <div className="payment-receipts">
           <h1>Transactions</h1>
           {transactions.length > 0 ? (
-            transactions.map((transaction, index) => (
-              <div className="Transaction-details-box" key={index}>
+            transactions.map((transaction) => (
+              <div className="Transaction-details-box" key={transaction._id}>
                 <div className="receipt-item">
                   <div className="transaction-header">
                     <div className="transaction-date">

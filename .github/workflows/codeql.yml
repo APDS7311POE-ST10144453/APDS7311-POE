@@ -6,7 +6,7 @@ concurrency:
 
 on:
   push:
-    branches: [ main, Part3Updates ]
+    branches: [ main ]
     paths:
       - '**.js'
       - '**.ts'
