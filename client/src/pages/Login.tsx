@@ -81,6 +81,13 @@ export default function Login(): JSX.Element {
         } else {
           throw new Error("Invalid token received");
         }
+        if (result.token && result.token.length > 0) {
+          localStorage.setItem("token", result.token);
+          setSuccessMessage("User logged in successfully");
+          navigate("/customer-dashboard");
+        } else {
+          throw new Error("Invalid token received");
+        }
       } else {
         const error = (await response.json()) as ErrorResponse;
         setErrorMessage(error.message || "Login failed");

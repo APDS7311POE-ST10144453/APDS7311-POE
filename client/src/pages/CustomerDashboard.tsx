@@ -58,7 +58,7 @@ function CustomerDashboard(): JSX.Element {
 
   const [username, setUsername] = useState("");
   const [accountNum, setAccountNum] = useState("");
-  const [ballance, setBallance] = useState("");
+  const [balance, setBalance] = useState("");
   interface Receipt {
     _id: string;
     transactionDate: string;
@@ -115,21 +115,21 @@ function CustomerDashboard(): JSX.Element {
           setAccountNum(accountResponse);
         }
         if (typeof balanceResponse === "string") {
-          setBallance(balanceResponse);
+          setBalance(balanceResponse);
         }
         if (Array.isArray(paymentsResponse)) {
           setReceipts(paymentsResponse);
         }
       } catch (error) {
         const logger = new Logger();
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
+        const errorMessage = error instanceof Error ? error.message : String(error);
         logger.error(`Error fetching user data: ${errorMessage}`);
       }
     }
 
     void fetchUserData();
   }, [authChecked]);
+
   if (!authChecked) {
     return <></>; // Render nothing until auth check is done
   }
@@ -225,7 +225,7 @@ function CustomerDashboard(): JSX.Element {
             <div className="details-box">
               <p>Acc No: {accountNum}</p>
               <p>
-                <strong>Available Balance</strong>: $ {ballance}
+                <strong>Available Balance</strong>: $ {balance}
               </p>
             </div>
           </div>

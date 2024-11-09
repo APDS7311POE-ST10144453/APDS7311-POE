@@ -33,16 +33,17 @@ interface PaymentResponse {
  * )
  */
 function CustomerPaymentForm(): JSX.Element {
-  const [recipientName, setRecipientName] = useState("");
-  const [recipientBank, setRecipientBank] = useState("");
-  const [recipientAccountNumber, setRecipientAccountNumber] = useState("");
-  const [transferAmount, setTransferAmount] = useState("");
+  const [recipientName, setRecipientName] = useState<string>("");
+  const [recipientBank, setRecipientBank] = useState<string>("");
+  const [recipientAccountNumber, setRecipientAccountNumber] = useState<string>("");
+  const [transferAmount, setTransferAmount] = useState<string>("");
   const [swiftCode, setSwiftCode] = useState("");
-  const [currency, setCurrency] = useState("USD");
   const [description, setdescription] = useState("");
+  const [currency, setCurrency] = useState("USD");
   const [isSwiftCodeValid, setIsSwiftCodeValid] = useState<boolean>(false);
   const navigate = useNavigate();
   const alertShown = useRef(false);
+
 
   const { errors, setFieldError, clearFieldError } = useFormValidationErrors([
     "recipientName",
