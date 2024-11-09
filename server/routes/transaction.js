@@ -56,7 +56,7 @@ router.post(
       const userID = req.user.userId;
 
       // Find the user to get their account number
-      const user = await User.findById(userID);
+      const user = await User.findOne({ _id: { $eq: userID } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -110,7 +110,7 @@ router.get(
   checkAuth,
   async (req, res) => {
     try {
-      const user = await User.findById(req.user.userId);
+      const user = await User.findOne({ _id: { $eq: req.user.userId } });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -131,7 +131,7 @@ router.get(
 router.get("/getPayments", transactionLimiter, checkAuth, async (req, res) => {
   try {
     const userID = req.user.userId;
-    const user = await User.findById(userID);
+    const user = await User.findOne({ _id: { $eq: userID } });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -166,17 +166,16 @@ router.post("/approveTransaction", transactionLimiter, async (req, res) => {
     }
 
     // Finding and updating transaction
-    await Transaction.findById(transactionID).then((transaction) => {
-      if (!transaction) {
-        return res.status(404).json({ error: "Transaction not found" });
-      }
-      // Changing the approvalStatus to approved
-      transaction.approvalStatus = "approved";
+    const transaction = await Transaction.findOne({ _id: { $eq: transactionID } });
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+    // Changing the approvalStatus to approved
+    transaction.approvalStatus = "approved";
 
-      // Save the updated transaction back to the database
-      return transaction.save().then(() => {
-        res.status(200).json({ message: "Transaction approved" });
-      });
+    // Save the updated transaction back to the database
+    await transaction.save().then(() => {
+      res.status(200).json({ message: "Transaction approved" });
     });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -195,17 +194,16 @@ router.post("/denyTransaction", transactionLimiter, async (req, res) => {
     }
 
     // Finding and updating transaction
-    await Transaction.findById(transactionID).then((transaction) => {
-      if (!transaction) {
-        return res.status(404).json({ error: "Transaction not found" });
-      }
-      // Changing the approvalStatus to denied
-      transaction.approvalStatus = "denied";
+    const transaction = await Transaction.findOne({ _id: { $eq: transactionID } });
+    if (!transaction) {
+      return res.status(404).json({ error: "Transaction not found" });
+    }
+    // Changing the approvalStatus to denied
+    transaction.approvalStatus = "denied";
 
-      // Save the updated transaction back to the database
-      return transaction.save().then(() => {
-        res.status(200).json({ message: "Transaction denied" });
-      });
+    // Save the updated transaction back to the database
+    await transaction.save().then(() => {
+      res.status(200).json({ message: "Transaction denied" });
     });
   } catch (err) {
     res.status(400).json({ error: err.message });
