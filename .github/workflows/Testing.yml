@@ -254,9 +254,18 @@ jobs:
         working-directory: ./client
         run: npm install
 
+      - name: Create .env file
+        working-directory: ./client
+        run: |
+          echo "VITE_SWIFT_CODE_VALIDATOR_API_KEY=${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}" >> .env
+          echo "REACT_APP_ENCRYPTION_KEY=${{ secrets.REACT_APP_ENCRYPTION_KEY }}" >> .env
+
       - name: Build with bundle analysis
         working-directory: ./client
         run: npm run build:analyze
+        env:
+          VITE_SWIFT_CODE_VALIDATOR_API_KEY: ${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}
+          REACT_APP_ENCRYPTION_KEY: ${{ secrets.REACT_APP_ENCRYPTION_KEY }}
 
       - name: Check bundle size
         working-directory: ./client
