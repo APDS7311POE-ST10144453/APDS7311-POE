@@ -6,6 +6,7 @@ const Transaction = require("../models/transaction");
 const checkAuth = require("../check-auth")();
 const { loginLimiter, employeeActionLimiter } = require("../middleware/rateLimiter");
 const Joi = require("joi");
+const { verifyPassword } = require("../helpers/passwordHelper");
 
 
 router.post("/login", loginLimiter, async (req, res) => {
@@ -37,13 +38,14 @@ router.post("/login", loginLimiter, async (req, res) => {
     }
 
     // Compare password
-    const isMatch = await bcrypt.compare(password, employee.password);
+    const isMatch = await verifyPassword(password, employee.password, employee.passwordSalt);
 
     if (!isMatch) {
       return res.status(401).json({
         message: "Authentication failed",
       });
     }
+
 
     // Generate JWT token
     const token = jwt.sign(
