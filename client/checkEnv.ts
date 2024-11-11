@@ -48,7 +48,7 @@ export default function checkEnvPlugin(): Plugin {
 
         if (invalidVars.includes("REACT_APP_ENCRYPTION_KEY")) {
           logger.error(
-            "Please set a valid encryption key for the application. You can generate one using the following command:"
+            "Please set a valid encryption key for the application. You can generate one using the following command: node generatecrypto.js in the server directory"
           );
           logger.error("https://api-ninjas.com/api/swiftcode");
         }
