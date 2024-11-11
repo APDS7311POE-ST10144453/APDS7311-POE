@@ -47,33 +47,34 @@ mongoose
 
 // Security Middleware
 app.use(globalLimiter);
-app.use(helmet());
 app.use(mongoSanitize());
 app.use(sanitizeXSS);
 
-// Enhanced Helmet Configuration
-app.use(helmet.xssFilter());
-app.use(helmet.noSniff());
-app.use(helmet.hidePoweredBy());
-app.use(helmet.frameguard({ action: "deny" }));
-
+// Consolidated Helmet Configuration
 app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "https://localhost:3000", "data:"],
-      connectSrc: ["'self'", "https://api.api-ninjas.com"],
-      fontSrc: ["'self'", "https:", "data:"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-      frameAncestors: ["'self'"],
-      formAction: ["'self'"],
-      upgradeInsecureRequests: [],
-      blockAllMixedContent: true,
+  helmet({
+    xssFilter: true,
+    noSniff: true,
+    hidePoweredBy: true,
+    frameguard: {
+      action: "deny"
     },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "https://localhost:3000", "data:"],
+        connectSrc: ["'self'", "https://api.api-ninjas.com"],
+        fontSrc: ["'self'", "https:", "data:"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'none'"],
+        frameAncestors: ["'self'"],
+        formAction: ["'self'"],
+        upgradeInsecureRequests: [],
+      }
+    }
   })
 );
 
