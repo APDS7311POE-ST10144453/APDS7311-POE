@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Transaction = require("../models/transaction");
 const User = require("../models/user");
-const { encrypt } = require("../helpers/encryption");
+const { encrypt, decrypt } = require("../helpers/encryption");
 const checkAuth = require("../check-auth")(); // Call the function to get the middleware
 const hashHelper = require("../helpers/hashHelper");
 const { transactionLimiter } = require("../middleware/rateLimiter");
@@ -224,7 +224,9 @@ router.post(
   checkAuth,
   async (req, res) => {
     try {
-      // Define validation schema for the request body
+      // Decrypt the account number before validation
+      const decryptedAccountNumber = decrypt(req.body.recipientAccountNumber);
+      
       const schema = Joi.object({
         recipientName: Joi.string().trim().required(),
         recipientBank: Joi.string().trim().required(),
@@ -233,13 +235,21 @@ router.post(
         currency: Joi.string().length(3).required(),
         swiftCode: Joi.string().alphanum().length(8).required(),
         transactionDescription: Joi.string().trim().optional(),
+        transactionDate: Joi.date().optional() // Add this line
       });
 
-      // Validate request body
-      const { error, value } = schema.validate(req.body);
+      // Validate with decrypted account number
+      const { error, value } = schema.validate({
+        ...req.body,
+        recipientAccountNumber: decryptedAccountNumber
+      });
+
       if (error) {
         return res.status(400).json({ error: error.details[0].message });
       }
+
+      // Use the encrypted account number for the transaction
+      value.recipientAccountNumber = req.body.recipientAccountNumber;
 
       // Destructure validated values
       const {
@@ -283,7 +293,7 @@ router.post(
         currency,
         swiftCode,
         transactionDescription,
-        transactionDate: new Date(),
+        transactionDate: new Date(), // Server sets the date
         approvalStatus: "pending",
       });
 
