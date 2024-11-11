@@ -22,6 +22,7 @@
 
 ## Demo Video
 Watch our PART 2 demo video here: [Demo Video](https://drive.google.com/file/d/1t8QLcuJ4CpbHoVXmP7NMi-rqdw9Db2tZ/view?usp=sharing)
+
 Watch our PART 3 demo video here: [Demo Video](https://drive.google.com/file/d/1mATVm_8RYgOrwQ9lneyQd0T69DjzJHqy/view?usp=sharing)
 
 We hope you enjoy watching it!
