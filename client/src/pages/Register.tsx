@@ -10,7 +10,65 @@ import {
   getUsernameErrors,
 } from "../validation/validation";
 
-export default function Register() {
+/**
+ * Register component handles the user registration form.
+ * It includes form fields for name, username, ID number, account number, password, and confirm password.
+ * It performs client-side validation before submitting the form data to the server.
+ *
+ * @returns {JSX.Element} The Register component.
+ *
+ * @component
+ *
+ * @example
+ * return (
+ *   <Register />
+ * )
+ *
+ * @remarks
+ * This component uses a custom hook `useFormValidationErrors` for managing form validation errors.
+ * It also handles the form submission and displays success or error messages based on the server response.
+ *
+ * @function
+ * @name Register
+ *
+ * @typedef {Object} FormData
+ * @property {string} name - The full name of the user.
+ * @property {string} username - The username of the user.
+ * @property {string} idNumber - The ID number of the user.
+ * @property {string} accountNumber - The account number of the user.
+ * @property {string} password - The password of the user.
+ * @property {string} confirmPassword - The confirmation of the password.
+ *
+ * @typedef {Object} ValidationErrors
+ * @property {string[]} name - Validation errors for the name field.
+ * @property {string[]} username - Validation errors for the username field.
+ * @property {string[]} idNumber - Validation errors for the ID number field.
+ * @property {string[]} accountNumber - Validation errors for the account number field.
+ * @property {string[]} password - Validation errors for the password field.
+ * @property {string[]} confirmPassword - Validation errors for the confirm password field.
+ *
+ * @typedef {Object} ServerResponse
+ * @property {string} message - The response message from the server.
+ *
+ * @typedef {Object} ServerError
+ * @property {string} message - The error message from the server.
+ *
+ * @hook
+ * @name useFormValidationErrors
+ * @param {string[]} fields - The list of fields to validate.
+ * @returns {Object} The validation errors and functions to set and clear errors.
+ *
+ * @function
+ * @name handleChange
+ * @param {React.ChangeEvent<HTMLInputElement>} e - The change event from the input field.
+ * @returns {void}
+ *
+ * @function
+ * @name registerUser
+ * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+ * @returns {Promise<void>}
+ */
+export default function Register(): JSX.Element {
   const [data, setData] = useState({
     name: "",
     username: "",
@@ -33,7 +91,7 @@ export default function Register() {
   const [responseMessage, setResponseMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setData({
       ...data,
@@ -41,7 +99,9 @@ export default function Register() {
     });
   };
 
-  const registerUser = async (e: React.FormEvent<HTMLFormElement>) => {
+  const registerUser = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
 
     // Validation
@@ -86,7 +146,6 @@ export default function Register() {
     }
 
     try {
-      console.log("User register attempt, data passed: ", data);
       const response = await fetch("https://localhost:3000/api/user/register", {
         method: "POST",
         headers: {
@@ -96,21 +155,22 @@ export default function Register() {
       });
 
       if (response.ok) {
-        const result = await response.json();
-        console.log(result);
-        setResponseMessage("User registered successfully");
-        console.log("Redirecting to /login");
+        const result = (await response.json()) as { message: string };
+        setResponseMessage(result.message);
         // wait a second before redirect
         setTimeout(() => {
           window.location.href = "/login"; // Redirect to login
         }, 2000);
       } else {
-        const error = await response.json();
+        const error = (await response.json()) as { message: string };
         setErrorMessage(error.message || "Registration failed");
       }
     } catch (error) {
-      console.error("An error occurred, please try again later.", error);
-      setErrorMessage("An error occurred, please try again later.");
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An error occurred, please try again later.";
+      setErrorMessage(errorMessage);
     }
   };
 
@@ -120,7 +180,11 @@ export default function Register() {
 
       <div className="login-form">
         <div className="form-container">
-          <form onSubmit={registerUser}>
+          <form
+            onSubmit={(e: React.FormEvent<HTMLFormElement>): void => {
+              void registerUser(e);
+            }}
+          >
             <div className="form-group">
               <label>Full Name</label>
               <input
@@ -131,7 +195,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
-              <text className="global-error-text">{errors["name"]}</text>
+              <text className="global-error-text">{errors.name}</text>
             </div>
             <div className="form-group">
               <label>Username</label>
@@ -143,7 +207,7 @@ export default function Register() {
                 onChange={handleChange}
                 className="input-field"
               />
-              <text className="global-error-text">{errors["username"]}</text>
+              <text className="global-error-text">{errors.username}</text>
             </div>
             <div className="form-group-horizontal">
               <div className="form-group">
@@ -156,7 +220,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                <text className="global-error-text">{errors["idNumber"]}</text>
+                <text className="global-error-text">{errors.idNumber}</text>
               </div>
               <div className="form-group">
                 <label>Account Number</label>
@@ -169,7 +233,7 @@ export default function Register() {
                   className="input-field"
                 />
                 <text className="global-error-text">
-                  {errors["accountNumber"]}
+                  {errors.accountNumber}
                 </text>
               </div>
             </div>
@@ -183,7 +247,7 @@ export default function Register() {
                   onChange={handleChange}
                   className="input-field"
                 />
-                <text className="global-error-text">{errors["password"]}</text>
+                <text className="global-error-text">{errors.password}</text>
               </div>
               <div className="form-group">
                 <label>Confirm Password</label>
@@ -195,7 +259,7 @@ export default function Register() {
                   className="input-field"
                 />
                 <text className="global-error-text">
-                  {errors["confirmPassword"]}
+                  {errors.confirmPassword}
                 </text>
               </div>
             </div>

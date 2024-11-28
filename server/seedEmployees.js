@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 const User = require("./models/user");
-const bcrypt = require("bcrypt");
-const crypto = require("crypto");
 require("dotenv").config();
 const {encrypt} = require("./helpers/encryption");
+const { hashPassword } = require("./helpers/passwordHelper");
 
 const employees = [
   {
@@ -24,14 +23,25 @@ const employees = [
   },
 ];
 
+// Add MongoDB client options
+const clientOptions = {
+  serverApi: { version: '1', strict: true, deprecationErrors: true }
+};
+
+/**
+ * Seeds employee data into the database.
+ *
+ * This function connects to the MongoDB database, encrypts sensitive employee
+ * information (ID number and account number), hashes passwords, and creates new
+ * employee records. Disconnects from the database upon completion or error.
+ */
 async function seedEmployees() {
   try {
-    await mongoose.connect(process.env.CONNECTION_STRING, {
-    });
+    await mongoose.connect(process.env.CONNECTION_STRING, clientOptions);
 
     for (const employee of employees) {
       // Hash the password
-      const hashedPassword = await bcrypt.hash(employee.password, 10);
+      const { salt, hash } = await hashPassword(employee.password);
 
       // Encrypt the idNumber and accountNumber
       const encryptedIdNumber = encrypt(employee.idNumber);
@@ -43,15 +53,17 @@ async function seedEmployees() {
         name: employee.name,
         idNumber: encryptedIdNumber,
         accountNumber: encryptedAccountNumber,
-        password: hashedPassword,
+        password: hash,
+        passwordSalt: salt,
         role: employee.role,
       });
     }
-
+    // eslint-disable-next-line no-console
     console.log("Employees seeded successfully");
     mongoose.disconnect();
   } catch (error) {
     console.error("Error seeding employees:", error);
+    mongoose.disconnect();
   }
 }
 

@@ -1,0 +1,54 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 2,
+    "passes": 2,
+    "pending": 0,
+    "failures": 0,
+    "start": "2024-11-09T14:26:38.144Z",
+    "end": "2024-11-09T14:26:38.225Z",
+    "duration": 81
+  },
+  "tests": [
+    {
+      "title": "should generate a salt",
+      "fullTitle": "generateCryptoFunctions should generate a salt",
+      "file": "/Users/nicsmeyer/Documents/VSProjects/APDS7311-POE/server/tests/generatecrypto.test.mjs",
+      "duration": 8,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should hash a password with salt and pepper",
+      "fullTitle": "generateCryptoFunctions should hash a password with salt and pepper",
+      "file": "/Users/nicsmeyer/Documents/VSProjects/APDS7311-POE/server/tests/generatecrypto.test.mjs",
+      "duration": 70,
+      "currentRetry": 0,
+      "speed": "medium",
+      "err": {}
+    }
+  ],
+  "pending": [],
+  "failures": [],
+  "passes": [
+    {
+      "title": "should generate a salt",
+      "fullTitle": "generateCryptoFunctions should generate a salt",
+      "file": "/Users/nicsmeyer/Documents/VSProjects/APDS7311-POE/server/tests/generatecrypto.test.mjs",
+      "duration": 8,
+      "currentRetry": 0,
+      "speed": "fast",
+      "err": {}
+    },
+    {
+      "title": "should hash a password with salt and pepper",
+      "fullTitle": "generateCryptoFunctions should hash a password with salt and pepper",
+      "file": "/Users/nicsmeyer/Documents/VSProjects/APDS7311-POE/server/tests/generatecrypto.test.mjs",
+      "duration": 70,
+      "currentRetry": 0,
+      "speed": "medium",
+      "err": {}
+    }
+  ]
+}

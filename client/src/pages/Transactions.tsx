@@ -1,15 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import '../css/Transaction.css';
 import { isAuthenticated } from "../utils/auth";
 
 interface TransactionStatusProps {
-  status: 'approved' | 'pending' | 'denied' | string;
+  status: 'approved' | 'pending' | 'denied' | 'completed';
 }
 
 const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
-  const getStatusColor = () => {
+  const getStatusColor = (): string => {
     switch (status) {
+      case 'completed': return 'blue';
       case 'approved': return 'green';
       case 'pending': return 'orange';
       case 'denied': return 'red';
@@ -28,43 +29,58 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ status }) => {
   );
 };
 
-function Transactions() {
+/**
+ * Transactions component fetches and displays a list of transactions for the authenticated user.
+ * 
+ * This component handles:
+ * - Navigation to the main menu and login page.
+ * - Fetching transactions from the server.
+ * - Displaying loading and error states.
+ * - Rendering the list of transactions with details such as date, description, amount, and status.
+ * 
+ * @returns {JSX.Element} The rendered Transactions component.
+ */
+function Transactions(): JSX.Element {
   const navigate = useNavigate();
   const alertShown = useRef(false);
 
-  const handleMainMenuClick = () => {
+  const handleMainMenuClick = (): void => {
     navigate("/customer-dashboard");
+  };
+
+  const handleLogOutClick = (): void => {
+    localStorage.removeItem('token');
+    navigate("/login");
   };
 
   useEffect(() => {
     if (!isAuthenticated() && !alertShown.current) {
       alert("You are not logged in. Please log in to continue.");
-      alertShown.current = true; // Set the ref to true after showing the alert
+      alertShown.current = true;
       navigate("/login");
     }
   }, [navigate]);
   
   interface Transaction {
+    _id: string;
+    senderLookupHash: string;
     transactionDate: string;
     transactionDescription: string;
     transferAmount: { $numberDecimal: string };
-    approvalStatus: 'approved' | 'pending' | 'denied';
+    approvalStatus: 'approved' | 'pending' | 'denied' | 'completed';
   }
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
-
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError(null);
+
     const token = localStorage.getItem('token');
     
-    if (!token) {
+    if (!(token != null && token.length > 0)) {
       setError("No authentication token found. Please log in again.");
       setLoading(false);
       return;
@@ -81,52 +97,82 @@ function Transactions() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+        throw new Error(`HTTP error! status: ${response.status.toString()}, message: ${errorText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as { transactionList: Transaction[] };
       if (Array.isArray(data.transactionList)) {
         setTransactions(data.transactionList);
       } else {
         throw new Error("Received data is not in the expected format");
       }
     } catch (error) {
-      console.error('Error fetching transactions:', error);
-      setError(`Failed to fetch transactions: ${error instanceof Error ? error.message : String(error)}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      setError(`Failed to fetch transactions: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [fetchTransactions]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
+  if (error != null) {
     return <div>Error: {error}</div>;
   }
 
   return (
     <div className="dashboard-container">
-      {/* Side Navigation Bar */}
       <div className="side-nav">
-        <button className="nav-button" onClick={handleMainMenuClick} >Dashboard</button>
-        <button className="nav-button">Transactions</button>
+        <button className="nav-button" onClick={handleMainMenuClick}>
+          Main Menu
+        </button>
+        <button className="nav-button" onClick={(): void => {
+          fetchTransactions();
+        }}>
+          Transactions
+        </button>
+        <button className="nav-button" onClick={handleLogOutClick}>
+          Log Out
+        </button>
       </div>
 
-      {/* Main Dashboard Content */}
       <div className="main-content">
         <div className="payment-receipts">
           <h1>Transactions</h1>
           {transactions.length > 0 ? (
-            transactions.map((transaction, index) => (
-              <div className="Transaction-details-box">
-                <div className="receipt-item" key={index}>
-                  <span>
-                    {new Date(transaction.transactionDate).toLocaleDateString()} {transaction.transactionDescription} ${transaction.transferAmount.$numberDecimal}
-                  </span>
-                  <div>
+            transactions.map((transaction) => (
+              <div className="Transaction-details-box" key={transaction._id}>
+                <div className="receipt-item">
+                  <div className="transaction-header">
+                    <div className="transaction-date">
+                      {new Date(transaction.transactionDate).toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </div>
                     <TransactionStatus status={transaction.approvalStatus} />
+                  </div>
+                  
+                  <div className="transaction-details">
+                    <div className="detail-item">
+                      <span className="detail-label">Description</span>
+                      <span className="detail-value">{transaction.transactionDescription}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="detail-label">Amount</span>
+                      <span className="detail-value transaction-amount">
+                        ${parseFloat(transaction.transferAmount.$numberDecimal).toFixed(2)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

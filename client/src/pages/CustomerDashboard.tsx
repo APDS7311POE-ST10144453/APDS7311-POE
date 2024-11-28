@@ -8,8 +8,40 @@ import {
   getPayments,
   getBalance,
 } from "../services/dataRequestService";
+import { Logger } from "../utils/logger";
 
-function CustomerDashboard() {
+/**
+ * The `CustomerDashboard` component represents the main dashboard for a customer.
+ * It handles user authentication, fetches user data, and displays the user's banking details and payment receipts.
+ *
+ * @returns {JSX.Element} The rendered customer dashboard component.
+ *
+ * @remarks
+ * - The component uses the `useNavigate` hook from `react-router-dom` for navigation.
+ * - It checks if the user is authenticated and redirects to the login page if not.
+ * - Fetches user data including username, account number, balance, and payment receipts.
+ * - Provides buttons for navigating to the main menu, transactions page, and logging out.
+ * - Allows the user to make a payment again using a previous receipt.
+ *
+ * @component
+ *
+ * @example
+ * ```tsx
+ * import React from 'react';
+ * import { CustomerDashboard } from './CustomerDashboard';
+ *
+ * function App() {
+ *   return (
+ *     <div className="App">
+ *       <CustomerDashboard />
+ *     </div>
+ *   );
+ * }
+ *
+ * export default App;
+ * ```
+ */
+function CustomerDashboard(): JSX.Element {
   const navigate = useNavigate();
   const alertShown = useRef(false); // Ref to track if the alert has been shown
   const [authChecked, setAuthChecked] = useState(false); // State to track if auth check is done
@@ -26,65 +58,135 @@ function CustomerDashboard() {
 
   const [username, setUsername] = useState("");
   const [accountNum, setAccountNum] = useState("");
-  const [ballance, setBallance] = useState("");
+  const [balance, setBalance] = useState("");
   interface Receipt {
-    id: string;
-    TransactionDate: string;
-    TransactionDescription: string;
-    transferAmount: number;
+    _id: string;
+    transactionDate: string;
+    transactionDescription: string;
+    transferAmount: {
+      $numberDecimal: string;
+    };
+    approvalStatus: string;
+    recipientName: string;
+    recipientBank: string;
+    recipientAccountNumber: string;
+    currency: string;
+    swiftCode: string;
   }
 
   const [receipts, setReceipts] = useState<Receipt[]>([]);
 
-  const handleLocalPaymentClick = () => {
+  const handleLocalPaymentClick = (): void => {
     navigate("/customer-payment-form");
   };
 
-  const handleMainMenuClick = () => {
+  const handleMainMenuClick = (): void => {
     navigate("/");
   };
 
-  const handleTransactionClick = () => {
+  const handleTransactionClick = (): void => {
     navigate("/transactions");
   };
 
   useEffect(() => {
     if (!authChecked) {
-      return; // Do nothing until auth check is done
+      return;
     }
 
     // Fetch the user's name when the component loads
-    async function fetchUsername() {
-      const name = await getUserName();
-      if (name) setUsername(name);
-    }
-    async function fetchUserAccountNum() {
-      const AN = await getUserAccountNum();
-      if (AN) setAccountNum(AN);
-    }
-    async function fetchUserReceipts() {
-      const receipts = await getPayments();
-      if (receipts) setReceipts(receipts);
+    async function fetchUserData(): Promise<void> {
+      try {
+        const [
+          nameResponse,
+          accountResponse,
+          balanceResponse,
+          paymentsResponse,
+        ] = await Promise.all([
+          getUserName() as Promise<string>,
+          getUserAccountNum() as Promise<string>,
+          getBalance() as Promise<string>,
+          getPayments() as Promise<Receipt[]>,
+        ]);
+
+        if (typeof nameResponse === "string") {
+          setUsername(nameResponse);
+        }
+        if (typeof accountResponse === "string") {
+          setAccountNum(accountResponse);
+        }
+        if (typeof balanceResponse === "string") {
+          setBalance(balanceResponse);
+        }
+        if (Array.isArray(paymentsResponse)) {
+          setReceipts(paymentsResponse);
+        }
+      } catch (error) {
+        const logger = new Logger();
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        logger.error(`Error fetching user data: ${errorMessage}`);
+      }
     }
 
-    async function fetchBalance() {
-      const B = await getBalance();
-      if (B) setBallance(B);
-    }
-
-    fetchUsername();
-    fetchUserAccountNum();
-    fetchBalance();
-    fetchUserReceipts();
+    void fetchUserData();
   }, [authChecked]);
 
   if (!authChecked) {
-    return null; // Render nothing until auth check is done
+    return <></>; // Render nothing until auth check is done
   }
 
-  const handleLogOutClick = () => {
+  const handleLogOutClick = (): void => {
     localStorage.removeItem("token");
     navigate("/login");
+  };
+
+  const handlePayAgain = async (receipt: Receipt): Promise<void> => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token == null) {
+        alert("Please log in to make a payment");
+        return;
+      }
+
+      // Send the encrypted account number directly without trying to re-encrypt
+      const response = await fetch(
+        "https://localhost:3000/api/transaction/transactFromReceipt",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            recipientName: receipt.recipientName,
+            recipientBank: receipt.recipientBank,
+            recipientAccountNumber: receipt.recipientAccountNumber, // Send encrypted account number
+            transferAmount: receipt.transferAmount.$numberDecimal,
+            currency: receipt.currency,
+            swiftCode: receipt.swiftCode,
+            transactionDescription: receipt.transactionDescription,
+            transactionDate: new Date().toISOString(),
+          }),
+        }
+      );
+
+      if (response.ok) {
+        alert("Payment initiated successfully!");
+        navigate("/transactions");
+      } else {
+        interface ErrorResponse {
+          error: string;
+        }
+        const errorData = (await response.json()) as ErrorResponse;
+        alert(`Payment failed: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert(
+        `Payment failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    }
   };
 
   return (
@@ -123,7 +225,7 @@ function CustomerDashboard() {
             <div className="details-box">
               <p>Acc No: {accountNum}</p>
               <p>
-                <strong>Available Balance</strong>: $ {ballance}
+                <strong>Available Balance</strong>: $ {balance}
               </p>
             </div>
           </div>
@@ -135,16 +237,53 @@ function CustomerDashboard() {
           <div className="details-box">
             {receipts.length > 0 ? (
               receipts.map((receipt) => (
-                <div key={receipt.id} className="receipt-item">
-                  <span>
-                    {receipt.TransactionDate} {receipt.TransactionDescription} $
-                    {receipt.transferAmount}
-                  </span>
-                  <button className="pay-again-button">Pay again</button>
+                <div key={`receipt-${receipt._id}`} className="receipt-card">
+                  <div className="receipt-header">
+                    <h4>Payment Receipt</h4>
+                    <span className="receipt-date">
+                      {new Date(receipt.transactionDate).toLocaleString(
+                        "en-US",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
+                    </span>
+                  </div>
+                  <div className="receipt-body">
+                    <div className="receipt-row">
+                      <span className="receipt-label">Description:</span>
+                      <span className="receipt-value">
+                        {receipt.transactionDescription}
+                      </span>
+                    </div>
+                    <div className="receipt-row">
+                      <span className="receipt-label">Amount:</span>
+                      <span className="receipt-value receipt-amount">
+                        $
+                        {parseFloat(
+                          receipt.transferAmount.$numberDecimal
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="receipt-footer">
+                    <button
+                      className="pay-again-button"
+                      onClick={() => {
+                        void handlePayAgain(receipt);
+                      }}
+                    >
+                      Pay again
+                    </button>
+                  </div>
                 </div>
               ))
             ) : (
-              <p>No receipts found.</p>
+              <p>No completed payments found.</p>
             )}
           </div>
         </div>

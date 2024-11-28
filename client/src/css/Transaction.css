@@ -1,27 +1,104 @@
+/* Status Badges */
 .transaction-status {
-    padding: 5px 10px;
-    border-radius: 4px;
+    padding: 8px 16px;
+    border-radius: 20px;
     font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: white;
+    display: inline-block;
+    text-transform: capitalize;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .transaction-status.approved {
-    background-color: green;
+    background-color: #2ecc71;
 }
 
 .transaction-status.pending {
-    background-color: orange;
+    background-color: #f1c40f;
 }
 
-.transaction-status.declined {
-    background-color: red;
+.transaction-status.denied {
+    background-color: #e74c3c;
 }
+
+.transaction-status.completed {
+    background-color: #3498db;
+}
+
+/* Transaction Card */
 .Transaction-details-box {
-    padding: 20px;
-    background-color: #2c2c2c7c; /* Added a dark background color */
-    border: 5px solid #19aa6b;
+    padding: 1.5rem;
+    background-color: #2c2c2c7c;
+    border: 2px solid #19aa6b;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.Transaction-details-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Transaction Content Layout */
+.receipt-item {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.transaction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #19aa6b;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.transaction-date {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.transaction-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.detail-label {
+    color: #19aa6b;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.transaction-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #19aa6b;
+}
+
+.transaction-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #19aa6b;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
 }

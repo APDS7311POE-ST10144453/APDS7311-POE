@@ -23,6 +23,10 @@ const userschema = mongoose.Schema({
     type: String,
     required: true,
   },
+  passwordSalt: {
+    type: String,
+    required: true,
+  },
   role: {
     type: String,
     enum: ["customer", "employee"],
@@ -30,8 +34,14 @@ const userschema = mongoose.Schema({
   },
   balance: {
     type: Decimal128,
-    required: true,
+    required: false,
+  },
+  accountLookupHash: {
+    type: String,
+    required: false,
+    index: true
   },
 });
 
 module.exports = mongoose.model("User", userschema);
+

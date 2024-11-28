@@ -1,0 +1,12 @@
+{
+  "push": {
+    "ref": "refs/heads/main",
+    "head_commit": {
+      "id": "test-commit-id"
+    },
+    "modified": [
+      "server/src/app.js",
+      "client/src/App.tsx"
+    ]
+  }
+}

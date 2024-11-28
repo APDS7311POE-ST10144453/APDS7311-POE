@@ -1,13 +1,99 @@
 name: Deploy Backend
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  dependencies:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
+      - name: Install dependencies
+        run: |
+          cd server && npm install
+          cd ../client && npm install
+
+  security-checks:
+    needs: dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [backend, frontend]
+        include:
+          - target: backend
+            path: ./server
+          - target: frontend
+            path: ./client
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          cd ${{ matrix.path }}
+          npm install
+
+      - name: Cache Snyk
+        uses: actions/cache@v4
+        with:
+          path: ~/.snyk
+          key: ${{ runner.os }}-snyk-${{ hashFiles('**/.snyk') }}
+          restore-keys: |
+            ${{ runner.os }}-snyk-
+
+      - name: Run Snyk Security Check
+        if: ${{ !env.ACT }}
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --severity-threshold=high --file=${{ matrix.path }}/package.json
+
+      - name: Skip Snyk in local environment
+        if: ${{ env.ACT }}
+        run: echo "Skipping Snyk security check in local environment"
+
+      - name: Monitor Dependencies
+        if: ${{ !env.ACT }}
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          args: --file=${{ matrix.path }}/package.json
+
+      - name: Skip Monitoring in local environment
+        if: ${{ env.ACT }}
+        run: echo "Skipping Snyk monitoring in local environment"
+
+  build-and-deploy:
+    needs: security-checks
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -16,6 +102,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install --verbose
@@ -30,11 +117,10 @@ jobs:
         working-directory: ./server
 
       - name: Deploy to Server
-        run: |
-          # Deployment script here
         working-directory: ./server
         env:
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           MY_SECRET_PEPPER: ${{ secrets.MY_SECRET_PEPPER }}
+        run: echo "Add your deployment commands here"

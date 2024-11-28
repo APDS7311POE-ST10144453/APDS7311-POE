@@ -1,53 +1,140 @@
 name: Node.js CI
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
+    paths:
+      - 'server/**'
+      - 'client/**'
+      - '.github/workflows/Testing.yml'
   pull_request:
     branches: [main]
+    paths:
+      - 'server/**'
+      - 'client/**'
+      - '.github/workflows/Testing.yml'
 
 permissions:
   contents: read
   checks: write
+  security-events: write
 
 jobs:
-  build:
+  dependencies:
+    timeout-minutes: 15
+    outputs:
+      cache-hit: ${{ steps.npm-cache.outputs.cache-hit }}
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Cache npm dependencies
+        id: npm-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
 
+      - name: Install dependencies
+        run: |
+          cd server && npm install
+          cd ../client && npm install
+
+  security:
+    needs: dependencies
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [20.x]
-
+        target: [backend, frontend]
+        include:
+          - target: backend
+            path: ./server
+            project: APDS-Backend
+          - target: frontend
+            path: ./client
+            project: APDS-Frontend
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
+      - name: Install Dependencies
+        run: |
+          cd ${{ matrix.path }}
+          npm install
+          
+      - name: Cache OWASP Dependency Check
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-dependency-check-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-dependency-check-
+
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: ${{ matrix.project }}
+          path: ${{ matrix.path }}
+          format: 'HTML'
+          out: './reports/${{ matrix.target }}'
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+            --nodePackageSkipDevDependencies false
+
+      - name: Upload dependency check report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report-${{ matrix.target }}
+          path: ./reports/${{ matrix.target }}
+          if-no-files-found: warn
+
+  tests:
+    needs: dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Restore npm cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
 
       - name: Install dependencies
-        run: npm install
         working-directory: ./server
+        run: npm install
 
       - name: Create test results directory
-        run: mkdir -p server/test-results
+        run: mkdir -p test-results
         working-directory: ./server
 
       - name: Run tests
         run: npm test
-        working-directory: ./server
-
-      - name: List test results directory
-        run: ls -la test-results
-        working-directory: ./server
-
-      - name: Add delay
-        run: sleep 5
-
-      - name: Debug:List GitHub workspace
-        run: ls -la ${{ github.workspace }}
         working-directory: ./server
 
       - name: Upload test results
@@ -58,9 +145,143 @@ jobs:
           if-no-files-found: warn
           include-hidden-files: false
 
-      - name: Publish test results to Dorny
+      - name: Publish test results
+        if: ${{ !env.ACT && (success() || failure()) }}
         uses: dorny/test-reporter@v1
         with:
           name: Mocha Tests
           path: ${{ github.workspace }}/server/test-results/test-results.json
           reporter: mocha-json
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create test environment
+        run: |
+          cd server
+          echo "CONNECTION_STRING=${{ secrets.CONNECTION_STRING }}" >> .env.test
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.test
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env.test
+          echo "MY_SECRET_PEPPER=${{ secrets.MY_SECRET_PEPPER }}" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+
+  lint:
+    needs: dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Restore npm cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install dependencies for server
+        working-directory: ./server
+        run: npm install
+
+      - name: Install dependencies for client
+        working-directory: ./client
+        run: npm install
+
+      - name: Run ESLint on client
+        working-directory: ./client
+        run: npm run lint
+
+      - name: Run ESLint on server
+        working-directory: ./server
+        run: npm run lint
+
+      - name: Upload ESLint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-results
+          path: |
+            **/eslint-results.json
+          if-no-files-found: warn
+
+  build:
+    needs: [security, tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Build server
+        run: |
+          cd server
+          npm install
+          npm run build
+
+      - name: Build client
+        run: |
+          cd client
+          echo "VITE_SWIFT_CODE_VALIDATOR_API_KEY=${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}" >> .env
+          echo "REACT_APP_ENCRYPTION_KEY=${{ secrets.REACT_APP_ENCRYPTION_KEY }}" >> .env
+          npm install
+          npm run build
+        env:
+          VITE_SWIFT_CODE_VALIDATOR_API_KEY: ${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}
+          REACT_APP_ENCRYPTION_KEY: ${{ secrets.REACT_APP_ENCRYPTION_KEY }}
+
+      - run: echo "Build complete"
+
+  bundle-analysis:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Create .env file
+        working-directory: ./client
+        run: |
+          echo "VITE_SWIFT_CODE_VALIDATOR_API_KEY=${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}" >> .env
+          echo "REACT_APP_ENCRYPTION_KEY=${{ secrets.REACT_APP_ENCRYPTION_KEY }}" >> .env
+
+      - name: Build with bundle analysis
+        working-directory: ./client
+        run: npm run build:analyze
+        env:
+          VITE_SWIFT_CODE_VALIDATOR_API_KEY: ${{ secrets.VITE_SWIFT_CODE_VALIDATOR_API_KEY }}
+          REACT_APP_ENCRYPTION_KEY: ${{ secrets.REACT_APP_ENCRYPTION_KEY }}
+
+      - name: Check bundle size
+        working-directory: ./client
+        run: |
+          MAX_SIZE_KB=250
+          BUNDLE_SIZE_KB=$(du -k dist/assets/*.js | awk '{sum += $1} END {print sum}')
+          if [ "$BUNDLE_SIZE_KB" -gt "$MAX_SIZE_KB" ]; then
+            echo "Bundle size ($BUNDLE_SIZE_KB KB) exceeds maximum allowed size ($MAX_SIZE_KB KB)"
+            exit 1
+          fi
+          echo "Bundle size ($BUNDLE_SIZE_KB KB) is within limits"
+
+      - name: Upload bundle analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-analysis
+          path: client/dist/stats.html
+          retention-days: 7

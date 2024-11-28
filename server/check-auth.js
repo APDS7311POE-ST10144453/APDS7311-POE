@@ -1,10 +1,16 @@
 const jwt = require('jsonwebtoken');
-
-console.log("checkAuth middleware called");
-
+/**
+ * Middleware function to check authentication.
+ * 
+ * This function checks for the presence of an authorization header in the request.
+ * If the header is present, it verifies the JWT token using the secret key.
+ * If the token is valid, it attaches the decoded user information to the request object.
+ * If the token is missing or invalid, it responds with a 401 status and an error message.
+ * 
+ * @returns {Function} Middleware function to handle authentication.
+ */
 const checkAuth = () => {
   return (req, res, next) => {
-    console.log(req, res, next);  // Log req, res, and next to debug
     try {
       if (!req.headers.authorization) {
         throw new Error("Authentication token not found.");
